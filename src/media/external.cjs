@@ -14,11 +14,19 @@ const MAX_MANIFEST_BYTES = 1024 * 1024;
 const MAX_STDIO_BYTES = 64 * 1024;
 const MAX_TIMEOUT_MS = 60 * 60 * 1000;
 const MAX_SCRATCH_BYTES = 300 * 1024 ** 3;
+const DEFAULT_CONNECTIONS = 4;
+const MIN_CONNECTIONS = 1;
+const MAX_CONNECTIONS = 16;
 
 function abortError() { return Object.assign(Error('Aborted'), { name: 'AbortError' }); }
-function safeTool(tools) {
+function safeTool(tools, requireAria2c = false) {
   if (!tools || !['ytDlp', 'ffmpeg', 'jsRuntime'].every(key => typeof tools[key] === 'string' && path.isAbsolute(tools[key]))) throw Error('Media tools are unavailable. Install the bundled yt-dlp and FFmpeg tools.');
+  if (requireAria2c && (typeof tools.aria2c !== 'string' || !path.isAbsolute(tools.aria2c))) throw Error('Media tools are unavailable. Install the bundled aria2c tool for YouTube downloads.');
   return tools;
+}
+function validatedConnections(value) {
+  if (!Number.isSafeInteger(value) || value < MIN_CONNECTIONS || value > MAX_CONNECTIONS) throw Error(`Connections must be an integer from ${MIN_CONNECTIONS} to ${MAX_CONNECTIONS}`);
+  return value;
 }
 function canonicalYouTubeUrl(value) {
   const url = checkedUrl(value);
@@ -73,8 +81,20 @@ async function preflightDash(value, headers = {}, signal) {
 async function createDashRelay({ finalUrl, manifest, signal, maxBytes }) {
   const origin = new URL(finalUrl).origin;
   const manifestPath = new URL(finalUrl).pathname + new URL(finalUrl).search;
+  let receivedBytes = 0;
+  let budgetError = null;
+  const upstreams = new Set();
+  const responses = new Set();
+  const abortRelay = error => {
+    budgetError ||= error;
+    for (const upstream of upstreams) upstream.destroy(budgetError);
+    for (const response of responses) response.destroy(budgetError);
+  };
   const server = http.createServer(async (request, response) => {
+    let upstream;
+    responses.add(response);
     try {
+      if (budgetError) throw budgetError;
       if (!['GET', 'HEAD'].includes(request.method || '') || typeof request.url !== 'string') throw Error('Unsupported relay request');
       if (request.url === manifestPath) {
         response.writeHead(200, { 'content-type': 'application/dash+xml', 'content-length': manifest.length });
@@ -87,15 +107,27 @@ async function createDashRelay({ finalUrl, manifest, signal, maxBytes }) {
       if (targetUrl.origin !== origin) throw Error('Relay origin mismatch');
       const target = checkedUrl(targetUrl.href);
       const result = await retryRequest(target.href, range ? { range } : {}, signal);
+      upstream = result.response; upstreams.add(upstream);
       const responseHeaders = {};
       for (const name of ['content-type', 'content-length', 'content-range', 'accept-ranges']) if (result.response.headers[name]) responseHeaders[name] = result.response.headers[name];
-      response.writeHead(result.response.statusCode || 502, responseHeaders);
-      if (request.method === 'HEAD') { result.response.destroy(); response.end(); return; }
-      let bytes = 0;
-      if (contentLength(result.response) > maxBytes) throw Error('DASH relay resource exceeds size limit');
-      for await (const chunk of result.response) { bytes += chunk.length; if (bytes > maxBytes) throw Error('DASH relay resource exceeds size limit'); if (!response.write(chunk)) await new Promise(resolve => response.once('drain', resolve)); }
+      if (contentLength(upstream) > maxBytes - receivedBytes) { abortRelay(Error('DASH relay resource budget exceeded')); throw budgetError; }
+      response.writeHead(upstream.statusCode || 502, responseHeaders);
+      if (request.method === 'HEAD') { upstream.destroy(); response.end(); return; }
+      for await (const chunk of upstream) {
+        if (budgetError) throw budgetError;
+        receivedBytes += chunk.length;
+        if (receivedBytes > maxBytes) { abortRelay(Error('DASH relay resource budget exceeded')); throw budgetError; }
+        if (!response.write(chunk)) await new Promise(resolve => response.once('drain', resolve));
+      }
       response.end();
-    } catch (error) { if (!response.headersSent) response.writeHead(502); response.end(); }
+    } catch (error) {
+      if (response.destroyed) return;
+      if (!response.headersSent) { response.writeHead(502); response.end(); }
+      else response.destroy(error);
+    } finally {
+      if (upstream) upstreams.delete(upstream);
+      responses.delete(response);
+    }
   });
   await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
   const port = server.address().port;
@@ -118,7 +150,7 @@ function terminate(child) {
   }
 }
 function mediaToolEnv(tools) {
-  const runtimePaths = [path.dirname(tools.ytDlp), path.dirname(tools.ffmpeg), path.dirname(tools.jsRuntime)];
+  const runtimePaths = [...new Set([tools.ytDlp, tools.ffmpeg, tools.jsRuntime, tools.aria2c].filter(value => typeof value === 'string' && path.isAbsolute(value)).map(path.dirname))];
   if (process.platform === 'win32') {
     const systemRoot = process.env.SystemRoot || process.env.WINDIR || 'C:\\Windows';
     return { ELECTRON_RUN_AS_NODE: '1', SystemRoot: systemRoot, WINDIR: systemRoot, TEMP: process.env.TEMP || path.join(systemRoot, 'Temp'), TMP: process.env.TMP || process.env.TEMP || path.join(systemRoot, 'Temp'), PATH: [...runtimePaths, path.join(systemRoot, 'System32')].join(';') };
@@ -194,14 +226,24 @@ async function validateMediaOutput(filename, ffmpeg, signal) {
   });
 }
 async function defaultTools() { return require('../tools/media-tools.cjs').resolveTools(); }
-async function downloadExternal({ url, mediaType, headers = {}, output, signal, maxBytes, speedLimit = 0, onProgress = () => {}, timeoutMs = 30 * 60 * 1000, tools, toolArgsPrefix = [], validateOutput = validateMediaOutput }) {
+function aria2Arguments(connections, speedLimit) {
+  const options = [
+    `--max-connection-per-server=${connections}`, `--split=${connections}`, '--min-split-size=1M', '--no-conf=true', '--no-netrc=true', '--max-concurrent-downloads=1', '--follow-torrent=false', '--follow-metalink=false',
+    '--enable-rpc=false', '--enable-dht=false', '--enable-dht6=false', '--enable-peer-exchange=false', '--bt-enable-lpd=false', '--check-certificate=true',
+    '--file-allocation=none', '--allow-overwrite=false', '--auto-file-renaming=false', '--console-log-level=warn', '--summary-interval=0', '--download-result=hide'
+  ];
+  if (speedLimit) options.push(`--max-download-limit=${speedLimit}`, `--max-overall-download-limit=${speedLimit}`);
+  return `aria2c:${options.join(' ')}`;
+}
+async function downloadExternal({ url, mediaType, headers = {}, output, signal, maxBytes, connections = DEFAULT_CONNECTIONS, speedLimit = 0, onProgress = () => {}, timeoutMs = 30 * 60 * 1000, tools, toolArgsPrefix = [], validateOutput = validateMediaOutput }) {
   if (!['dash', 'youtube'].includes(mediaType)) throw Error('External media type must be dash or youtube');
   if (typeof output !== 'string' || !path.isAbsolute(output) || !Number.isSafeInteger(maxBytes) || maxBytes < 1) throw Error('Invalid external media output or size limit');
   if (!Number.isSafeInteger(speedLimit) || speedLimit < 0 || !Number.isSafeInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > MAX_TIMEOUT_MS) throw Error('Invalid external media limits');
+  const actualConnections = validatedConnections(connections);
   if (signal?.aborted) throw abortError();
   rejectCredentialHeaders(headers);
-  const actualTools = safeTool(tools || await defaultTools());
   const youtubeSource = mediaType === 'youtube' ? canonicalYouTubeUrl(url) : null;
+  const actualTools = safeTool(tools || await defaultTools(), mediaType === 'youtube');
   const preflight = mediaType === 'dash' ? await preflightDash(url, headers, signal) : null;
   let relay;
   const scratch = path.join(path.dirname(output), `.flowdm-external-${crypto.randomUUID()}`);
@@ -212,14 +254,23 @@ async function downloadExternal({ url, mediaType, headers = {}, output, signal, 
   const source = relay ? relay.url : youtubeSource;
   const finalSource = preflight?.finalUrl || source;
   const template = path.join(scratch, 'media.%(ext)s');
+  const nativeConnections = speedLimit ? Math.min(actualConnections, speedLimit) : actualConnections;
+  const nativeRate = speedLimit ? Math.max(1, Math.floor(speedLimit / nativeConnections)) : 0;
+  const youtubeFormat = 'bv*[vcodec^=avc1][height<=1080][protocol=m3u8_native]+ba[acodec^=mp4a][ext=m4a]/bv*[vcodec^=avc1][height<=1080][ext=mp4]+ba[acodec^=mp4a][ext=m4a]/b[ext=mp4]';
   const args = [
     ...toolArgsPrefix, '--ignore-config', '--no-plugin-dirs', '--no-remote-components', '--no-playlist', '--no-overwrites', '--no-part', '--no-cache-dir', '--no-mtime', '--no-simulate',
     '--newline', '--progress', '--progress-template', 'download:flowdm-progress:%(progress.downloaded_bytes)s:%(progress.total_bytes_estimate)s',
     '--print', 'after_move:flowdm-file:%(filepath)s', '--ffmpeg-location', actualTools.ffmpeg, '--js-runtimes', `node:${actualTools.jsRuntime}`,
-    '--merge-output-format', 'mp4', '--format', mediaType === 'youtube' ? 'bv*[vcodec^=avc1][height<=1080][ext=mp4]+ba[acodec^=mp4a][ext=m4a]/b[ext=mp4]' : 'bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]', '--max-filesize', String(maxBytes), '-o', template
+    '--merge-output-format', 'mp4', '--format', mediaType === 'youtube' ? youtubeFormat : 'bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]', '--max-filesize', String(maxBytes), '-o', template
   ];
-  if (mediaType === 'youtube') args.push('--match-filter', "live_status != 'is_live' & live_status != 'is_upcoming' & live_status != 'post_live'");
-  if (speedLimit) args.push('--limit-rate', String(speedLimit));
+  if (mediaType === 'youtube') {
+    args.push('--match-filter', "live_status != 'is_live' & live_status != 'is_upcoming' & live_status != 'post_live'", '--downloader', `http:${actualTools.aria2c}`, '--downloader-args', aria2Arguments(actualConnections, speedLimit), '--downloader', 'dash,m3u8:native', '--concurrent-fragments', String(nativeConnections));
+  } else {
+    args.push('--downloader', 'dash,m3u8:native', '--concurrent-fragments', String(nativeConnections));
+    // yt-dlp applies limit-rate per native fragment, so divide it to retain the job-wide cap.
+    if (speedLimit) args.push('--limit-rate', String(nativeRate));
+  }
+  if (mediaType === 'youtube' && speedLimit) args.push('--limit-rate', String(nativeRate));
   args.push('--batch-file', '-');
   let child; let stopReason = null; let resultPath; let stderr = Buffer.alloc(0); let stdout = Buffer.alloc(0); let stdoutTail = '';
   let timer; let sizeTimer; let scratchError = null; let checkingScratch = false;
@@ -270,4 +321,4 @@ async function downloadExternal({ url, mediaType, headers = {}, output, signal, 
     await fs.rm(scratch, { recursive: true, force: true }).catch(() => {});
   }
 }
-module.exports = { canonicalYouTubeUrl, preflightDash, downloadExternal, rejectCredentialHeaders, createDashRelay, validateMediaOutput, mediaToolEnv };
+module.exports = { canonicalYouTubeUrl, preflightDash, downloadExternal, rejectCredentialHeaders, createDashRelay, validateMediaOutput, mediaToolEnv, aria2Arguments };

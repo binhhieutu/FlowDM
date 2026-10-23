@@ -1,0 +1,43 @@
+{
+  "at": "2026-10-23T17:19:08.006Z",
+  "packaged": false,
+  "fixedResourceLatencyMs": 400,
+  "rows": [
+    {
+      "mediaType": "hls",
+      "connections": 1,
+      "peakRequests": 1,
+      "resourceRequests": 3,
+      "milliseconds": 1317,
+      "bytes": 47188,
+      "sha256": "8fd49049fe73583d0e179541f59b57090178a412cd8676250cabbcb6f0bfbc4e"
+    },
+    {
+      "mediaType": "hls",
+      "connections": 4,
+      "peakRequests": 3,
+      "resourceRequests": 3,
+      "milliseconds": 457,
+      "bytes": 47188,
+      "sha256": "8fd49049fe73583d0e179541f59b57090178a412cd8676250cabbcb6f0bfbc4e"
+    },
+    {
+      "mediaType": "dash",
+      "connections": 1,
+      "peakRequests": 1,
+      "resourceRequests": 8,
+      "milliseconds": 5132,
+      "bytes": 41899,
+      "sha256": "47486d3f87501c7cc371156ee296cfb3094e28768ef4ac413bc187003923717b"
+    },
+    {
+      "mediaType": "dash",
+      "connections": 4,
+      "peakRequests": 4,
+      "resourceRequests": 8,
+      "milliseconds": 2862,
+      "bytes": 41899,
+      "sha256": "47486d3f87501c7cc371156ee296cfb3094e28768ef4ac413bc187003923717b"
+    }
+  ]
+}

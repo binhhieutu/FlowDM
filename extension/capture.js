@@ -2,7 +2,7 @@
 (function(root){
   const httpUrl=value=>{try{const u=new URL(value);return ['http:','https:'].includes(u.protocol)&&!u.username&&!u.password?u.href:null;}catch{return null;}};
   function createCapture(chrome,{timeoutMs=5000,pauseRetryMs=50,userAgent=()=>root.navigator?.userAgent||'',uuid=()=>crypto.randomUUID(),onStatus=()=>{}}={}){
-    const settings={autoCapture:true,credentials:{}};const handled=new Set();const pausing=new Set();const requests=new Map();
+    const settings={autoCapture:true,credentials:{},connections:4};const handled=new Set();const pausing=new Set();const requests=new Map();
     const consentEpochs=new Map();let permissionEpoch=0;
     const context=origin=>({origin,consent:settings.credentials[origin]===true,consentEpoch:consentEpochs.get(origin)||0,permissionEpoch});
     const validContext=stamp=>stamp.consentEpoch===(consentEpochs.get(stamp.origin)||0)&&stamp.permissionEpoch===permissionEpoch&&stamp.consent===(settings.credentials[stamp.origin]===true);
@@ -46,7 +46,7 @@
         const has=name=>Object.keys(headers).some(key=>key.toLowerCase()===name);
         const agent=userAgent();if(!has('user-agent')&&typeof agent==='string'&&agent.length<=2048&&!/[\u0000-\u001f\u007f]/.test(agent)&&agent)headers['User-Agent']=agent;
       }
-      return {url,...(input.filename?{filename:input.filename.split(/[\\/]/).pop()}:{}),...(mediaType?{mediaType}:{}),...(Object.keys(headers).length?{headers}:{})};
+      return {url,connections:Number.isInteger(settings.connections)&&settings.connections>=1&&settings.connections<=16?settings.connections:4,...(input.filename?{filename:input.filename.split(/[\\/]/).pop()}:{}),...(mediaType?{mediaType}:{}),...(Object.keys(headers).length?{headers}:{})};
     }
     async function cookieHeaders(url,stamp){
       if(!settings.credentials[new URL(url).origin]||!chrome.cookies||!chrome.permissions)return {};

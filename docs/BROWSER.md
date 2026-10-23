@@ -1,4 +1,4 @@
-# Cầu nối trình duyệt FlowDM 0.3
+# Cầu nối trình duyệt FlowDM 0.4
 
 Tiện ích Manifest V3 dành cho Chromium tự chuyển tải HTTP/HTTPS sang FlowDM và cho người dùng chọn tải video. Ứng dụng phải đang mở. Windows đóng gói không cần cài Node.js ngoài.
 
@@ -9,6 +9,8 @@ Tiện ích Manifest V3 dành cho Chromium tự chuyển tải HTTP/HTTPS sang F
 3. Vào `chrome://extensions` hoặc `edge://extensions`, bật Developer mode, chọn **Load unpacked / Tải tiện ích đã giải nén**, rồi chọn đúng thư mục vừa mở.
 4. Sao chép ID tiện ích gồm 32 ký tự a–p, dán vào FlowDM và nhấn **Kết nối**. Ghim tiện ích trên thanh công cụ nếu muốn mở popup nhanh.
 5. Thử một tệp HTTP/HTTPS. Popup/huy hiệu và danh sách FlowDM hiển thị kết quả; kiểm tra tác vụ trong ứng dụng.
+
+Khi nâng cấp từ 0.3 hoặc cũ hơn, hãy ngắt/kết nối lại native host trong FlowDM, xuất lại thư mục tiện ích, rồi nhấn **Reload / Tải lại** cho tiện ích unpacked. Giao thức 0.4 thêm trường `connections`; dùng lẫn host và tiện ích cũ/mới có thể làm mất lựa chọn 1/2/4/8/16 của popup.
 
 FlowDM chỉ đăng ký native host cho tài khoản hiện tại và đúng ID tiện ích. Trên Windows, ứng dụng tạo bản runtime Electron/Node ở vị trí ổn định trong dữ liệu người dùng; host không phụ thuộc đường dẫn giải nén tạm của portable hoặc Node.js cài riêng. Không đổi trang chủ hay sửa các tiện ích khác.
 
@@ -32,9 +34,11 @@ Tiện ích theo dõi video/audio/source động và phản hồi mạng để t
 
 Nhấn **Tải video bằng FlowDM** cạnh media hoặc nút YouTube trên trang, hay chọn **Tải bằng FlowDM** trong danh sách popup. Nút trên trang chỉ nhận click thật của người dùng; click do JavaScript trang tạo bị bỏ qua. Dán URL MPD hoặc URL YouTube công khai vào FlowDM cũng tự nhận loại tải.
 
+Popup cho phép chọn tối đa 1/2/4/8/16 kết nối cho lượt bàn giao tiếp theo và lưu lựa chọn này. Đây là mức trần: tệp nhỏ, playlist ít đoạn hoặc server/CDN hạn chế có thể tạo ít request song song hơn. HLS dùng cửa sổ worker hữu hạn và ghép đúng thứ tự qua đĩa; DASH dùng fragment downloader native của yt-dlp. Không có tài nguyên nào đồng thời bị nhân song song qua hai tầng.
+
 HLS chỉ hỗ trợ VOD có ENDLIST, không mã hóa, các đoạn MPEG-TS hoặc fMP4 với một initialization map. Có thể chọn variant từ master. DASH chỉ hỗ trợ MPD tĩnh không DRM qua HTTP(S), video/audio tách riêng và ghép MP4; từ chối live, DRM/mã hóa, CDATA, tham chiếu namespace/remote, byte range và cấu trúc ngoài parser hiện có. Tạm dừng/tiếp tục/thử lại HLS hoặc DASH tải lại toàn bộ nội dung.
 
-YouTube chỉ nhận video công khai ở `youtube.com/watch`, `youtube.com/shorts`, `youtu.be` và dạng mobile được chuẩn hóa về URL video tương ứng. Mặc định tải H.264 tối đa 1080p cùng M4A rồi ghép MP4. Không có bộ chọn chất lượng và không tuyên bố hỗ trợ 4K. Không hỗ trợ video đăng nhập/private, age wall, DRM, live, PO token, plugin hay cách vượt bảo vệ website. Tạm dừng/tiếp tục/thử lại YouTube tải lại toàn bộ.
+YouTube chỉ nhận video công khai ở `youtube.com/watch`, `youtube.com/shorts`, `youtu.be` và dạng mobile được chuẩn hóa về URL video tương ứng. Mặc định ưu tiên HLS native H.264 tối đa 1080p; aria2 tải AAC/M4A qua HTTP và tải tệp HTTP thông thường khi phải fallback, sau đó FFmpeg ghép MP4. Không có bộ chọn chất lượng và không tuyên bố hỗ trợ 4K. Không hỗ trợ video đăng nhập/private, age wall, DRM, live, PO token, plugin hay cách vượt bảo vệ website. Tạm dừng/tiếp tục/thử lại YouTube tải lại toàn bộ.
 
 Mặc định không chuyển Cookie, Authorization, Referer hoặc User-Agent. Khi cần đăng nhập:
 
@@ -46,20 +50,22 @@ Khi quan sát được Cookie/Authorization mà chưa có consent, tải tự đ
 
 Headers chỉ trong bộ nhớ; không ghi vào lịch sử. Bỏ quyền/consent hủy bàn giao còn chờ bằng thế hệ quyền, kể cả khi bật lại ngay. Headers nhạy cảm bị loại khi redirect hoặc tài nguyên chuyển origin. URL có signed query vẫn cần để tải/resume và được lưu trong lịch sử desktop; không chia sẻ thư mục dữ liệu. Danh sách media session có giới hạn và hết hạn, xóa khi điều hướng/đóng tab.
 
+Khi phần âm thanh hoặc fallback HTTP dùng aria2, URL CDN có chữ ký do yt-dlp trích xuất được truyền trong command line của tiến trình con trong thời gian tải. Tiến trình cùng tài khoản hoặc quyền cao hơn có thể quan sát nó. FlowDM không ghi URL này vào journal, log, lỗi, giao diện, ảnh chụp hoặc bằng chứng kiểm thử.
+
 ## Kiểm chứng và giao thức
 
-E2E 0.3 đã chạy trên Windows với Chrome for Testing 156 và Electron thật: native host sinh từ giao diện, capture tự động, tắt capture, host vắng mặt, fallback đăng nhập, consent cookie, video trực tiếp, HLS TS/fMP4, DASH popup video/audio tách riêng và YouTube công khai. Tải YouTube Big Buck Bunny hoàn tất với 634,624 giây, 288,738,744 byte, H.264 1080p/AAC và FFmpeg giải mã toàn bộ. Test dùng profile tạm và bản sao tiện ích cấp sẵn API cookies tùy chọn; consent theo origin của sản phẩm vẫn được bật/tắt và kiểm tra. Điều này không chứng minh hộp xin quyền tương tác đã được tự động hóa trên mọi bản Chrome/Edge. Báo cáo đóng gói sẽ ở [VERIFICATION_V3.md](VERIFICATION_V3.md); các báo cáo 0.1/0.2 giữ nguyên tính lịch sử.
+E2E 0.4 đã chạy nguồn trên Windows với Chromium/Electron thật: native host sinh từ giao diện, capture, lựa chọn kết nối, video trực tiếp, HLS TS/fMP4, DASH và YouTube công khai. Big Buck Bunny N=4 tải trong 21,258 giây; toàn bộ E2E gồm xác minh mất 49,787 giây. Video dài 634,624 giây, 288.972.332 byte, H.264 1920×1080/AAC và qua bước giải mã toàn bộ riêng bằng FFmpeg. Fixture cục bộ 400 ms/tài nguyên đo HLS N=1 1.317 ms/peak 1, N=4 457 ms/peak 3; DASH N=1 5.132 ms/peak 1, N=4 2.862 ms/peak 4, đầu ra byte-exact. Đây không phải cam kết tốc độ trên mọi máy/CDN. Test dùng profile tạm; chưa có xác minh media native Linux/macOS. Báo cáo 0.4 sẽ ở [VERIFICATION_V4.md](VERIFICATION_V4.md); các báo cáo cũ giữ nguyên tính lịch sử.
 
-Windows đóng gói kèm yt-dlp 2026.10.21 và FFmpeg 8.1 đã ghim hash, không cần Node.js ngoài. Source ZIP không kèm binary; chuẩn bị bundle Windows bằng `node scripts/prepare-media-tools.cjs "C:\đường-dẫn\ffmpeg.exe"`. Linux/macOS cần yt-dlp và FFmpeg trên `PATH` và chưa chạy kiểm thử native. CI có thể tải Gyan “latest” nhưng so hash ghim nên sẽ từ chối bản upstream khác.
+Windows đóng gói kèm yt-dlp 2026.10.21, FFmpeg 8.1 và aria2 1.37.0 đã ghim hash, không cần Node.js ngoài. Source ZIP không kèm binary; chuẩn bị bundle Windows bằng `node scripts/prepare-media-tools.cjs "C:\đường-dẫn\ffmpeg.exe"`. Linux/macOS cần `yt-dlp`, `ffmpeg` và `aria2c` trên `PATH` và chưa chạy kiểm thử media native. CI so hash ghim và từ chối binary khác.
 
-Chạy `npm test`, `npm run test:coverage` và `npm run test:e2e`. `FLOWDM_BROWSER_EXECUTABLE` chọn Chromium thử; `FLOWDM_FFMPEG` chọn bộ giải mã fixture; `FLOWDM_EXECUTABLE` chọn ứng dụng đóng gói. Xem [browser-capture-report.md](browser-capture-report.md) cho contract UI và kiểm thử giả lập; xem [xác minh bản 0.3](VERIFICATION_V3.md) khi báo cáo đóng gói đã được tạo.
+Chạy `npm test`, `npm run test:coverage` và `npm run test:e2e`. `FLOWDM_BROWSER_EXECUTABLE` chọn Chromium thử; `FLOWDM_FFMPEG` chọn bộ giải mã fixture; `FLOWDM_EXECUTABLE` chọn ứng dụng đóng gói. Xem [browser-capture-report.md](browser-capture-report.md) cho contract UI và kiểm thử giả lập; xem [xác minh bản 0.4](VERIFICATION_V4.md) khi báo cáo được tạo.
 
 Native Messaging dùng frame độ dài 4 byte theo byte order máy + JSON UTF-8, tối đa 1 MiB; stdout chỉ chứa frame. Request:
 
 ```json
-{"schema":1,"request_id":"unique-id","op":"add","payload":{"url":"https://example.com/movie.m3u8","mediaType":"hls"}}
+{"schema":1,"request_id":"unique-id","op":"add","payload":{"url":"https://example.com/movie.m3u8","mediaType":"hls","connections":4}}
 ```
 
-Payload còn cho phép `filename` và `headers` giới hạn; `mediaType` là `direct`, `hls`, `dash` hoặc `youtube`. DASH/YouTube không nhận browser headers. ACK thành công là `{"request_id":"unique-id","ok":true,"payload":{"id":"task-id"}}`. Trường dư, URL có credentials, scheme khác HTTP(S) hoặc headers ngoài danh sách cho phép bị từ chối.
+Payload còn cho phép `filename`, `headers` giới hạn và `connections` là số nguyên 1–16; `mediaType` là `direct`, `hls`, `dash` hoặc `youtube`. DASH/YouTube không nhận browser headers. ACK thành công là `{"request_id":"unique-id","ok":true,"payload":{"id":"task-id"}}`. Trường dư, URL có credentials, scheme khác HTTP(S), giá trị kết nối ngoài giới hạn hoặc headers ngoài danh sách cho phép bị từ chối.
 
 Host chuyển tới named pipe Windows/Unix socket có secret ngẫu nhiên mỗi phiên; không mở API TCP quản trị. Request ID chống lặp trong bộ nhớ desktop, không phải bảo đảm exactly-once bền vững qua restart. Dùng thư mục dữ liệu riêng của tài khoản, không đặt trên share/public. Không tuyên bố bảo vệ khỏi mã độc chạy cùng tài khoản.

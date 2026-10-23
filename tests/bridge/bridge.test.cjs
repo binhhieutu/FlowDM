@@ -12,6 +12,10 @@ const { createBridge } = require('../../src/bridge/server.cjs');
 const { dispatch } = require('../../src/bridge/client.cjs');
 assert.equal(require('../../src/bridge/index.cjs').createBridge,createBridge);
 const request = (id = 'test-1', url = 'https://example.com/ảnh.zip') => ({schema:1,request_id:id,op:'add',payload:{url}});
+test('bridge accepts only bounded integer connection choices', () => {
+  for (const connections of [1,2,4,8,16]) assert.equal(validRequest({ ...request(), payload: { url: 'https://example.com/video.mpd', mediaType: 'dash', connections } }), true);
+  for (const connections of [0,17,-1,1.5,'4',null]) assert.equal(validRequest({ ...request(), payload: { url: 'https://example.com/file', connections } }), false);
+});
 async function fixture(t, onAdd = async () => ({id:'task-1'})) {
   const dataDir = await fs.mkdtemp(path.join(os.tmpdir(),'flowdm-bridge-'));
   const server = await createBridge({dataDir,onAdd});

@@ -6,8 +6,9 @@ const capture=FlowDMCapture.createCapture(chrome,{onStatus:text=>{
  chrome.action.setTitle({title:`FlowDM: ${text}`});
 }});
 const media=FlowDMMedia.createMediaStore();
-const ready=Promise.all([chrome.storage.local.get({autoCapture:true,credentials:{}}),chrome.storage.session.get({detectedMedia:[]})]).then(async([saved,session])=>{
+const ready=Promise.all([chrome.storage.local.get({autoCapture:true,credentials:{},connections:4}),chrome.storage.session.get({detectedMedia:[]})]).then(async([saved,session])=>{
  Object.assign(capture.settings,saved);media.restore(session.detectedMedia);
+ capture.settings.connections=Number.isInteger(capture.settings.connections)&&capture.settings.connections>=1&&capture.settings.connections<=16?capture.settings.connections:4;
  const allowed=await chrome.permissions.contains({permissions:['cookies']});
  if(!allowed)capture.settings.credentials={};
 });
@@ -52,6 +53,7 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
   if(!extensionPage&&message?.type!=='flowdm:download')return {ok:false};
   if(message?.type==='flowdm:state')return {settings:capture.settings,status,items:await stateItems(message.tabId,extensionPage)};
   if(message?.type==='flowdm:settings'){
+   if(Object.hasOwn(message,'connections')){if(!Number.isInteger(message.connections)||message.connections<1||message.connections>16)return {ok:false};capture.settings.connections=message.connections;}
    if(typeof message.autoCapture==='boolean')capture.settings.autoCapture=message.autoCapture;
    const origin=FlowDMCapture.httpUrl(message.origin);
    if(origin&&typeof message.credentials==='boolean'){

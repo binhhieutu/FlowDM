@@ -137,6 +137,7 @@ test('real Chromium extension auto capture, video/HLS, cookie consent and host-d
   // Render the real popup for the active fixture page, then use its controls.
   await page.bringToFront(); await popup.reload();
   await popup.getByTestId('download-media').first().waitFor();
+  await popup.getByTestId('connections').selectOption('8');
   await popup.screenshot({ path: 'test-results/browser-popup-v2.png' });
   const hlsTasks = [];
   for (const name of ['list.m3u8', 'fmp4.m3u8']) {
@@ -146,9 +147,11 @@ test('real Chromium extension auto capture, video/HLS, cookie consent and host-d
   const expectedTs = Buffer.concat(await Promise.all(['segment00.ts', 'segment01.ts', 'segment02.ts'].map(name => fs.readFile(path.join(fixture, name)))));
   const expectedMp4 = Buffer.concat(await Promise.all(['init.mp4', 'fragment00.m4s', 'fragment01.m4s', 'fragment02.m4s'].map(name => fs.readFile(path.join(fixture, name)))));
   assert.deepEqual(await fs.readFile(hlsTasks[0].path), expectedTs); assert.deepEqual(await fs.readFile(hlsTasks[1].path), expectedMp4);
+  assert.ok(hlsTasks.every(item => item.connections === 8));
   await popup.locator('.media').filter({ hasText: 'manifest.mpd' }).getByTestId('download-media').click();
   const dash = await until(async () => (await tasks()).find(item => item.mediaType === 'dash' && ['completed', 'failed'].includes(item.status)), 'DASH download');
   assert.equal(dash.status, 'completed', JSON.stringify(dash));
+  assert.equal(dash.connections, 8);
   const dashProbe = spawnSync('ffprobe', ['-v', 'error', '-show_streams', '-of', 'json', dash.path], { encoding: 'utf8', windowsHide: true });
   assert.equal(dashProbe.status, 0, dashProbe.stderr); assert.deepEqual(JSON.parse(dashProbe.stdout).streams.map(stream => stream.codec_type).sort(), ['audio', 'video']);
   for (const item of [direct, ...hlsTasks, dash]) {
@@ -160,12 +163,14 @@ test('real Chromium extension auto capture, video/HLS, cookie consent and host-d
     const youtubePage = await context.newPage();
     await youtubePage.goto(process.env.FLOWDM_LIVE_YOUTUBE, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await youtubePage.bringToFront(); await popup.reload();
+    await popup.getByTestId('connections').selectOption('4');
     const youtubeRow = popup.locator('.media').filter({ hasText: 'YOUTUBE' });
     await youtubeRow.getByTestId('download-media').waitFor();
     await popup.screenshot({ path: 'test-results/youtube-browser-popup-v3.png' });
     await youtubeRow.getByTestId('download-media').click();
     const youtubeTask = await until(async () => (await tasks()).find(item => item.mediaType === 'youtube' && ['completed', 'failed'].includes(item.status)), 'YouTube browser handoff', 120000);
     assert.equal(youtubeTask.status, 'completed', JSON.stringify(youtubeTask));
+    assert.equal(youtubeTask.connections, 4);
     const youtubeProbe = spawnSync('ffprobe', ['-v', 'error', '-show_streams', '-of', 'json', youtubeTask.path], { encoding: 'utf8', windowsHide: true });
     assert.equal(youtubeProbe.status, 0, youtubeProbe.stderr); assert.deepEqual(JSON.parse(youtubeProbe.stdout).streams.map(stream => stream.codec_type).sort(), ['audio', 'video']);
     events.push('real-youtube-page-popup-to-native-completed');

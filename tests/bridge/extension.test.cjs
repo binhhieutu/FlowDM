@@ -4,6 +4,15 @@ const fs=require('node:fs/promises');
 const os=require('node:os');
 const path=require('node:path');
 const {backgroundFixture}=require('./extension-fixture.cjs');
+test('connection preference is trusted, bounded and included in native handoff',async()=>{
+ const f=backgroundFixture();
+ await f.message({type:'flowdm:settings',connections:8});
+ await f.listeners.clicked({menuItemId:'flowdm-add',linkUrl:'https://example.com/movie.mpd'});
+ assert.equal(f.messages.at(-1).request.payload.connections,8);
+ assert.equal((await f.message({type:'flowdm:settings',connections:17})).ok,false);
+ assert.equal((await f.message({type:'flowdm:settings',connections:16},{tab:{id:3}})).ok,false);
+ assert.equal((await f.message({type:'flowdm:state',tabId:3})).settings.connections,8);
+});
 test('context menu sends explicit valid URL and ignores blob URLs',async()=>{
  const f=backgroundFixture();f.listeners.installed();assert.equal(f.menus[0].title,'Tải bằng FlowDM');
  await f.listeners.clicked({menuItemId:'flowdm-add',linkUrl:'https://example.com/file'});

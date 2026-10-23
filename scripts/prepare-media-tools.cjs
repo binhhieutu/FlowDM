@@ -17,6 +17,19 @@ async function verifiedBytes(file, expected) {
   const data = Buffer.from(await response.arrayBuffer());
   if (data.length !== ytdlp.bytes || crypto.createHash('sha256').update(data).digest('hex') !== ytdlp.sha256) throw Error('yt-dlp release hash mismatch');
   await fs.writeFile(path.join(root, ytdlp.file), data);
+  const aria = lock.entries.aria2c;
+  const archiveResponse = await fetch(aria.archiveUrl, { signal: AbortSignal.timeout(60000) });
+  if (!archiveResponse.ok) throw Error(`aria2 download HTTP ${archiveResponse.status}`);
+  const archive = Buffer.from(await archiveResponse.arrayBuffer());
+  if (crypto.createHash('sha256').update(archive).digest('hex') !== aria.archiveSha256) throw Error('aria2 archive hash mismatch');
+  const temporary = await fs.mkdtemp(path.join(root, 'aria2-prepare-'));
+  try {
+    const zip = path.join(temporary, 'aria2.zip'); await fs.writeFile(zip, archive);
+    await require('node:util').promisify(require('node:child_process').execFile)('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', 'Expand-Archive -LiteralPath $env:FLOWDM_PREPARE_ZIP -DestinationPath $env:FLOWDM_PREPARE_OUT -ErrorAction Stop'], { windowsHide: true, env: { ...process.env, FLOWDM_PREPARE_ZIP: zip, FLOWDM_PREPARE_OUT: path.join(temporary, 'extracted') } });
+    const directory = path.join(temporary, 'extracted', 'aria2-1.37.0-win-64bit-build1');
+    await fs.writeFile(path.join(root, aria.file), await verifiedBytes(path.join(directory, aria.file), aria));
+    await fs.copyFile(path.join(directory, 'COPYING'), path.join(root, 'licenses/aria2-GPLv2.txt'));
+  } finally { await fs.rm(temporary, { recursive: true, force: true }); }
   const directories = (process.env.PATH || process.env.Path || '').split(';');
   let ffmpeg = process.argv[2];
   if (!ffmpeg) for (const directory of directories) { const candidate = path.join(directory, 'ffmpeg.exe'); try { if ((await fs.stat(candidate)).isFile()) { ffmpeg = candidate; break; } } catch {} }

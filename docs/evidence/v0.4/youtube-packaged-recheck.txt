@@ -1,0 +1,10 @@
+✔ real public YouTube downloads through desktop and contains playable video and audio (49540.5621ms)
+ℹ {"at":"2026-10-23T17:29:22.679Z","source":"https://www.youtube.com/watch?v=aqz-KE-bpKQ","appVersion":"0.4.0","packaged":true,"connections":4,"downloadMilliseconds":20210,"path":"I:\\dich_nguoc\\FlowDM\\downloads\\verification-v4\\YouTube-BigBuckBunny-packaged-N4-live-youtube-1792776513284.mp4","bytes":288972332,"sha256":"fc6b9d58d1f91ebfba1e26f3968368ab4dce11d17b749a781e360688d08c44b4","duration":634.624,"streams":[{"type":"video","codec":"h264","width":1920,"height":1080},{"type":"audio","codec":"aac"}],"decodedBeginningAndEnd":true,"wholeFileDecoded":true}
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 49966.676

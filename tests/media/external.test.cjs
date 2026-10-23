@@ -5,7 +5,9 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const os = require('node:os');
 const http = require('node:http');
-const { downloadExternal, preflightDash, canonicalYouTubeUrl, validateMediaOutput, mediaToolEnv } = require('../../src/media/external.cjs');
+const crypto = require('node:crypto');
+const { spawn } = require('node:child_process');
+const { downloadExternal, preflightDash, canonicalYouTubeUrl, validateMediaOutput, mediaToolEnv, aria2Arguments, createDashRelay } = require('../../src/media/external.cjs');
 const { youtubeUrl } = require('../../extension/media.js');
 
 test('invalid YouTube URLs create no scratch workspace', async t => {
@@ -61,6 +63,172 @@ test('extension and download core accept the same canonical YouTube host forms',
 test('media child environment is a minimal executable environment without inherited application secrets', () => {
   const env = mediaToolEnv({ ytDlp: path.resolve('vendor/media-tools/yt-dlp.exe'), ffmpeg: path.resolve('vendor/media-tools/ffmpeg.exe'), jsRuntime: process.execPath });
   assert.equal(env.ELECTRON_RUN_AS_NODE, '1'); assert.equal(Object.hasOwn(env, 'OPENAI_API_KEY'), false); assert.equal(Object.hasOwn(env, 'NODE_OPTIONS'), false);
+});
+
+test('external downloader only accepts one through sixteen connections', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'flowdm-external-connections-'));
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const input = { url: 'https://www.youtube.com/watch?v=AbCdEf12345', mediaType: 'youtube', output: path.join(root, 'job.part'), maxBytes: 1024, tools: { ytDlp: process.execPath, ffmpeg: process.execPath, jsRuntime: process.execPath, aria2c: process.execPath } };
+  for (const connections of [0, 17, 1.5, '4', null]) await assert.rejects(downloadExternal({ ...input, connections }), /connections/i);
+});
+
+test('external downloader accepts each supported connection boundary', async t => {
+  const fixture = await server(t, (_req, res) => res.end('<MPD type="static"><BaseURL>media.mp4</BaseURL></MPD>'));
+  const fake = path.join(fixture.root, 'accept-yt.js');
+  await fs.writeFile(fake, "const fs=require('node:fs'),path=require('node:path');const i=process.argv.indexOf('-o'),out=process.argv[i+1].replace('%(ext)s','mp4');fs.mkdirSync(path.dirname(out),{recursive:true});fs.writeFileSync(out,'muxed-video');process.stdout.write('flowdm-file:'+out);");
+  const tools = { ytDlp: process.execPath, ffmpeg: process.execPath, jsRuntime: process.execPath };
+  for (const connections of [1, 2, 4, 8, 16]) {
+    const output = path.join(fixture.root, `data-${connections}`, 'job.part'); await fs.mkdir(path.dirname(output), { recursive: true });
+    await downloadExternal({ url: `${fixture.url}/manifest.mpd`, mediaType: 'dash', output, maxBytes: 1024, connections, tools, toolArgsPrefix: [fake], validateOutput: async () => {} });
+  }
+});
+
+test('external DASH uses native fragments and YouTube HTTP uses bounded aria2c connections', async t => {
+  const fixture = await server(t, (_req, res) => res.end('<MPD type="static"><BaseURL>media.mp4</BaseURL></MPD>'));
+  const part = path.join(fixture.root, 'data', 'job.part'); await fs.mkdir(path.dirname(part), { recursive: true });
+  const capture = path.join(fixture.root, 'argv.json');
+  const fake = path.join(fixture.root, 'capture-yt.js');
+  await fs.writeFile(fake, "const fs=require('node:fs'),path=require('node:path');const capture=process.argv[2],args=process.argv.slice(3),i=args.indexOf('-o'),out=args[i+1].replace('%(ext)s','mp4');fs.writeFileSync(capture,JSON.stringify(args));fs.mkdirSync(path.dirname(out),{recursive:true});fs.writeFileSync(out,'muxed-video');process.stdout.write('flowdm-file:'+out);");
+  const tools = { ytDlp: process.execPath, ffmpeg: process.execPath, jsRuntime: process.execPath, aria2c: process.execPath };
+  await downloadExternal({ url: `${fixture.url}/manifest.mpd`, mediaType: 'dash', output: part, maxBytes: 1024, tools, toolArgsPrefix: [fake, capture, '--concurrent-fragments', '16'], validateOutput: async () => {} });
+  const dashArgs = JSON.parse(await fs.readFile(capture, 'utf8'));
+  const dashConcurrency = dashArgs.lastIndexOf('--concurrent-fragments');
+  assert.equal(dashArgs[dashConcurrency + 1], '4');
+  assert.ok(dashConcurrency > dashArgs.indexOf('--concurrent-fragments'));
+  assert.ok(dashArgs.includes('dash,m3u8:native'));
+  assert.equal(dashArgs.some(value => String(value).includes('aria2c')), false);
+
+  await downloadExternal({ url: 'https://www.youtube.com/watch?v=AbCdEf12345', mediaType: 'youtube', output: path.join(fixture.root, 'data', 'youtube.part'), maxBytes: 1024, connections: 8, speedLimit: 8000, tools, toolArgsPrefix: [fake, capture], validateOutput: async () => {} });
+  const youtubeArgs = JSON.parse(await fs.readFile(capture, 'utf8'));
+  assert.ok(youtubeArgs.includes(`http:${process.execPath}`));
+  const format = youtubeArgs[youtubeArgs.indexOf('--format') + 1];
+  assert.match(format, /^bv\*\[vcodec\^=avc1\]\[height<=1080\]\[protocol=m3u8_native\]\+ba\[acodec\^=mp4a\]\[ext=m4a\]\//);
+  assert.match(format, /bv\*\[vcodec\^=avc1\]\[height<=1080\]\[ext=mp4\]\+ba\[acodec\^=mp4a\]\[ext=m4a\]/);
+  const aria = youtubeArgs[youtubeArgs.indexOf('--downloader-args') + 1];
+  assert.match(aria, /^aria2c:/);
+  for (const option of ['--max-connection-per-server=8', '--split=8', '--min-split-size=1M', '--no-conf=true', '--no-netrc=true', '--max-concurrent-downloads=1', '--follow-torrent=false', '--follow-metalink=false', '--enable-rpc=false', '--enable-dht=false', '--enable-dht6=false', '--enable-peer-exchange=false', '--bt-enable-lpd=false', '--check-certificate=true', '--file-allocation=none', '--allow-overwrite=false', '--auto-file-renaming=false', '--console-log-level=warn', '--summary-interval=0', '--download-result=hide', '--max-overall-download-limit=8000']) assert.ok(aria.includes(option), option);
+  const youtubeConcurrency = youtubeArgs.lastIndexOf('--concurrent-fragments');
+  assert.equal(youtubeArgs[youtubeConcurrency + 1], '8');
+  assert.ok(youtubeArgs.includes('dash,m3u8:native'));
+  assert.equal(youtubeArgs[youtubeArgs.lastIndexOf('--limit-rate') + 1], '1000');
+
+  await downloadExternal({ url: 'https://www.youtube.com/watch?v=AbCdEf12345', mediaType: 'youtube', output: path.join(fixture.root, 'data', 'tiny-rate.part'), maxBytes: 1024, connections: 16, speedLimit: 1, tools, toolArgsPrefix: [fake, capture], validateOutput: async () => {} });
+  const tinyRateArgs = JSON.parse(await fs.readFile(capture, 'utf8'));
+  const tinyAria = tinyRateArgs[tinyRateArgs.indexOf('--downloader-args') + 1];
+  assert.equal(tinyRateArgs[tinyRateArgs.lastIndexOf('--concurrent-fragments') + 1], '1');
+  assert.equal(tinyRateArgs[tinyRateArgs.lastIndexOf('--limit-rate') + 1], '1');
+  assert.ok(tinyAria.includes('--max-download-limit=1'));
+  assert.ok(tinyAria.includes('--max-overall-download-limit=1'));
+
+  await downloadExternal({ url: `${fixture.url}/manifest.mpd`, mediaType: 'dash', output: path.join(fixture.root, 'data', 'dash-tiny-rate.part'), maxBytes: 1024, connections: 16, speedLimit: 1, tools, toolArgsPrefix: [fake, capture], validateOutput: async () => {} });
+  const tinyDashArgs = JSON.parse(await fs.readFile(capture, 'utf8'));
+  assert.equal(tinyDashArgs[tinyDashArgs.lastIndexOf('--concurrent-fragments') + 1], '1');
+  assert.equal(tinyDashArgs[tinyDashArgs.lastIndexOf('--limit-rate') + 1], '1');
+});
+
+test('YouTube requires aria2c while DASH does not', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'flowdm-external-aria-'));
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  await assert.rejects(downloadExternal({ url: 'https://www.youtube.com/watch?v=AbCdEf12345', mediaType: 'youtube', output: path.join(root, 'job.part'), maxBytes: 1024, tools: { ytDlp: process.execPath, ffmpeg: process.execPath, jsRuntime: process.execPath } }), /aria2c/i);
+});
+
+function runAria2(executable, args) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(executable, args, { shell: false, windowsHide: true, stdio: ['ignore', 'ignore', 'pipe'] });
+    let stderr = '';
+    child.stderr.on('data', chunk => { stderr = `${stderr}${chunk}`.slice(-4096); });
+    child.once('error', reject);
+    child.once('close', code => code === 0 ? resolve() : reject(Error(`aria2c exited ${code}: ${stderr}`)));
+  });
+}
+
+test('pinned aria2c accepts FlowDM arguments and bounds direct HTTP concurrency', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'flowdm-aria2-'));
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const payload = Buffer.alloc(32 * 1024 * 1024, 0x5a);
+  const digest = crypto.createHash('sha256').update(payload).digest('hex');
+  let active = 0; let peak = 0;
+  const fixture = await server(t, (req, res) => {
+    if (req.url !== '/payload.bin') return res.writeHead(404).end();
+    const range = /^bytes=(\d+)-(\d*)$/.exec(req.headers.range || '');
+    const start = range ? Number(range[1]) : 0;
+    const end = range && range[2] ? Math.min(Number(range[2]), payload.length - 1) : payload.length - 1;
+    if (start > end || end >= payload.length) return res.writeHead(416).end();
+    active++; peak = Math.max(peak, active);
+    res.writeHead(range ? 206 : 200, { 'accept-ranges': 'bytes', 'content-length': end - start + 1, ...(range ? { 'content-range': `bytes ${start}-${end}/${payload.length}` } : {}) });
+    let offset = start;
+    const send = () => {
+      if (offset > end) { res.end(); active--; return; }
+      const next = Math.min(offset + 256 * 1024, end + 1);
+      res.write(payload.subarray(offset, next)); offset = next;
+      setTimeout(send, 8).unref();
+    };
+    send();
+  });
+  const aria2c = path.resolve('vendor/media-tools/aria2c.exe');
+  for (const [connections, minPeak] of [[1, 1], [4, 2]]) {
+    peak = 0;
+    const filename = `payload-${connections}.bin`;
+    const args = [...aria2Arguments(connections, 0).slice('aria2c:'.length).split(' '), `--dir=${root}`, `--out=${filename}`, `${fixture.url}/payload.bin`];
+    await runAria2(aria2c, args);
+    assert.equal(crypto.createHash('sha256').update(await fs.readFile(path.join(root, filename))).digest('hex'), digest);
+    if (connections === 1) assert.equal(peak, minPeak);
+    else assert.equal(peak >= minPeak && peak <= connections, true, `expected 2-${connections} requests, got ${peak}`);
+  }
+});
+
+function relayGet(url) {
+  return new Promise((resolve, reject) => {
+    const request = http.get(url, response => {
+      let bytes = 0; let ended = false;
+      response.on('data', chunk => { bytes += chunk.length; });
+      response.once('end', () => { ended = true; resolve({ status: response.statusCode, bytes, ended }); });
+      response.once('aborted', () => resolve({ status: response.statusCode, bytes, ended }));
+      response.once('error', error => resolve({ status: response.statusCode, bytes, ended, error }));
+      response.once('close', () => { if (!ended) resolve({ status: response.statusCode, bytes, ended }); });
+    });
+    request.once('error', error => resolve({ status: null, bytes: 0, ended: false, error }));
+  });
+}
+
+test('DASH relay enforces one shared resource budget across concurrent responses', async t => {
+  const payload = Buffer.alloc(800, 0x7a);
+  const fixture = await server(t, (req, res) => {
+    if (!['/first.bin', '/second.bin'].includes(req.url)) return res.writeHead(404).end();
+    res.writeHead(200, { 'content-length': payload.length });
+    res.write(payload.subarray(0, 400));
+    setTimeout(() => res.end(payload.subarray(400)), 20).unref();
+  });
+  const relay = await createDashRelay({ finalUrl: `${fixture.url}/manifest.mpd`, manifest: Buffer.from('<MPD type="static"/>'), maxBytes: 1024 });
+  t.after(() => relay.close());
+  const base = new URL(relay.url);
+  const [first, second] = await Promise.all([relayGet(new URL('/first.bin', base).href), relayGet(new URL('/second.bin', base).href)]);
+  assert.ok(first.bytes + second.bytes <= 1024, `relay delivered ${first.bytes + second.bytes} bytes despite a 1024-byte shared cap`);
+  assert.equal(first.status === 200 && second.status === 200 && first.ended && second.ended, false);
+});
+
+test('pinned yt-dlp downloads DASH fragments at the requested native concurrency', async t => {
+  const videoDir = path.resolve('tests/fixtures/video');
+  const files = Object.fromEntries(await Promise.all(['init.mp4', 'fragment00.m4s', 'fragment01.m4s', 'fragment02.m4s'].map(async name => [name, await fs.readFile(path.join(videoDir, name))])));
+  const mpd = '<?xml version="1.0"?><MPD type="static" mediaPresentationDuration="PT3S" minBufferTime="PT1S" profiles="urn:mpeg:dash:profile:isoff-main:2011"><Period duration="PT3S"><AdaptationSet mimeType="video/mp4" segmentAlignment="true"><Representation id="muxed" bandwidth="200000" codecs="avc1.64000a" width="320" height="240"><SegmentList timescale="1000000" duration="1000000"><Initialization sourceURL="init.mp4"/><SegmentURL media="fragment00.m4s"/><SegmentURL media="fragment01.m4s"/><SegmentURL media="fragment02.m4s"/></SegmentList></Representation></AdaptationSet></Period></MPD>';
+  let active = 0; let peak = 0;
+  const fixture = await server(t, (req, res) => {
+    const name = new URL(req.url, 'http://local').pathname.slice(1);
+    if (name === 'manifest.mpd') return res.end(mpd);
+    if (!Object.hasOwn(files, name)) return res.writeHead(404).end();
+    if (!name.startsWith('fragment')) return res.end(files[name]);
+    active++; peak = Math.max(peak, active);
+    setTimeout(() => { res.end(files[name]); active--; }, 150).unref();
+  });
+  const tools = { ytDlp: path.resolve('vendor/media-tools/yt-dlp.exe'), ffmpeg: path.resolve('vendor/media-tools/ffmpeg.exe'), jsRuntime: process.execPath };
+  for (const [connections, expectedPeak] of [[1, 1], [4, 2]]) {
+    peak = 0;
+    const output = path.join(fixture.root, `dash-${connections}.mp4`);
+    const result = await downloadExternal({ url: `${fixture.url}/manifest.mpd`, mediaType: 'dash', output, maxBytes: 10 * 1024 * 1024, connections, tools, timeoutMs: 30000 });
+    assert.ok(result.bytes > 0);
+    if (connections === 1) assert.equal(peak, expectedPeak, `expected one serial fragment request, got ${peak}`);
+    else assert.equal(peak >= expectedPeak, true, `expected ${connections} connections to reach ${expectedPeak}, got ${peak}`);
+  }
 });
 
 test('external downloader only publishes finished mux output, reports bytes and never accepts credential headers', async t => {

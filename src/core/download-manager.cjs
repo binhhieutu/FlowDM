@@ -9,6 +9,7 @@ const { probe, retryRequest, rangeInfo, contentLength } = require('./http-client
 const { atomicJournal, uniqueDestination, openPartial, hashFile, publish, recoverPublished, preflightPublication } = require('./storage.cjs');
 const { loadPlaylist, getResource } = require('../media/hls.cjs');
 const { createValidator } = require('../media/container-check.cjs');
+const { transferHlsParallel } = require('../media/hls-parallel.cjs');
 const { downloadExternal } = require('../media/external.cjs');
 
 const clone = value => structuredClone(value);
@@ -258,7 +259,7 @@ class DownloadManager extends EventEmitter {
   async _transferExternal(task, runtime) {
     const result = await this.externalDownloader({
       url: task.url, mediaType: task.mediaType, headers: this.secrets.get(task.id) || {}, output: this._partial(task.id),
-      signal: runtime.controller.signal, maxBytes: this.maxBytes, speedLimit: task.speedLimit,
+      signal: runtime.controller.signal, maxBytes: this.maxBytes, speedLimit: task.speedLimit, connections: task.connections,
       onProgress: progress => {
         if (runtime.controller.signal.aborted || task.status !== 'downloading') return;
         const downloaded = Number.isSafeInteger(progress.downloadedBytes) ? Math.min(progress.downloadedBytes, this.maxBytes) : 0;
@@ -278,36 +279,11 @@ class DownloadManager extends EventEmitter {
   }
 
   async _transferHls(task, playlist, handle, runtime) {
-    const signal = runtime.controller.signal;
-    for (const [index, url] of playlist.resources.entries()) {
-      const { response } = await getResource(url, playlist.context, signal);
-      const validator = createValidator(playlist.extension === '.ts' ? 'ts' : index === 0 ? 'mp4-init' : 'mp4-fragment', this.maxBytes);
-      let received = 0;
-      try {
-        const length = contentLength(response);
-        if (length !== null && (length === 0 || length > this.maxBytes - task.downloadedBytes)) throw Error('HLS resource exceeds size limit or is empty');
-        for await (const chunk of response) {
-          if (signal.aborted) throw Object.assign(Error('Aborted'), { name: 'AbortError' });
-          if (chunk.length > this.maxBytes - task.downloadedBytes || (length !== null && received + chunk.length > length)) throw Error('HLS response exceeds expected size or size limit');
-          validator.push(chunk);
-          runtime.transferred += chunk.length;
-          if (task.speedLimit) await delay(Math.max(0, runtime.transferred * 1000 / task.speedLimit - (Date.now() - runtime.began)), undefined, { signal });
-          let written = 0;
-          while (written < chunk.length) {
-            const result = await handle.write(chunk, written, chunk.length - written, task.downloadedBytes + written);
-            if (!result.bytesWritten) throw Error('Disk write made no progress');
-            written += result.bytesWritten;
-          }
-          await handle.sync(); received += written; task.downloadedBytes += written; task.segments[0].received = task.downloadedBytes;
-          task.speed = Math.round(runtime.transferred * 1000 / Math.max(1, Date.now() - runtime.began));
-          await this._persist(); this._notify();
-        }
-        if (!received || (length !== null && received !== length)) throw Error('Truncated or empty HLS resource');
-        validator.finish();
-        if (playlist.extension !== '.mp4' || index > 0) task.media.completedSegments++;
-      } finally { response.destroy(); }
-    }
-    task.totalBytes = task.downloadedBytes;
+    const result = await transferHlsParallel({ playlist, connections: task.connections, tempRoot: this.dataDir, maxBytes: this.maxBytes, speedLimit: task.speedLimit, signal: runtime.controller.signal,
+      append: async chunk => { let written = 0; while (written < chunk.length) { const value = await handle.write(chunk, written, chunk.length - written, task.downloadedBytes + written); if (!value.bytesWritten) throw Error('Disk write made no progress'); written += value.bytesWritten; } await handle.sync(); },
+      onProgress: progress => { task.downloadedBytes += progress.committedBytes; task.segments[0].received = task.downloadedBytes; task.media.completedSegments++; task.media.networkBytes = progress.networkBytes; task.media.effectiveConnections = Math.min(task.connections, playlist.resources.length); runtime.transferred = progress.networkBytes; task.speed = Math.round(runtime.transferred * 1000 / Math.max(1, Date.now() - runtime.began)); void this._persist(); this._notify(); }
+    });
+    task.totalBytes = task.downloadedBytes; task.media.networkBytes = result.networkBytes; task.media.peakWorkers = result.peakWorkers;
   }
 
   async _transfer(task, headers, handle, runtime) {

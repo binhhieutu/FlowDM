@@ -68,7 +68,7 @@ function render() {
   $('details').hidden = !task;
   if (task) {
     $('detail-name').textContent = task.filename; $('detail-state').textContent = labels[task.status];
-    const streamed = ['hls', 'dash', 'youtube'].includes(task.mediaType); $('detail-path').textContent = task.path; $('detail-connections').textContent = streamed ? `${task.media?.completedSegments || 0}/${task.media?.segmentCount || '?'} đoạn ${task.mediaType.toUpperCase()}` : `${task.segments?.length || task.connections} kết nối`;
+    const streamed = ['hls', 'dash', 'youtube'].includes(task.mediaType); $('detail-path').textContent = task.path; $('detail-connections').textContent = streamed ? `${task.connections} kết nối tối đa · ${task.media?.completedSegments || 0}/${task.media?.segmentCount || '?'} đoạn ${task.mediaType.toUpperCase()}` : `${task.segments?.length || task.connections} kết nối`;
     $('detail-hash').textContent = task.sha256 || 'Được tính khi tải hoàn tất';
     $('detail-error').hidden = !task.error && !streamed; $('detail-error').textContent = task.error || (streamed ? `Video ${task.mediaType.toUpperCase()} được tải lại từ đầu khi tiếp tục để giữ đúng nội dung.` : '');
     $('segments').replaceChildren(...(task.segments || []).map((segment, index) => {

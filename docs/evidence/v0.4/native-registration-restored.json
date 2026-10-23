@@ -1,0 +1,11 @@
+{
+  "chrome": {
+    "exists": false
+  },
+  "testing": {
+    "exists": false
+  },
+  "chromium": {
+    "exists": false
+  }
+}

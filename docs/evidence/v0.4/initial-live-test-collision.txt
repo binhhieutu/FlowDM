@@ -1,0 +1,49 @@
+✔ real Chromium extension auto capture, video/HLS, cookie consent and host-down fallback (42309.0438ms)
+ℹ Loaded real extension liolmikhkegmilgaoomcdpihmenmjhgm
+ℹ Native messaging launches the generated host successfully
+ℹ Auto capture completed exact bytes and original browser download was canceled after ACK
+✖ real public YouTube downloads through desktop and contains playable video and audio (21630.8543ms)
+  AssertionError [ERR_ASSERTION]: {"id":"9628f570-77fd-4849-b51d-1b80cf6055ce","url":"https://www.youtube.com/watch?v=aqz-KE-bpKQ","path":"I:\\dich_nguoc\\FlowDM\\downloads\\verification-v4\\YouTube-BigBuckBunny (2).mp4","filename":"YouTube-BigBuckBunny (2).mp4","status":"failed","totalBytes":288972332,"downloadedBytes":288972332,"speed":0,"error":"Download failed (EEXIST)","connections":4,"segments":[{"index":0,"start":0,"end":null,"received":288972332}],"createdAt":"2026-10-23T17:27:36.229Z","startAt":null,"speedLimit":0,"finalUrl":"https://www.youtube.com/watch?v=aqz-KE-bpKQ","sha256":"fc6b9d58d1f91ebfba1e26f3968368ab4dce11d17b749a781e360688d08c44b4","validator":null,"ranges":false,"requiresHeaders":false,"mediaType":"youtube","media":{"format":"mp4","resumePolicy":"restart","externalTool":"yt-dlp","completedSegments":1}}
+  + actual - expected
+
+  + 'failed'
+  - 'completed'
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\e2e\media-live.test.cjs:28:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'failed',
+    expected: 'completed',
+    operator: 'strictEqual'
+  }
+
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 64630.1661
+
+✖ failing tests:
+
+test at tests\e2e\media-live.test.cjs:7:1
+✖ real public YouTube downloads through desktop and contains playable video and audio (21630.8543ms)
+  AssertionError [ERR_ASSERTION]: {"id":"9628f570-77fd-4849-b51d-1b80cf6055ce","url":"https://www.youtube.com/watch?v=aqz-KE-bpKQ","path":"I:\\dich_nguoc\\FlowDM\\downloads\\verification-v4\\YouTube-BigBuckBunny (2).mp4","filename":"YouTube-BigBuckBunny (2).mp4","status":"failed","totalBytes":288972332,"downloadedBytes":288972332,"speed":0,"error":"Download failed (EEXIST)","connections":4,"segments":[{"index":0,"start":0,"end":null,"received":288972332}],"createdAt":"2026-10-23T17:27:36.229Z","startAt":null,"speedLimit":0,"finalUrl":"https://www.youtube.com/watch?v=aqz-KE-bpKQ","sha256":"fc6b9d58d1f91ebfba1e26f3968368ab4dce11d17b749a781e360688d08c44b4","validator":null,"ranges":false,"requiresHeaders":false,"mediaType":"youtube","media":{"format":"mp4","resumePolicy":"restart","externalTool":"yt-dlp","completedSegments":1}}
+  + actual - expected
+
+  + 'failed'
+  - 'completed'
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\e2e\media-live.test.cjs:28:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'failed',
+    expected: 'completed',
+    operator: 'strictEqual'
+  }

@@ -1,0 +1,1 @@
+{"status":"passed","artifact":"FlowDM 0.4.0.exe","bytes":2097152,"sha256":"fa34b23e55d873bc5d38c40f515cb60b98cbd5e0037103d5c5221d770ca414fd","pauseRestartResume":true,"mediaToolsVerified":true,"youtube":{"bytes":288972332,"sha256":"fc6b9d58d1f91ebfba1e26f3968368ab4dce11d17b749a781e360688d08c44b4","matchesFullyDecodedSample":true},"at":"2026-10-23T17:29:58.016Z"}

@@ -5,7 +5,8 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 test('real public YouTube downloads through desktop and contains playable video and audio', { skip: !process.env.FLOWDM_LIVE_YOUTUBE, timeout: 900000 }, async t => {
-  const root = path.resolve('.tmp', `live-youtube-${Date.now()}`); const output = path.resolve('downloads/verification-v3');
+  const root = path.resolve('.tmp', `live-youtube-${Date.now()}`); const output = path.resolve('downloads/verification-v4');
+  const connections = Number(process.env.FLOWDM_LIVE_CONNECTIONS || 4);
   await fs.mkdir(root, { recursive: true }); await fs.mkdir(output, { recursive: true });
   const executablePath = process.env.FLOWDM_EXECUTABLE || require('electron');
   const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => key.toUpperCase() !== 'ELECTRON_RUN_AS_NODE'));
@@ -14,7 +15,11 @@ test('real public YouTube downloads through desktop and contains playable video 
   const info = await page.evaluate(() => window.flow.info()); assert.equal(info.data.mediaTools.ready, true, JSON.stringify(info));
   await page.getByRole('button', { name: 'Thêm liên kết', exact: true }).click();
   await page.locator('#url').fill(process.env.FLOWDM_LIVE_YOUTUBE);
-  await page.locator('#filename').fill('YouTube-BigBuckBunny.mp4');
+  // Separate app instances cannot reserve each other's pending destination.
+  const runName = `YouTube-BigBuckBunny-${process.env.FLOWDM_EXECUTABLE ? 'packaged' : 'source'}-N${connections}-${path.basename(root)}.mp4`;
+  await page.locator('#filename').fill(runName);
+  await page.locator('#connections').selectOption(String(connections));
+  const began = Date.now();
   await page.locator('#add-form').evaluate(form => form.requestSubmit());
   let task; const end = Date.now() + 750000;
   while (Date.now() < end) {
@@ -22,7 +27,8 @@ test('real public YouTube downloads through desktop and contains playable video 
     if (task && ['completed', 'failed'].includes(task.status)) break;
     await new Promise(resolve => setTimeout(resolve, 1000));
   }
-  assert.equal(task?.status, 'completed', JSON.stringify(task)); assert.equal(task.mediaType, 'youtube');
+  assert.equal(task?.status, 'completed', JSON.stringify(task)); assert.equal(task.mediaType, 'youtube'); assert.equal(task.connections, connections);
+  const downloadMilliseconds = Date.now() - began;
   const probe = spawnSync(process.env.FLOWDM_FFPROBE || 'ffprobe', ['-v', 'error', '-show_streams', '-show_format', '-of', 'json', task.path], { encoding: 'utf8', windowsHide: true, timeout: 30000 });
   assert.equal(probe.status, 0, probe.stderr); const metadata = JSON.parse(probe.stdout);
   assert.ok(metadata.streams.some(stream => stream.codec_type === 'video')); assert.ok(metadata.streams.some(stream => stream.codec_type === 'audio'));
@@ -33,8 +39,8 @@ test('real public YouTube downloads through desktop and contains playable video 
   }
   const fullDecode = spawnSync(process.env.FLOWDM_FFMPEG || 'ffmpeg', ['-v', 'error', '-xerror', '-i', task.path, '-map', '0:v:0', '-map', '0:a:0', '-f', 'null', '-'], { encoding: 'utf8', windowsHide: true, timeout: 300000 });
   assert.equal(fullDecode.status, 0, fullDecode.stderr); assert.equal(fullDecode.stderr, '');
-  await fs.mkdir('test-results', { recursive: true }); await page.screenshot({ path: 'test-results/youtube-v3.png' });
-  const report = { at: new Date().toISOString(), source: process.env.FLOWDM_LIVE_YOUTUBE, appVersion: info.data.version, packaged: !!process.env.FLOWDM_EXECUTABLE, path: task.path, bytes: task.totalBytes, sha256: task.sha256, duration, streams: metadata.streams.map(stream => ({ type: stream.codec_type, codec: stream.codec_name, width: stream.width, height: stream.height })), decodedBeginningAndEnd: true, wholeFileDecoded: true };
-  await fs.writeFile('test-results/youtube-v3.json', JSON.stringify(report, null, 2));
+  await fs.mkdir('test-results', { recursive: true }); await page.screenshot({ path: 'test-results/youtube-v4.png' });
+  const report = { at: new Date().toISOString(), source: process.env.FLOWDM_LIVE_YOUTUBE, appVersion: info.data.version, packaged: !!process.env.FLOWDM_EXECUTABLE, connections, downloadMilliseconds, path: task.path, bytes: task.totalBytes, sha256: task.sha256, duration, streams: metadata.streams.map(stream => ({ type: stream.codec_type, codec: stream.codec_name, width: stream.width, height: stream.height })), decodedBeginningAndEnd: true, wholeFileDecoded: true };
+  await fs.writeFile(`test-results/youtube-v4-N${connections}.json`, JSON.stringify(report, null, 2));
   t.diagnostic(JSON.stringify(report));
 });

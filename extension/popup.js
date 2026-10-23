@@ -8,6 +8,7 @@
  async function refresh(){
   const state=await chrome.runtime.sendMessage({type:'flowdm:state',tabId:tab?.id});
   settings=state.settings;
+  find('connections').value=String(settings.connections||4);
   const origins=[...new Set([pageOrigin,...state.items.map(item=>toOrigin(item.url))].filter(Boolean))];
   if(!origins.includes(origin))origin=origins[0];
   const selector=find('credential-origin');selector.replaceChildren();
@@ -31,6 +32,7 @@
  }
  find('credential-origin').onchange=event=>{origin=event.target.value;find('credentials').checked=!!settings.credentials[origin];find('site-origin').textContent='Quyền áp dụng cho: '+origin;};
  find('auto-capture').onchange=async event=>{await chrome.runtime.sendMessage({type:'flowdm:settings',autoCapture:event.target.checked});await refresh();};
+ find('connections').onchange=async event=>{await chrome.runtime.sendMessage({type:'flowdm:settings',connections:Number(event.target.value)});await refresh();};
  find('credentials').onchange=async event=>{
   const enable=event.target.checked;
   if(enable&&!await chrome.permissions.request({permissions:['cookies'],origins:[`${origin}/*`]})){event.target.checked=false;return;}

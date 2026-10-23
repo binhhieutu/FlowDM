@@ -30,10 +30,11 @@ class FrameDecoder {
 }
 const plainObject = value => value !== null && typeof value === 'object' && !Array.isArray(value) && [Object.prototype,null].includes(Object.getPrototypeOf(value));
 function normalizePayload(payload) {
-  if (!plainObject(payload) || Object.keys(payload).some(key=>!['url','filename','headers','mediaType'].includes(key))) return null;
+  if (!plainObject(payload) || Object.keys(payload).some(key=>!['url','filename','headers','mediaType','connections'].includes(key))) return null;
   if(typeof payload.url!=='string' || payload.url.length>16384 || /[\u0000-\u0020\u007f]/.test(payload.url)) return null;
   try {const url=new URL(payload.url);if(!['http:','https:'].includes(url.protocol)||url.username||url.password)return null;}catch{return null;}
   const result={url:payload.url};
+  if(Object.hasOwn(payload,'connections')) { if(!Number.isInteger(payload.connections)||payload.connections<1||payload.connections>16)return null;result.connections=payload.connections; }
   if(Object.hasOwn(payload,'filename')) {
     const name=payload.filename;
     if(typeof name!=='string'||!name.length||name.length>180||/[<>:"/\\|?*\u0000-\u001f\u007f]/.test(name)||/[. ]$/.test(name)||/^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(name)||['.','..'].includes(name))return null;

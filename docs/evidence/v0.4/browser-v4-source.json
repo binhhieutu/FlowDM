@@ -1,0 +1,83 @@
+{
+  "at": "2026-10-23T17:22:55.661Z",
+  "platform": "win32",
+  "extensionId": "haledpmjjglhklbgookgljcicjipdmka",
+  "browser": "156.0.8078.4",
+  "nativeMessaging": true,
+  "automaticCapture": true,
+  "disabledFallback": true,
+  "hostDownFallback": true,
+  "cookieConsent": true,
+  "syntheticClickBlocked": true,
+  "hlsTsFmp4ByteExact": true,
+  "decoder": "ffmpeg",
+  "fixturesPregrantCookieApi": true,
+  "events": [
+    "direct-video-and-hls-ts-fmp4-decoded",
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": null
+    },
+    {
+      "authRequest": true,
+      "hasCookie": false,
+      "range": "bytes=0-0"
+    },
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": null
+    },
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": "bytes=0-0"
+    },
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": "bytes=0-0"
+    },
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": "bytes=0-262143"
+    },
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": "bytes=262144-524287"
+    },
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": "bytes=524288-786431"
+    },
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": "bytes=786432-1048575"
+    },
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": "bytes=1048576-1310719"
+    },
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": "bytes=1310720-1572863"
+    },
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": "bytes=1572864-1835007"
+    },
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": "bytes=1835008-2097151"
+    }
+  ]
+}

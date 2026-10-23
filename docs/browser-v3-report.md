@@ -23,3 +23,11 @@ For explicit `dash` and `youtube` handoffs, the native admission gate verifies m
 `node --test tests/bridge/extension-media.test.cjs tests/bridge/extension.test.cjs tests/bridge/extension-popup.test.cjs tests/browser/admission.test.cjs`
 
 The suite covers DASH selection, `.mpd` auto-capture exclusion, canonical YouTube URL acceptance, lookalike/channel/playlist rejection, same-tab sender checks, popup selection, native tool-gated handoff, credentials, and existing fallback behavior.
+
+## v0.4 multi-connection addendum
+
+The popup persists a requested per-job connection ceiling of 1, 2, 4, 8, or 16 and sends it as the validated integer `connections` field in the Native Messaging payload. Upgrading requires reconnecting/re-exporting the native host bundle and reloading the unpacked extension so both sides use the updated protocol.
+
+FlowDM applies only one parallelism layer to a media resource. Native HLS uses a bounded sliding worker window with ordered disk commit; static DASH uses yt-dlp native concurrent fragments. Public YouTube prefers native HLS H.264 video up to 1080p; aria2 handles its ordinary HTTP(S) audio and full-file HTTP fallback. A requested count remains an upper bound and can be reduced by resource count, rate limits, server behavior, or format availability.
+
+aria2 receives the transient signed CDN URL in its child-process command line. That narrow same-user/privileged-process exposure is documented; the URL is excluded from FlowDM journal, log, UI, error, screenshot, and test evidence. Browser Cookie, Authorization, Referer, and User-Agent remain forbidden for DASH and YouTube.
