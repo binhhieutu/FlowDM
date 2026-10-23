@@ -1,0 +1,8 @@
+node_modules/
+dist/
+coverage/
+coverage-all/
+.tmp/
+test-results/
+*.log
+/audit.json

@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "artifact": "FlowDM 0.1.0.exe",
+  "bytes": 2097152,
+  "sha256": "0fb5e76c3b28d17d3ea464e14fc1c53e329a600cf7d1882c50715e1390f6aec9",
+  "pauseRestartResume": true,
+  "at": "2026-10-23T15:38:03.961Z"
+}

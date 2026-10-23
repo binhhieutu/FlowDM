@@ -1,0 +1,81 @@
+
+> flowdm@0.1.0 test:coverage
+> node scripts/coverage.cjs
+
+✔ frames preserve Unicode through partial prefixes, payload and multiple frames (4.0292ms)
+✔ malformed, truncated, oversized and invalid UTF8 frames fail (5.5467ms)
+✔ authenticated private IPC acknowledges and deduplicates concurrent requests (32.4605ms)
+✔ schema, operations, credentials, URLs, fields and request ids are rejected before callback (13.1777ms)
+✔ callback errors and deadlines return bounded safe errors (52.2999ms)
+✔ invalid callback results and absent configuration fail safely (9.1354ms)
+✔ native host subprocess uses framed stdout with Unicode and absent desktop error (190.4127ms)
+✔ extension explicitly sends link or media and reports host absence without interception (10.1726ms)
+✔ bundle helper writes only requested destination and exact extension origin (19.3386ms)
+✔ downloads parallel ranges with exact content, hash and detached snapshots (158.1806ms)
+✔ falls back for ignored ranges and unknown length chunked responses (119.5334ms)
+✔ rejects unsafe inputs and avoids overwriting files in selected directory (107.5792ms)
+✔ detects malformed Content-Range and enforces configured size ceiling (79.0322ms)
+✔ journals without secret headers and restores scheduled tasks safely (28.1469ms)
+✔ pauses active transfer, resumes ranges and survives manager restart (580.4264ms)
+✔ refuses changed resume validator and allows retry after server recovers (1111.8393ms)
+✔ restarts from zero without validator and limits actual transfer speed (608.2601ms)
+✔ bounds active download queue and starts scheduled jobs only when due (431.7079ms)
+✔ cancel interrupts limiter waits; close is idempotent; invalid controls fail (31.4759ms)
+✔ retries transient probe errors but stops permanent HTTP failure (490.9836ms)
+✔ strips credentials across redirects and bounds redirect loops (116.7605ms)
+✔ rejects truncated, oversized, encoded and changed range responses (185.9731ms)
+✔ restored header-dependent downloads require user to supply headers again (23.8198ms)
+✔ shutdown checkpoints running download and init is idempotent (21.3891ms)
+✔ safely falls back to fresh single stream if server abandons Range after probe (102.9808ms)
+✔ supports empty files and missing or shortened checkpoint files restart safely (2360.8812ms)
+✔ does not split range responses without a strong validator (101.4572ms)
+✔ staging publication is exclusive, complete and cleans temporary entries on failure (19.8281ms)
+✔ policy rejects reserved headers and filenames; journal corruption fails visibly (17.8097ms)
+✔ retries an interrupted validated segment from its committed byte offset (230.1365ms)
+✔ per-host queue cap applies independently from global download cap (849.9638ms)
+✔ disk-full publication failure leaves no partial final name and preserves source (12.8647ms)
+✔ Last-Modified same-second changes restart a complete fresh single stream (627.1133ms)
+✔ recognizes fully published crash checkpoints without network using persisted digest (58.3727ms)
+✔ does not recover an unrelated final file or malformed stored digest as complete (61.2941ms)
+✔ preflights unsupported destination filesystems before any network body transfer (37.8983ms)
+✔ resume recovers a published final appearing after init without contacting offline source (29.7729ms)
+✔ published recovery rejects size mismatches and non-file destinations (5.0855ms)
+ℹ tests 38
+ℹ suites 0
+ℹ pass 38
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8758.7529
+✔ desktop downloads exact bytes, pause/resume, persists, rejects invalid URLs and keeps isolation (4036.216ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4584.2365
+-----------------------|---------|----------|---------|---------|-----------------------------------
+File                   | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+-----------------------|---------|----------|---------|---------|-----------------------------------
+All files              |    96.7 |    86.54 |   92.13 |    96.7 |
+ src                   |   83.33 |     72.5 |   76.92 |   83.33 |
+  main.cjs             |   93.42 |    67.74 |      75 |   93.42 | 41-42,59-61
+  preload.cjs          |   28.57 |    88.88 |   77.77 |   28.57 | 1-9,14
+ src/bridge            |   96.06 |    79.72 |    87.5 |   96.06 |
+  client.cjs           |     100 |       80 |     100 |     100 | 6,8,12-13
+  host.cjs             |     100 |    53.33 |     100 |     100 | 10,12,21-29
+  index.cjs            |     100 |      100 |     100 |     100 |
+  install.cjs          |    87.5 |    64.28 |   33.33 |    87.5 | 21-23
+  protocol.cjs         |     100 |    89.47 |     100 |     100 | 8,20,32,37
+  server.cjs           |   93.93 |    83.63 |     100 |   93.93 | 28-31
+ src/core              |   99.36 |    90.45 |     100 |   99.36 |
+  download-manager.cjs |     100 |    90.51 |     100 |     100 | ...41,253,261,275,278,280,282-283
+  http-client.cjs      |     100 |    87.87 |     100 |     100 | 10,21,38,40-43,50
+  policy.cjs           |     100 |    91.83 |     100 |     100 | 24-25,35
+  storage.cjs          |   95.89 |    92.15 |     100 |   95.89 | 23,55-56
+ src/ui                |   97.22 |    85.36 |   81.81 |   97.22 |
+  app.js               |   97.22 |    85.36 |   81.81 |   97.22 | 11,90-91
+-----------------------|---------|----------|---------|---------|-----------------------------------

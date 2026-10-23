@@ -1,0 +1,7 @@
+
+> flowdm@0.1.0 dist:mac
+> electron-builder --mac zip --x64 --arm64 --publish=never
+
+  • electron-builder  version=26.15.3 os=10.0.19045
+  • loaded configuration  file=package.json ("build" field)
+  ⨯ Build for macOS is supported only on macOS, please see https://electron.build/multi-platform-build

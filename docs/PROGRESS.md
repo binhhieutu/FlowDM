@@ -1,0 +1,21 @@
+# FlowDM execution ledger
+
+Plan: docs/superpowers/plans/2026-10-23-flowdm.md
+
+2026-10-23 | Setup | User authorized autonomous implementation and testing. Design decisions documented; preserve reverse-analysis sources. Independent tasks use disjoint allowlists. Shared contract: manager in DESIGN.md, bridge dispatch callback in main.
+
+Ruling: Build dependable HTTP/HTTPS desktop scope first and explicitly document advanced IDM features that are still absent. Cost: no claim of complete IDM parity.
+
+Ruling: Use Electron rather than Rust/Qt for one UI and actual automated desktop testing with the available Node environment. Cost: larger application binary.
+
+2026-10-23 | Engine | RED missing module, GREEN initial engine; release review reproduced weak Last-Modified mixing, publication crash gap and late unsupported-filesystem failure. Fixed with ETag-only byte resume, offline full SHA/size final recovery and destination capability preflight. Final 29 core tests green.
+
+2026-10-23 | Browser | RED missing module, GREEN 9 protocol/extension cases, including actual Node native-host subprocess. No browser/registry modification. Installer is manual-only.
+
+2026-10-23 | Desktop | RED absent main, then fixed test environment ELECTRON_RUN_AS_NODE presence and Windows cleanup ordering. Source and Windows packaged E2E green: byte-identical completed file, pause/restart/resume, custom folder/schedule/cancel, filters, invalid input, 404, sandbox/context isolation. NSIS strips Playwright loader; portable smoke uses temporary loopback CDP and passes same pause/restart/resume byte check.
+
+2026-10-23 | Review | Independent reviewer confirmed all 1 P1 and 2 P2 fixed; no remaining blockers in reviewed scope. Deferred minor: publication crash recovery may retain an obsolete internal .part copy; documented in README/verification.
+
+2026-10-23 | Release gate | npm run test:coverage: 38 unit/integration + actual Electron journey green; aggregate all-src V8 96.70% lines/statements, 86.54% branches, 92.13% functions. npm audit zero vulnerabilities. Real HTTPS smoke 502941 bytes equals independent fetch.
+
+2026-10-23 | Packaging | Windows portable ~101 MB passes direct GUI smoke; Linux tar.gz ~125 MB created, corrected POSIX executable permissions and verified 71 payloads. Both ASARs contain 17 runtime source/asset files exactly matching frozen source. macOS builder explicitly refuses Windows host. No native Linux/Mac runtime available; never claimed their runtime verification. CI matrix provided locally, not dispatched.

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>FlowDM</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-icon">↓</span><span>FlowDM<small>DOWNLOAD MANAGER</small></span></div>
+    <div class="side-label">THƯ VIỆN TẢI XUỐNG</div>
+    <nav aria-label="Bộ lọc trạng thái">
+      <button data-filter="all" class="selected"><span>▤　Tất cả tệp</span><b id="count-all">0</b></button>
+      <button data-filter="active"><span>↓　Đang tải</span><b id="count-active">0</b></button>
+      <button data-filter="paused"><span>Ⅱ　Tạm dừng</span><b id="count-paused">0</b></button>
+      <button data-filter="completed"><span>✓　Hoàn tất</span><b id="count-completed">0</b></button>
+      <button data-filter="failed"><span>!　Cần xử lý</span><b id="count-failed">0</b></button>
+    </nav>
+    <div class="sidebar-bottom"><span class="online-dot"></span> Lưu tiến trình tự động<br><small id="app-version">FlowDM</small></div>
+  </aside>
+  <main>
+    <header><div><div class="eyebrow">KHÔNG GIAN TẢI XUỐNG</div><h1 id="view-title">Tất cả tệp</h1></div><button id="add-button" class="primary" aria-label="Thêm liên kết">＋ Thêm liên kết</button></header>
+    <section class="transfer-bar" aria-label="Tình trạng tải"><div><span class="live-dot"></span><strong id="transfer-speed">0 B/s</strong><span class="muted">Tốc độ hiện tại</span></div><span id="queue-summary">Hàng đợi trống</span><button id="open-folder" class="quiet">Mở thư mục tải ↗</button></section>
+    <section class="library">
+      <div class="library-tools"><span id="visible-count">0 tệp</span><input id="search" type="search" aria-label="Tìm tệp" placeholder="Tìm theo tên hoặc địa chỉ…"><button id="pause-all" class="quiet">Tạm dừng tất cả</button><button id="resume-all" class="quiet">Tiếp tục tất cả</button></div>
+      <div class="column-labels"><span>TÊN TỆP / NGUỒN</span><span>TIẾN TRÌNH</span><span>THAO TÁC</span></div>
+      <div id="tasks" aria-live="polite"></div>
+      <div id="empty"><div class="empty-icon">↓</div><h2>Sẵn sàng cho lượt tải tiếp theo</h2><p>Thêm liên kết HTTP hoặc HTTPS để bắt đầu.<br>Tiến trình được lưu để bạn có thể tiếp tục sau.</p><button id="empty-add" class="secondary">Thêm liên kết đầu tiên</button></div>
+    </section>
+    <section id="details" class="details" hidden><div class="detail-heading"><h2 id="detail-name"></h2><span id="detail-state" class="badge"></span></div><div id="segments" class="segments"></div><div class="detail-grid"><div><small>ĐÍCH LƯU</small><span id="detail-path"></span></div><div><small>KẾT NỐI</small><span id="detail-connections"></span></div><div><small>SHA-256</small><code id="detail-hash"></code></div></div><p id="detail-error" class="error" hidden></p></section>
+    <footer><span>HTTP / HTTPS · Tối đa 3 lượt tải đồng thời</span><span id="bridge-status">FlowDM desktop</span></footer>
+  </main>
+  <dialog id="add-dialog"><form id="add-form"><div class="dialog-heading"><div><span class="eyebrow">LƯỢT TẢI MỚI</span><h2>Thêm liên kết</h2></div><button type="button" id="close-dialog" class="icon-button" aria-label="Đóng">×</button></div><label for="url">Địa chỉ tải</label><input id="url" type="url" placeholder="https://example.com/file.zip" required autofocus><label for="filename">Tên tệp</label><input id="filename" placeholder="Tự lấy từ đường dẫn liên kết" maxlength="180"><label for="directory">Thư mục lưu</label><div class="folder-input"><input id="directory" readonly><button type="button" id="choose-directory" class="secondary">Chọn…</button></div><div class="form-grid"><div><label for="connections">Số kết nối</label><select id="connections"><option value="1">1 kết nối</option><option value="2">2 kết nối</option><option value="4" selected>4 kết nối</option><option value="8">8 kết nối</option></select></div><div><label for="speed-limit">Giới hạn tốc độ (KiB/s)</label><input id="speed-limit" type="number" min="0" max="1048576" value="0"><small>0 = không giới hạn</small></div></div><label for="start-at">Hẹn giờ bắt đầu (tùy chọn)</label><input id="start-at" type="datetime-local"><p class="hint">Giờ địa phương trên máy. Máy và FlowDM cần đang chạy.</p><p id="form-error" class="error" hidden></p><div class="dialog-footer"><button type="button" id="cancel-dialog" class="secondary">Hủy</button><button type="submit" id="submit-download" class="primary">Bắt đầu tải</button></div></form></dialog>
+  <div id="toast" role="status" hidden></div>
+  <script src="app.js"></script>
+</body>
+</html>

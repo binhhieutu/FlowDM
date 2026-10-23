@@ -1,0 +1,110 @@
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+const { _electron } = require('playwright');
+const { createServer } = require('node:http');
+const fs = require('node:fs/promises');
+const path = require('node:path');
+const os = require('node:os');
+const crypto = require('node:crypto');
+
+test('desktop downloads exact bytes, pause/resume, persists, rejects invalid URLs and keeps isolation', { timeout: 120000 }, async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'flowdm-e2e-'));
+  const body = crypto.randomBytes(3 * 1024 * 1024);
+  const server = createServer((req, res) => {
+    if (req.url === '/missing') { res.writeHead(404).end(); return; }
+    let start = 0; let end = body.length - 1;
+    const range = /^bytes=(\d+)-(\d*)$/.exec(req.headers.range || '');
+    if (range) { start = Number(range[1]); end = range[2] ? Math.min(Number(range[2]), end) : end; }
+    const headers = { 'Content-Length': end - start + 1, 'Accept-Ranges': 'bytes', ETag: '"fixture-v1"' };
+    if (range) headers['Content-Range'] = `bytes ${start}-${end}/${body.length}`;
+    res.writeHead(range ? 206 : 200, headers);
+    if (req.method === 'HEAD') { res.end(); return; }
+    let at = start;
+    const timer = setInterval(() => {
+      if (at > end) { clearInterval(timer); res.end(); return; }
+      const next = Math.min(at + 16384, end + 1); res.write(body.subarray(at, next)); at = next;
+    }, 12);
+    res.on('close', () => clearInterval(timer));
+  });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  let desktop;
+  const coverageDir = process.env.FLOWDM_COVERAGE_DIR;
+  const saveCoverage = async page => {
+    if (!coverageDir) return;
+    const results = await page.coverage.stopJSCoverage();
+    await fs.mkdir(coverageDir, { recursive: true });
+    await fs.writeFile(path.join(coverageDir, `coverage-renderer-${crypto.randomUUID()}.json`), JSON.stringify({ result: results.map(({ scriptId, url, functions }) => ({ scriptId, url, functions })) }));
+  };
+  t.after(async () => {
+    if (desktop) await desktop.app.close().catch(() => {});
+    server.closeAllConnections(); await new Promise(resolve => server.close(resolve));
+    await fs.rm(root, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 });
+  });
+  const errors = [];
+  const launch = async () => {
+    const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => key.toUpperCase() !== 'ELECTRON_RUN_AS_NODE'));
+    const executablePath = process.env.FLOWDM_EXECUTABLE;
+    const app = await _electron.launch({ ...(executablePath ? { executablePath } : {}), args: executablePath ? [] : [path.resolve(__dirname, '../..')], env: { ...env, ...(coverageDir ? { NODE_V8_COVERAGE: coverageDir } : {}), FLOWDM_DATA_DIR: path.join(root, 'data'), FLOWDM_DOWNLOAD_DIR: path.join(root, 'downloads') } });
+    const page = await app.firstWindow();
+    page.setDefaultTimeout(15000);
+    page.on('pageerror', e => errors.push(e.message));
+    if (coverageDir) { await page.coverage.startJSCoverage({ resetOnNavigation: false }); await page.reload(); }
+    await page.getByRole('button', { name: 'Thêm liên kết', exact: true }).waitFor();
+    return { app, page };
+  };
+  desktop = await launch();
+  const { page } = desktop;
+  assert.equal(await page.evaluate(() => typeof window.require), 'undefined');
+  const prefs = await desktop.app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].webContents.getLastWebPreferences());
+  assert.equal(prefs.contextIsolation, true); assert.equal(prefs.sandbox, true); assert.equal(prefs.nodeIntegration, false);
+  await page.getByRole('button', { name: 'Thêm liên kết', exact: true }).click();
+  await page.getByLabel('Địa chỉ tải').fill(`http://127.0.0.1:${server.address().port}/fixture.bin`);
+  await page.getByLabel('Tên tệp').fill('fixture.bin');
+  await page.getByRole('button', { name: 'Bắt đầu tải', exact: true }).click();
+  await page.waitForFunction(() => [...document.querySelectorAll('[data-task]')].some(row => row.textContent.includes('Đang tải')));
+  const row = page.locator('[data-task]').filter({ hasText: 'fixture.bin' });
+  await row.getByRole('button', { name: 'Tạm dừng', exact: true }).click();
+  await row.getByText('Tạm dừng', { exact: true }).waitFor();
+  await fs.mkdir(path.resolve('test-results'), { recursive: true });
+  await page.screenshot({ path: 'test-results/desktop-paused.png' });
+  await saveCoverage(page);
+  await desktop.app.close(); desktop = null;
+  desktop = await launch();
+  const restored = desktop.page.locator('[data-task]').filter({ hasText: 'fixture.bin' });
+  await restored.getByText('Tạm dừng', { exact: true }).waitFor();
+  await restored.getByRole('button', { name: 'Tiếp tục', exact: true }).click();
+  await restored.getByText('Hoàn tất', { exact: true }).waitFor({ timeout: 45000 });
+  const output = await fs.readFile(path.join(root, 'downloads', 'fixture.bin'));
+  assert.deepEqual(output, body);
+  const result = await desktop.page.evaluate(() => window.flow.list());
+  assert.equal(result.ok, true); assert.equal(result.data[0].sha256, crypto.createHash('sha256').update(body).digest('hex'));
+  const invalid = await desktop.page.evaluate(() => window.flow.add({ url: 'file:///etc/passwd' }));
+  assert.equal(invalid.ok, false);
+  const failure = await desktop.page.evaluate(url => window.flow.add({ url, filename: 'missing.bin' }), `http://127.0.0.1:${server.address().port}/missing`);
+  assert.equal(failure.ok, true);
+  await desktop.page.waitForFunction(() => document.body.textContent.includes('Thất bại'), null, { timeout: 30000 });
+  await desktop.page.getByRole('button', { name: /Hoàn tất/ }).first().click();
+  assert.equal(await desktop.page.locator('[data-task]').count(), 1);
+  await desktop.page.getByLabel('Tìm tệp').fill('absent-file');
+  assert.equal(await desktop.page.locator('[data-task]').count(), 0);
+  await desktop.page.getByLabel('Tìm tệp').fill('');
+  await desktop.page.getByRole('button', { name: /Tất cả tệp/ }).first().click();
+  const custom = path.join(root, 'custom'); await fs.mkdir(custom);
+  await desktop.app.evaluate(({ dialog }, directory) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [directory] }); }, custom);
+  await desktop.page.getByRole('button', { name: 'Thêm liên kết', exact: true }).click();
+  await desktop.page.getByLabel('Địa chỉ tải').fill(`http://127.0.0.1:${server.address().port}/scheduled.bin`);
+  await desktop.page.getByLabel('Tên tệp').fill('scheduled.bin');
+  await desktop.page.getByRole('button', { name: 'Chọn…', exact: true }).click();
+  assert.equal(await desktop.page.getByLabel('Thư mục lưu').inputValue(), custom);
+  await desktop.page.getByLabel('Hẹn giờ bắt đầu (tùy chọn)').fill('2099-10-23T12:00');
+  await desktop.page.getByRole('button', { name: 'Bắt đầu tải', exact: true }).click();
+  const scheduled = desktop.page.locator('[data-task]').filter({ hasText: 'scheduled.bin' });
+  await scheduled.getByText('Chờ tải', { exact: true }).waitFor();
+  await scheduled.getByRole('button', { name: 'Hủy', exact: true }).click();
+  await scheduled.getByText('Đã hủy', { exact: true }).waitFor();
+  await scheduled.getByRole('button', { name: 'Xóa khỏi danh sách', exact: true }).click();
+  await scheduled.waitFor({ state: 'detached' });
+  await desktop.page.screenshot({ path: 'test-results/desktop-complete.png' });
+  await saveCoverage(desktop.page);
+  assert.deepEqual(errors, []);
+});

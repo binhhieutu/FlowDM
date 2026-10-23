@@ -1,0 +1,13 @@
+
+> flowdm@0.1.0 test:e2e
+> node --test --test-concurrency=1 tests/e2e/*.test.cjs
+
+✔ desktop downloads exact bytes, pause/resume, persists, rejects invalid URLs and keeps isolation (3841.8233ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4263.9057
