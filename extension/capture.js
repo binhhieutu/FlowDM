@@ -28,15 +28,25 @@
       requests.delete(url);requests.set(url,{method:details.method,headers,hasCredentials,at:Date.now()});
       while(requests.size>128)requests.delete(requests.keys().next().value);
     }
+    function inferredMediaType(value, requested){
+      if(requested)return requested;
+      let url;try{url=new URL(value);}catch{return undefined;}
+      if(/\.mpd$/i.test(url.pathname))return 'dash';
+      const host=url.hostname.toLowerCase();let id;
+      if(['youtube.com','www.youtube.com','m.youtube.com'].includes(host))id=url.pathname==='/watch'?url.searchParams.get('v'):/^\/shorts\/([A-Za-z0-9_-]{11})\/?$/.exec(url.pathname)?.[1];
+      else if(host==='youtu.be')id=/^\/([A-Za-z0-9_-]{11})\/?$/.exec(url.pathname)?.[1];
+      return /^[A-Za-z0-9_-]{11}$/.test(id||'')?'youtube':undefined;
+    }
     function payload(input){
       const url=httpUrl(input.url);if(!url)return null;
+      const mediaType=inferredMediaType(url,input.mediaType);
       const record=requests.get(url);const consent=settings.credentials[new URL(url).origin]===true;
       const headers=consent&&record&&Date.now()-record.at<60000?{...record.headers}:{};
       if(consent){
         const has=name=>Object.keys(headers).some(key=>key.toLowerCase()===name);
         const agent=userAgent();if(!has('user-agent')&&typeof agent==='string'&&agent.length<=2048&&!/[\u0000-\u001f\u007f]/.test(agent)&&agent)headers['User-Agent']=agent;
       }
-      return {url,...(input.filename?{filename:input.filename.split(/[\\/]/).pop()}:{}),...(input.mediaType?{mediaType:input.mediaType}:{}),...(Object.keys(headers).length?{headers}:{})};
+      return {url,...(input.filename?{filename:input.filename.split(/[\\/]/).pop()}:{}),...(mediaType?{mediaType}:{}),...(Object.keys(headers).length?{headers}:{})};
     }
     async function cookieHeaders(url,stamp){
       if(!settings.credentials[new URL(url).origin]||!chrome.cookies||!chrome.permissions)return {};
@@ -53,11 +63,11 @@
       })(),new Promise(resolve=>{timer=setTimeout(()=>resolve({}),1000);})]);}catch{return {};}finally{clearTimeout(timer);}
     }
     async function send(input){
-      let data=payload(input);if(!data)return false;const stamp=context(new URL(data.url).origin);
-      if(settings.credentials[new URL(data.url).origin]&&!Object.keys(data.headers||{}).some(name=>name.toLowerCase()==='cookie')){
+      let data=payload(input);if(!data)return false;const externalMedia=['dash','youtube'].includes(data.mediaType);if(externalMedia&&data.headers){data={...data};delete data.headers;}const stamp=context(new URL(data.url).origin);
+      if(!externalMedia&&settings.credentials[new URL(data.url).origin]&&!Object.keys(data.headers||{}).some(name=>name.toLowerCase()==='cookie')){
         const cookies=await cookieHeaders(data.url,stamp);if(validContext(stamp)&&Object.keys(cookies).length)data={...data,headers:{...data.headers,...cookies}};
       }
-      if(!validContext(stamp)||!await permissionAllowed(stamp)||!validContext(stamp)){onStatus('Quyền đăng nhập đã thay đổi; trình duyệt tiếp tục tải. Hãy gửi lại sau khi kiểm tra quyền.');return false;}
+      if(!externalMedia&&(!validContext(stamp)||!await permissionAllowed(stamp)||!validContext(stamp))){onStatus('Quyền đăng nhập đã thay đổi; trình duyệt tiếp tục tải. Hãy gửi lại sau khi kiểm tra quyền.');return false;}
       const request={schema:1,request_id:uuid(),op:'add',payload:data};
       return new Promise(resolve=>{let settled=false;const finish=(accepted,error)=>{if(settled)return;settled=true;clearTimeout(timer);onStatus(accepted?'Đã chuyển sang FlowDM':error||'FlowDM chưa xác nhận; trình duyệt tiếp tục tải.');resolve(accepted);};
         const timer=setTimeout(()=>finish(false,'Hết thời gian chờ FlowDM; kiểm tra hàng đợi trước khi gửi lại.'),timeoutMs);
@@ -66,7 +76,7 @@
     }
     async function automatic(item){
       const url=httpUrl(item.finalUrl||item.url);const record=requests.get(url);
-      if(!settings.autoCapture||!url||item.incognito||item.state!=='in_progress'||item.danger!=='safe'||(record&&record.method!=='GET')||(handled.has(item.id)||pausing.has(item.id)))return false;
+      if(!settings.autoCapture||!url||/\.mpd(?:$|[?#])/i.test(url)||item.incognito||item.state!=='in_progress'||item.danger!=='safe'||(record&&record.method!=='GET')||(handled.has(item.id)||pausing.has(item.id)))return false;
       if(record?.hasCredentials&&!settings.credentials[new URL(url).origin]){onStatus('Tải cần đăng nhập: bật quyền cho trang này để chuyển sang FlowDM. Trình duyệt tiếp tục tải.');return false;}
       const autoStamp=context(new URL(url).origin);
       pausing.add(item.id);let paused;try{paused=await pauseWhenReady(item.id);}finally{pausing.delete(item.id);}

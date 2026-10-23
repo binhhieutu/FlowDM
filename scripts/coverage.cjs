@@ -15,7 +15,7 @@ function run(args, env = process.env) {
   if (result.error) throw result.error;
   if (result.status !== 0) process.exit(result.status || 1);
 }
-const files = ['core', 'media', 'bridge', 'browser'].flatMap(group => fs.readdirSync(path.join(root, 'tests', group)).filter(file => file.endsWith('.test.cjs')).map(file => `tests/${group}/${file}`));
+const files = ['core', 'media', 'bridge', 'browser', 'tools'].flatMap(group => fs.readdirSync(path.join(root, 'tests', group)).filter(file => file.endsWith('.test.cjs')).map(file => `tests/${group}/${file}`));
 run([c8, `--temp-directory=${unit}`, '--include=src/**', '--include=extension/**', '--all', '--reporter=json-summary', process.execPath, '--test', ...files]);
 run(['--test', '--test-concurrency=1', 'tests/e2e/desktop.test.cjs'], { ...process.env, FLOWDM_COVERAGE_DIR: desktop });
 for (const directory of [unit, desktop]) for (const file of fs.readdirSync(directory)) {

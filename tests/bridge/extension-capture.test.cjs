@@ -76,4 +76,13 @@ test('cross-origin page query secrets never become an invented Referer',async()=
  let request;const chrome={runtime:{sendNativeMessage(host,value,done){request=value;done({ok:true,request_id:value.request_id,payload:{id:'task'}});}}};
  const c=createCapture(chrome,{userAgent:()=> 'Browser UA'});c.settings.credentials['https://cdn.test']=true;await c.send({url:'https://cdn.test/movie.mp4',referrer:'https://private.test/watch?access_token=do-not-forward#fragment'});assert.equal(request.payload.headers.Referer,undefined);assert.equal(request.payload.headers['User-Agent'],'Browser UA');
 });
+test('DASH and YouTube handoffs infer their external type and omit all browser-derived headers even with consent',async()=>{
+ const requests=[];const chrome={permissions:{async contains(){return false;}},cookies:{async getAll(){throw Error('must not read cookies');}},runtime:{sendNativeMessage(host,request,done){requests.push(request);done({ok:true,request_id:request.request_id,payload:{id:'task'}});}}};
+ const c=createCapture(chrome,{uuid:()=> 'req',userAgent:()=> 'Browser UA'});c.settings.credentials['https://cdn.test']=true;c.settings.credentials['https://www.youtube.com']=true;
+ c.remember({url:'https://cdn.test/manifest.mpd',method:'GET',requestHeaders:[{name:'Cookie',value:'private'},{name:'Referer',value:'https://page.test/'}]});
+ await c.send({url:'https://cdn.test/manifest.mpd',mediaType:'dash'});await c.send({url:'https://www.youtube.com/watch?v=dQw4w9WgXcQ',mediaType:'youtube'});
+ await c.send({url:'https://cdn.test/menu-manifest.mpd'});await c.send({url:'https://youtu.be/dQw4w9WgXcQ'});
+ for(const request of requests){assert.equal(request.payload.headers,undefined);assert.ok(['dash','youtube'].includes(request.payload.mediaType));}
+});
+test('automatic capture leaves MPD manifests in the browser',async()=>{const f=fixture();assert.equal(await f.capture.automatic({...f.item,url:'https://cdn.test/manifest.mpd'}),false);assert.deepEqual(f.calls,[]);});
 

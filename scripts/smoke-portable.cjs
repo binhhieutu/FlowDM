@@ -41,11 +41,13 @@ const assert = require('node:assert/strict');
   }
   async function close() {
     if (!instance) return;
-    if (instance.page) await instance.page.close().catch(() => {});
-    if (instance.browser) await instance.browser.close().catch(() => {});
+    // Electron does not reliably implement CDP Target.closeTarget. Request the
+    // window close in its renderer, then wait for the real portable launcher.
+    if (instance.page) await instance.page.evaluate(() => window.close()).catch(() => {});
     let timer;
     try { await Promise.race([instance.exited, new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Portable did not shut down')), 20000); })]); }
     finally { clearTimeout(timer); }
+    if (instance.browser) await instance.browser.close().catch(() => {});
     instance = null;
   }
   try {
@@ -63,9 +65,24 @@ const assert = require('node:assert/strict');
     await row.getByRole('button', { name: 'Tiếp tục', exact: true }).click();
     await row.getByText('Hoàn tất', { exact: true }).waitFor({ timeout: 30000 });
     assert.deepEqual(await fs.readFile(path.join(root, 'files', 'portable.bin')), content);
+    const info = await page.evaluate(() => window.flow.info()); assert.equal(info.data.mediaTools.ready, true, JSON.stringify(info));
+    let youtube = null;
+    if (process.env.FLOWDM_LIVE_YOUTUBE) {
+      const added = await page.evaluate(url => window.flow.add({ url, filename: 'portable-youtube.mp4' }), process.env.FLOWDM_LIVE_YOUTUBE);
+      assert.equal(added.ok, true, JSON.stringify(added)); const end = Date.now() + 180000; let task;
+      while (Date.now() < end) {
+        task = (await page.evaluate(() => window.flow.list())).data.find(item => item.id === added.data.id);
+        if (['completed', 'failed'].includes(task.status)) break;
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      assert.equal(task.status, 'completed', JSON.stringify(task));
+      const actualHash = crypto.createHash('sha256').update(await fs.readFile(task.path)).digest('hex'); assert.equal(actualHash, task.sha256);
+      if (process.env.FLOWDM_EXPECTED_YOUTUBE_SHA256) assert.equal(actualHash, process.env.FLOWDM_EXPECTED_YOUTUBE_SHA256);
+      youtube = { bytes: task.totalBytes, sha256: actualHash, matchesFullyDecodedSample: !!process.env.FLOWDM_EXPECTED_YOUTUBE_SHA256 };
+    }
     await fs.mkdir('test-results', { recursive: true });
     await page.screenshot({ path: 'test-results/portable-smoke.png' });
-    const report = { status: 'passed', artifact: path.basename(executable), bytes: content.length, sha256: crypto.createHash('sha256').update(content).digest('hex'), pauseRestartResume: true, at: new Date().toISOString() };
+    const report = { status: 'passed', artifact: path.basename(executable), bytes: content.length, sha256: crypto.createHash('sha256').update(content).digest('hex'), pauseRestartResume: true, mediaToolsVerified: info.data.mediaTools.ready, youtube, at: new Date().toISOString() };
     await fs.writeFile('test-results/portable-smoke.json', JSON.stringify(report, null, 2)); console.log(JSON.stringify(report));
     await close();
   } finally {

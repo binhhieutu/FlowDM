@@ -1,10 +1,10 @@
-# FlowDM 0.2
+# FlowDM 0.3
 
-Ứng dụng tải HTTP/HTTPS desktop với tiện ích Chromium tự bắt tải xuống và chọn tải video HLS VOD. Mã nguồn và nhận diện riêng; không dùng mã hay tài sản IDM và không tuyên bố đủ mọi tính năng IDM.
+Ứng dụng tải HTTP/HTTPS desktop với tiện ích Chromium tự bắt tải xuống và chọn tải video HLS VOD, DASH tĩnh giới hạn và YouTube công khai. Mã nguồn và nhận diện riêng; không dùng mã hay tài sản IDM và không tuyên bố đủ mọi tính năng IDM.
 
 ## Dùng trên Windows
 
-Mở `dist/FlowDM 0.2.0.exe` hoặc `dist/win-unpacked/FlowDM.exe`. Bản đóng gói không cần cài Node.js. Nhấn **Thêm liên kết** để chọn URL, thư mục, tên tệp và số kết nối. Có tạm dừng/tiếp tục, hủy/thử lại, tìm kiếm/lọc, hẹn giờ, giới hạn tốc độ và SHA-256 sau tải. Không tự mở hay chạy tệp tải về; không ghi đè tệp có sẵn.
+Mở `dist/FlowDM 0.3.0.exe` hoặc `dist/win-unpacked/FlowDM.exe`. Bản Windows đóng gói không cần cài Node.js; kèm yt-dlp 2026.10.21 và FFmpeg 8.1 đã ghim hash cùng giấy phép trong private artifact. Nhấn **Thêm liên kết** để chọn URL, thư mục, tên tệp và số kết nối. Có tạm dừng/tiếp tục, hủy/thử lại, tìm kiếm/lọc, hẹn giờ, giới hạn tốc độ và SHA-256 sau tải. Không tự mở hay chạy tệp tải về; không ghi đè tệp có sẵn.
 
 Tải tệp nhiều kết nối và resume giữ byte cần server hỗ trợ Range và validator an toàn. Khi không thể xác minh cùng phiên bản, ứng dụng tải lại an toàn hoặc báo lỗi thay vì trộn dữ liệu. HLS tiếp tục/thử lại từ đầu toàn bộ video. Hủy xóa dữ liệu tạm; xóa lịch sử không xóa tệp đã hoàn tất.
 
@@ -22,7 +22,9 @@ Tự bắt tải HTTP(S) bật mặc định khi cài tiện ích và có thể 
 
 Cookie, Authorization, Referer và User-Agent mặc định không được chuyển. Nếu cần đăng nhập, mở popup, chọn đúng tên miền của trang hoặc tài nguyên/CDN rồi bật quyền rõ ràng. Cookie được lấy theo URL với quyền tùy chọn; bearer token cần một yêu cầu mạng mới sau khi cấp quyền. Headers chỉ ở bộ nhớ và bị bỏ khi chuyển sang origin khác.
 
-Tiện ích nhận diện video/audio/source động và các manifest mạng, kể cả player dùng blob. Nhấn **Tải video bằng FlowDM** cạnh media hoặc chọn mục trong popup. Phát hiện media không tự tải mọi luồng. Hỗ trợ tệp trực tiếp và HLS VOD không mã hóa dạng MPEG-TS hoặc fMP4. Chưa hỗ trợ live, DRM/mã hóa, DASH, audio/video tách riêng hay quy tắc trích xuất riêng cho từng website. HLS ghép theo thứ tự nguồn, không chuyển mã/remux; xem [phạm vi media](docs/media-report.md).
+Tiện ích nhận diện video/audio/source động và các manifest mạng, kể cả player dùng blob. Nhấn **Tải video bằng FlowDM** cạnh media, nút YouTube trên trang, hoặc chọn mục trong popup; dán MPD/URL YouTube cũng tự nhận dạng loại phù hợp. Phát hiện media không tự tải mọi luồng. Hỗ trợ tệp trực tiếp, HLS VOD không mã hóa dạng MPEG-TS/fMP4, và DASH tĩnh không DRM có video/audio tách riêng để ghép MP4.
+
+YouTube chỉ dành cho video công khai ở URL chuẩn `watch`, `shorts`, `youtu.be` hoặc bản mobile tương ứng. Mặc định chọn H.264 tối đa 1080p kèm M4A; chưa có bộ chọn chất lượng và không hứa tải 4K. Không hỗ trợ DRM, live, video cần đăng nhập/age wall, PO token, plugin hoặc cơ chế vượt bảo vệ. DASH chỉ là tập con tĩnh: từ chối DRM, live, CDATA, tham chiếu namespace/remote, byte range và các manifest phức tạp ngoài parser hiện có. HLS/DASH/YouTube tạm dừng hoặc thử lại sẽ tải lại toàn bộ để tránh ghép sai nội dung. DASH/YouTube không gửi Cookie, Authorization, Referer hay User-Agent. Xem [phạm vi media](docs/media-report.md).
 
 Nếu đang dùng IDM, tắt tích hợp IDM cho trình duyệt dùng FlowDM để tránh hai trình quản lý cùng bắt một tải. Kiểm thử thấy IDM vẫn can thiệp Chrome thường dù đã bỏ tiện ích IDM. Không cần thay đổi profile thật để thử bản này.
 
@@ -30,7 +32,7 @@ Nếu đang dùng IDM, tắt tích hợp IDM cho trình duyệt dùng FlowDM đ�
 
 - `downloads.json` và dữ liệu tạm nằm ở `app.getPath('userData')/state`; đích mặc định là `Downloads/FlowDM`. Có thể đặt `FLOWDM_DATA_DIR` và `FLOWDM_DOWNLOAD_DIR` bằng đường dẫn tuyệt đối.
 - URL, gồm signed query/token cần để resume, được lưu trong lịch sử. Không chia sẻ thư mục dữ liệu. Headers nhạy cảm không được lưu; tải cần đăng nhập có thể phải thêm lại sau khi khởi động.
-- Journal 0.2 ghi schema v2 và đọc được schema v1. Bản 0.1 từ chối v2: sao lưu thư mục dữ liệu trước khi nâng cấp nếu cần quay lại bản cũ.
+- Journal 0.3 ghi schema v3 và đọc được schema v1/v2. Bản cũ không đọc schema mới: sao lưu thư mục dữ liệu trước khi nâng cấp nếu cần quay lại bản cũ.
 - Giới hạn mặc định 100 GiB/tệp, ba lượt tải đồng thời, tối đa ba lượt/host; UI chọn 1/2/4/8 kết nối. Server không hỗ trợ Range dùng một luồng. Cần chỗ trống cho dữ liệu tạm và tệp cuối.
 - Đích cần filesystem hỗ trợ hard link như NTFS/ext4/APFS; FAT/exFAT chưa hỗ trợ. Không có FTP, proxy xác thực, site grabber, nhập dữ liệu IDM hay tự cập nhật.
 
@@ -46,10 +48,12 @@ npm run test:coverage
 npm run test:e2e
 ```
 
-Đóng gói bằng `npm run dist:win`, `npm run dist:linux` hoặc `npm run dist:mac`. Windows là nền tảng đã chạy kiểm thử desktop và trình duyệt thật; xem kết quả tại [VERIFICATION_V2.md](docs/VERIFICATION_V2.md). Linux x64 tar.gz đã build nhưng chưa chạy native trên Linux; macOS chưa build/chạy. Linux cần thư viện Electron, X11/Wayland và sandbox hoạt động; không tắt sandbox hoặc chạy root để bỏ qua lỗi môi trường. Bản chưa ký/notarize có thể cần phê duyệt theo chính sách hệ điều hành.
+Đóng gói bằng `npm run dist:win`, `npm run dist:linux` hoặc `npm run dist:mac`. Windows là nền tảng đã chạy kiểm thử desktop và trình duyệt thật; báo cáo đóng gói 0.3 sẽ ở [VERIFICATION_V3.md](docs/VERIFICATION_V3.md). Linux x64 tar.gz đã build nhưng chưa chạy native trên Linux; macOS chưa build/chạy. Linux cần thư viện Electron, X11/Wayland và sandbox hoạt động; không tắt sandbox hoặc chạy root để bỏ qua lỗi môi trường. Bản chưa ký/notarize có thể cần phê duyệt theo chính sách hệ điều hành.
+
+Source ZIP không kèm `vendor/media-tools`. Khi chuẩn bị bản Windows từ nguồn, dùng lệnh rõ ràng `node scripts/prepare-media-tools.cjs "C:\đường-dẫn\ffmpeg.exe"`; script chỉ chấp nhận FFmpeg 8.1 full build Gyan đúng hash và tải yt-dlp đã ghim phiên bản/hash. Linux/macOS cần tự cài yt-dlp và FFmpeg trên `PATH`; chưa có kiểm thử native hai nền tảng này. CI tải Gyan “latest” rồi đối chiếu hash đã ghim, nên sẽ từ chối thay đổi upstream thay vì đóng gói binary khác; CI chưa phải bằng chứng chạy native phát hành 0.3.
 
 E2E trình duyệt thật dùng Chrome for Testing 156 và Electron, kiểm tra tự bắt tải, tắt bắt tải, host vắng mặt, đăng nhập khi chưa/có consent, nút media chống click giả, byte tệp trực tiếp/HLS TS/fMP4 và giải mã bằng FFmpeg. Profile thử dùng bản Chromium được đổi tên để tránh hook IDM; IDM và profile thật của chủ máy không bị chỉnh sửa. Bản sao tiện ích thử được cấp sẵn API cookies tùy chọn để tránh hộp quyền tự động, còn consent theo origin của sản phẩm vẫn được kiểm tra bật/tắt.
 
-Có thể cấu hình E2E bằng `FLOWDM_BROWSER_EXECUTABLE`, `FLOWDM_FFMPEG` và `FLOWDM_EXECUTABLE`; FFmpeg chỉ dùng xác minh fixture media, không phải phụ thuộc chạy FlowDM. Nguồn fixture: [video/README.md](tests/fixtures/video/README.md). Kết quả bản 0.2 nằm trong [VERIFICATION_V2.md](docs/VERIFICATION_V2.md); [VERIFICATION.md](docs/VERIFICATION.md) là bằng chứng lịch sử 0.1, không phải xác nhận 0.2.
+Có thể cấu hình E2E bằng `FLOWDM_BROWSER_EXECUTABLE`, `FLOWDM_FFMPEG` và `FLOWDM_EXECUTABLE`; FFmpeg chỉ dùng xác minh fixture media, không phải phụ thuộc chạy FlowDM. Kiểm thử nguồn 0.3 đã tải Big Buck Bunny công khai từ YouTube: 634,624 giây, 288,738,744 byte, H.264 1080p/AAC, giải mã toàn bộ bằng FFmpeg; Chromium thật cũng đã tải DASH popup có video/audio tách riêng và ghép MP4. Báo cáo đóng gói cuối cùng sẽ ở [VERIFICATION_V3.md](docs/VERIFICATION_V3.md). [VERIFICATION_V2.md](docs/VERIFICATION_V2.md) và [VERIFICATION.md](docs/VERIFICATION.md) là bằng chứng lịch sử, không phải xác nhận 0.3.
 
 Kiến trúc: `src/core` tải/journal; `src/media` HLS; `src/browser` thiết lập và kiểm tra tiếp nhận; `src/bridge` Native Messaging/IPC; `src/ui` giao diện Electron sandbox. Xem [DESIGN.md](docs/DESIGN.md) và [browser-capture-report.md](docs/browser-capture-report.md).

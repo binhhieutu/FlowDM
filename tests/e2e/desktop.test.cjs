@@ -61,7 +61,7 @@ test('desktop downloads exact bytes, pause/resume, persists, rejects invalid URL
   await page.getByRole('button', { name: 'Kết nối trình duyệt', exact: true }).click();
   await page.getByRole('button', { name: 'Mở thư mục tiện ích', exact: true }).click();
   await page.getByText('Đã mở thư mục.', { exact: false }).waitFor();
-  assert.equal(JSON.parse(await fs.readFile(path.join(root, 'browser-extension', 'manifest.json'), 'utf8')).version, '0.2.0');
+  assert.equal(JSON.parse(await fs.readFile(path.join(root, 'browser-extension', 'manifest.json'), 'utf8')).version, require('../../package.json').version);
   await page.getByLabel('ID tiện ích FlowDM').fill('bad');
   await page.getByRole('button', { name: 'Kết nối', exact: true }).click();
   await page.getByText('ID tiện ích phải gồm đúng 32 ký tự a–p.', { exact: true }).waitFor();

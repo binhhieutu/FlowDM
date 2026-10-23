@@ -1,0 +1,16 @@
+  • electron-builder  version=26.15.3 os=10.0.19045
+  • loaded configuration  file=package.json ("build" field)
+  • executing @electron/rebuild  electronVersion=45.0.0 arch=x64 buildFromSource=false workspaceRoot=I:\dich_nguoc\FlowDM projectDir=./ appDir=./
+  • installing native dependencies  arch=x64
+  • completed installing native dependencies
+  • packaging       platform=win32 arch=x64 electron=45.0.0 appOutDir=dist\win-unpacked
+  • downloaded      label=electron progress=100%
+  • downloaded electron zip extracted successfully  output=I:\dich_nguoc\FlowDM\dist\win-unpacked
+  • searching for node modules  pm=npm searchDir=I:\dich_nguoc\FlowDM
+  • searching for node modules  pm=traversal searchDir=I:\dich_nguoc\FlowDM
+  • using manual traversal of node_modules to build dependency tree
+  • no node modules returned while searching directories  searchDirectories=[""]
+  • updating asar integrity executable resource  executablePath=dist\win-unpacked\FlowDM.exe
+  • file signing skipped via signExecutable configuration  file=dist\win-unpacked\FlowDM.exe
+  • building        target=portable file=dist\FlowDM 0.3.0.exe archs=x64
+  • file signing skipped via signExecutable configuration  file=dist\FlowDM 0.3.0.exe

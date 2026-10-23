@@ -24,7 +24,7 @@
    const row=document.createElement('div');row.className='media';row.dataset.mediaType=item.mediaType;
    const title=document.createElement('p');let name;try{name=new URL(item.url).pathname.split('/').pop();}catch{}
    title.textContent=`${item.mediaType.toUpperCase()} · ${item.title||name||'Video / âm thanh'}`;
-   const button=document.createElement('button');button.dataset.testid='download-media';button.textContent=item.mediaType==='dash'?'DASH chưa hỗ trợ':'Tải bằng FlowDM';button.disabled=item.mediaType==='dash';
+   const button=document.createElement('button');button.dataset.testid='download-media';button.textContent='Tải bằng FlowDM';button.disabled=false;
    button.onclick=async()=>{button.disabled=true;const result=await chrome.runtime.sendMessage({type:'flowdm:download',tabId:tab.id,url:item.url,mediaType:item.mediaType});await refresh();if(!result.ok)find('capture-status').textContent=result.error||'Chưa chuyển được. Mở FlowDM và kiểm tra cầu nối.';};
    row.append(title,button);list.append(row);
   }

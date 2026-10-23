@@ -18,6 +18,10 @@ for (const platform of ['win-unpacked', 'linux-unpacked']) {
   const packaged = JSON.parse(asar.extractFile(archive, 'package.json').toString());
   const source = require('../package.json');
   if (packaged.version !== source.version || packaged.main !== source.main || packaged.name !== source.name) throw new Error('Packaged metadata mismatch');
+  if (platform === 'win-unpacked') for (const entry of Object.values(require('../assets/media-tools.json').entries)) {
+    const binary = fs.readFileSync(path.join(root, 'dist', platform, 'resources', 'media-tools', entry.file));
+    if (binary.length !== entry.bytes || crypto.createHash('sha256').update(binary).digest('hex') !== entry.sha256) throw new Error(`Bundled media tool mismatch: ${entry.file}`);
+  }
   manifest.push({ platform, filesVerified: verified, asarSha256: crypto.createHash('sha256').update(fs.readFileSync(archive)).digest('hex') });
 }
 fs.mkdirSync(path.join(root, 'test-results'), { recursive: true });

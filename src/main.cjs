@@ -5,6 +5,7 @@ const { DownloadManager } = require('./core/download-manager.cjs');
 const { createBridge } = require('./bridge/server.cjs');
 const { createBrowserSetup } = require('./browser/setup.cjs');
 const { createBrowserAdmission } = require('./browser/admission.cjs');
+const { mediaToolStatus } = require('./tools/media-tools.cjs');
 
 const dataDir = process.env.FLOWDM_DATA_DIR || path.join(app.getPath('userData'), 'state');
 if (process.env.FLOWDM_DATA_DIR) app.setPath('userData', path.dirname(dataDir));
@@ -46,7 +47,7 @@ function installHandlers() {
     try { return { ok: true, data: await action(input) }; }
     catch (error) { return { ok: false, error: error.message }; }
   });
-  handle('info', async () => ({ version: app.getVersion(), platform: process.platform, downloadDir, bridgeAvailable: !!bridge, bridgeError, browser: await browserSetup.info() }));
+  handle('info', async () => ({ version: app.getVersion(), platform: process.platform, downloadDir, bridgeAvailable: !!bridge, bridgeError, browser: await browserSetup.info(), mediaTools: await mediaToolStatus() }));
   handle('browserInfo', () => browserSetup.info());
   handle('browserExport', async () => { const directory = await browserSetup.prepareExtension(); const error = await shell.openPath(directory); if (error) throw new Error(error); return directory; });
   handle('browserConnect', input => browserSetup.connect(input || {}));

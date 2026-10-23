@@ -31,16 +31,37 @@ test('bundle helper writes only requested destination and exact extension origin
  assert.deepEqual(manifest.allowed_origins,[`chrome-extension://${'a'.repeat(32)}/`]);assert.equal(manifest.name,'local.flowdm.bridge');assert.ok((await fs.stat(manifest.path)).isFile());
  await assert.rejects(generateBundle({outputDir:output,dataDir:output,extensionId:'*',nodePath:process.execPath}));
 });
-test('background excludes incognito network media, rejects DASH and removes tab state',async()=>{
+test('background excludes incognito media, accepts explicit DASH and removes tab state',async()=>{
  const f=backgroundFixture();await f.message({type:'flowdm:state',tabId:3});await f.listeners.headers({incognito:true,tabId:3,url:'https://a.test/private.mp4'});
  await f.message({type:'flowdm:media',items:[{url:'https://a.test/video.mpd'}]},{tab:{id:3}});
- assert.equal((await f.message({type:'flowdm:download',tabId:3,url:'https://a.test/video.mpd',mediaType:'dash'})).ok,false);
+ assert.equal((await f.message({type:'flowdm:download',tabId:3,url:'https://a.test/video.mpd',mediaType:'dash'})).ok,true);
  assert.equal((await f.message({type:'flowdm:options'},{tab:{id:3}})).items.length,1);
  assert.equal((await f.message({type:'flowdm:options'},{tab:{id:3,incognito:true}})).items.length,0);
  assert.equal((await f.message({type:'flowdm:download',url:'https://a.test/video.mpd',mediaType:'direct'},{tab:{id:3,incognito:true}})).ok,false);
  await f.listeners.removed(3);assert.equal((await f.message({type:'flowdm:state',tabId:3})).items.length,0);
  assert.equal((await f.message({type:'unknown'})).ok,false);
  f.chrome.permissions.contains=async()=>false;await f.listeners.permissionRemoved();assert.deepEqual(f.local.credentials,{});
+});
+test('content may add only its own canonical YouTube watch page and a user action can hand it off',async()=>{
+ const f=backgroundFixture();const sender={id:'test-extension',url:'https://www.youtube.com/watch?v=dQw4w9WgXcQ',tab:{id:7,url:'https://www.youtube.com/watch?v=dQw4w9WgXcQ'}};f.chrome.tabs.get=async()=>sender.tab;
+ assert.equal((await f.message({type:'flowdm:youtube',url:'https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=ignored',title:'Clip'},sender)).ok,true);
+ const state=await f.message({type:'flowdm:state',tabId:7});assert.equal(JSON.stringify(state.items.map(item=>[item.mediaType,item.url])),JSON.stringify([['youtube','https://www.youtube.com/watch?v=dQw4w9WgXcQ']]));
+ assert.equal((await f.message({type:'flowdm:download',tabId:7,url:state.items[0].url,mediaType:'youtube'})).ok,true);
+ assert.equal((await f.message({type:'flowdm:youtube',url:'https://www.youtube.com/watch?v=aaaaaaaaaaa'},{...sender,tab:{id:7,url:'https://www.youtube.com/watch?v=dQw4w9WgXcQ'}})).ok,false);
+ assert.equal((await f.message({type:'flowdm:youtube',url:'https://youtube.com.evil.test/watch?v=dQw4w9WgXcQ'},sender)).ok,false);
+});
+test('trusted popup derives only the current public YouTube page when no media element was detected',async()=>{
+ const f=backgroundFixture();f.chrome.tabs.get=async id=>({id,url:'https://m.youtube.com/shorts/dQw4w9WgXcQ?si=ignored',incognito:false});
+ const state=await f.message({type:'flowdm:state',tabId:8});assert.equal(JSON.stringify(state.items.map(item=>[item.mediaType,item.url])),JSON.stringify([['youtube','https://www.youtube.com/shorts/dQw4w9WgXcQ']]));assert.equal(f.messages.length,0);assert.equal((await f.message({type:'flowdm:download',tabId:8,url:state.items[0].url,mediaType:'youtube'})).ok,true);
+ f.chrome.tabs.get=async id=>({id,url:'https://youtube.com.evil.test/watch?v=dQw4w9WgXcQ',incognito:false});assert.equal((await f.message({type:'flowdm:state',tabId:9})).items.length,0);
+ f.chrome.tabs.get=async id=>({id,url:'https://www.youtube.com/watch?v=dQw4w9WgXcQ',incognito:true});assert.equal((await f.message({type:'flowdm:state',tabId:10})).items.length,0);
+});
+test('trusted popup reconciles YouTube rows after SPA navigation and rejects a stale selection',async()=>{
+ const f=backgroundFixture();let url='https://www.youtube.com/watch?v=dQw4w9WgXcQ';f.chrome.tabs.get=async id=>({id,url,incognito:false});
+ let state=await f.message({type:'flowdm:state',tabId:11});assert.equal(state.items.filter(item=>item.mediaType==='youtube').length,1);const stale=state.items[0].url;
+ url='https://www.youtube.com/watch?v=9bZkp7q19f0';state=await f.message({type:'flowdm:state',tabId:11});assert.equal(JSON.stringify(state.items.filter(item=>item.mediaType==='youtube').map(item=>item.url)),JSON.stringify(['https://www.youtube.com/watch?v=9bZkp7q19f0']));
+ assert.equal((await f.message({type:'flowdm:download',tabId:11,url:stale,mediaType:'youtube'})).ok,false);assert.equal(f.messages.length,0);
+ url='https://www.youtube.com/';state=await f.message({type:'flowdm:state',tabId:11});assert.equal(state.items.filter(item=>item.mediaType==='youtube').length,0);
 });
 test('own extension popup tab is trusted while content tab cannot alter settings',async()=>{
  const f=backgroundFixture();const own={id:'test-extension',url:'chrome-extension://test-extension/popup.html',tab:{id:50,url:'chrome-extension://test-extension/popup.html'}};

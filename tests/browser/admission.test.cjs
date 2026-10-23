@@ -17,7 +17,7 @@ test('browser ownership ACK requires an accessible non-login response before que
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve)); t.after(() => { server.closeAllConnections(); server.close(); });
   const url = `http://127.0.0.1:${server.address().port}`; const added = [];
   const manager = { maxBytes: 1000, add: async payload => { added.push(payload); return { id: 'queued' }; } };
-  const accept = createBrowserAdmission(manager, { timeoutMs: 60, maxPending: 1 });
+  const accept = createBrowserAdmission(manager, { timeoutMs: 60, maxPending: 1, resolveTools: async () => ({ ready: true }) });
   await assert.rejects(accept({ url: `${url}/auth` }), /401/); assert.equal(added.length, 0);
   await assert.rejects(accept({ url: `${url}/html` }), /HTML|login/i); assert.equal(added.length, 0);
   assert.equal((await accept({ url: `${url}/auth`, headers: { cookie: 'session=ok' } })).id, 'queued');
@@ -27,6 +27,8 @@ test('browser ownership ACK requires an accessible non-login response before que
   await assert.rejects(accept({ url: `${url}/wrong-range` }), /range/);
   await assert.rejects(accept({ url: `${url}/large` }), /size limit/);
   assert.equal((await accept({ url: `${url}/plain`, mediaType: 'direct' })).id, 'queued');
+  assert.equal((await accept({ url: `${url}/manifest.mpd`, mediaType: 'dash' })).id, 'queued');
+  assert.equal((await accept({ url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', mediaType: 'youtube' })).id, 'queued');
   const slow = accept({ url: `${url}/slow` });
-  await assert.rejects(accept({ url: `${url}/auth` }), /busy/i); await assert.rejects(slow); assert.equal(added.length, 2);
+  await assert.rejects(accept({ url: `${url}/auth` }), /busy/i); await assert.rejects(slow); assert.equal(added.length, 4);
 });

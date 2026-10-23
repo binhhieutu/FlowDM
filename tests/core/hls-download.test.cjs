@@ -80,7 +80,7 @@ test('HLS strips credential context for cross-origin variants and redirects', as
 });
 test('validates media type, bounded URL and explicit direct override', async t => {
   const { manager, url } = await setup(t, (req, res) => res.end('plain'));
-  await assert.rejects(manager.add({ url, mediaType: 'dash' }), /Media type/);
+  await assert.rejects(manager.add({ url, mediaType: 'torrent' }), /Media type/);
   await assert.rejects(manager.add({ url: `${url}?${'x'.repeat(32769)}` }), /32768/);
   await assert.rejects(manager.add({ url: `${url}?${'é'.repeat(6000)}` }), /32768/);
   const done = await wait(manager, (await manager.add({ url, mediaType: 'direct' })).id);

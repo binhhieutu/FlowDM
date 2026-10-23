@@ -1,0 +1,10 @@
+# Media tool provenance
+
+FlowDM invokes yt-dlp and FFmpeg as separate processes. Application MIT licensing does not replace tool licenses. The local Windows build includes the following pinned, unsigned binaries; runtime checks packaged binary hashes against assets/media-tools.json before media downloads. No automatic executable update or remote plugin download is enabled.
+
+- yt-dlp 2026.10.21: official https://github.com/yt-dlp/yt-dlp/releases/tag/2026.10.21, executable SHA-256 checked against that release's SHA2-256SUMS. Upstream LICENSE and THIRD_PARTY_LICENSES are included beside the binaries. This pinned release includes the upstream security update published on October 21.
+- FFmpeg 8.1 full_build from gyan.dev, taken from the owner's existing WinGet installation and checked against the recorded SHA-256. Upstream build download/recipe: https://www.gyan.dev/ffmpeg/builds/ ; FFmpeg source tag n8.1: https://git.ffmpeg.org/ffmpeg.git ; licenses https://ffmpeg.org/legal.html . This build enables GPL and version3; its GPLv3 text and actual `ffmpeg -version` configuration are included in this local artifact.
+
+This is a private build prepared and tested on the owner's machine. It has not been publicly distributed. Before public redistribution of the bundled GPL build, assemble/review the complete corresponding sources and build dependencies for that exact Gyan build; source links and a license copy alone are not a claim that this obligation is fulfilled. The source ZIP excludes executable vendor files. Build preparation is explicit: `node scripts/prepare-media-tools.cjs ABSOLUTE_PATH_TO_PINNED_FFMPEG_EXE`.
+
+On Linux/macOS install compatible yt-dlp (with EJS) and FFmpeg using the platform's package tools. Source/development runs can use absolute FLOWDM_YTDLP/FLOWDM_FFMPEG overrides. Packaged Windows ignores PATH for these binaries and rejects overrides. Electron's own Node runtime is used for yt-dlp EJS with ELECTRON_RUN_AS_NODE=1; no external Node install is required by the Windows bundle. Child environments omit unrelated API keys, loader options, proxies and browser credentials.

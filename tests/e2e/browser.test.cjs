@@ -20,6 +20,7 @@ test('real Chromium extension auto capture, video/HLS, cookie consent and host-d
   const stateDir = path.join(root, 'app', 'state'); const userDataDir = path.dirname(stateDir);
   const profile = path.join(root, 'chromium'); const output = path.join(root, 'files');
   const extension = path.join(root, 'extension'); const fixture = path.resolve(__dirname, '../fixtures/video');
+  const dashFixture = path.resolve(__dirname, '../fixtures/dash');
   const body = crypto.randomBytes(2 * 1024 * 1024); let desktop; let context; let popup;
   const registrations = createRegistration(); const before = {};
   const browsers = process.platform === 'win32' ? ['chrome', 'testing', 'chromium'] : ['chromium'];
@@ -39,6 +40,10 @@ test('real Chromium extension auto capture, video/HLS, cookie consent and host-d
       res.on('close', () => clearInterval(timer)); return;
     }
     const name = path.basename(url.pathname);
+    if (url.pathname === `/dash/${name}` && /^(manifest\.mpd|(?:init|chunk)-stream\d+(?:-\d+)?\.m4s)$/.test(name)) {
+      try { const data = await fs.readFile(path.join(dashFixture, name)); res.writeHead(200, { 'Content-Type': name.endsWith('.mpd') ? 'application/dash+xml' : 'video/mp4', 'Content-Length': data.length }).end(data); } catch { res.writeHead(404).end(); }
+      return;
+    }
     if (url.pathname !== `/video/${name}` || !/^(?:direct\.mp4|list\.m3u8|fmp4\.m3u8|init\.mp4|segment\d+\.ts|fragment\d+\.m4s)$/.test(name)) { res.writeHead(404).end(); return; }
     try {
       const buffer = await fs.readFile(path.join(fixture, name));
@@ -123,11 +128,12 @@ test('real Chromium extension auto capture, video/HLS, cookie consent and host-d
   assert.deepEqual(await fs.readFile(direct.path), await fs.readFile(path.join(fixture, 'direct.mp4')));
   // Simulate a player's manifest network requests; actual extension observer
   // records these, then a real extension-page message selects the observed URL.
-  await page.evaluate(async () => { await fetch('/video/list.m3u8'); await fetch('/video/fmp4.m3u8'); });
+  await page.evaluate(async () => { await fetch('/video/list.m3u8'); await fetch('/video/fmp4.m3u8'); await fetch('/dash/manifest.mpd'); });
   const tab = await popup.evaluate(async target => (await chrome.tabs.query({})).find(tab => tab.url === target), `${origin}/`);
   assert.ok(tab?.id);
   const state = await until(async () => { const result = await popup.evaluate(tabId => chrome.runtime.sendMessage({ type: 'flowdm:state', tabId }), tab.id); return result.items?.filter(item => item.mediaType === 'hls').length === 2 ? result : null; }, 'HLS observer');
   assert.equal(state.items.filter(item => item.url.endsWith('/direct.mp4')).length, 1);
+  assert.equal(state.items.filter(item => item.mediaType === 'dash').length, 1);
   // Render the real popup for the active fixture page, then use its controls.
   await page.bringToFront(); await popup.reload();
   await popup.getByTestId('download-media').first().waitFor();
@@ -140,11 +146,31 @@ test('real Chromium extension auto capture, video/HLS, cookie consent and host-d
   const expectedTs = Buffer.concat(await Promise.all(['segment00.ts', 'segment01.ts', 'segment02.ts'].map(name => fs.readFile(path.join(fixture, name)))));
   const expectedMp4 = Buffer.concat(await Promise.all(['init.mp4', 'fragment00.m4s', 'fragment01.m4s', 'fragment02.m4s'].map(name => fs.readFile(path.join(fixture, name)))));
   assert.deepEqual(await fs.readFile(hlsTasks[0].path), expectedTs); assert.deepEqual(await fs.readFile(hlsTasks[1].path), expectedMp4);
-  for (const item of [direct, ...hlsTasks]) {
+  await popup.locator('.media').filter({ hasText: 'manifest.mpd' }).getByTestId('download-media').click();
+  const dash = await until(async () => (await tasks()).find(item => item.mediaType === 'dash' && ['completed', 'failed'].includes(item.status)), 'DASH download');
+  assert.equal(dash.status, 'completed', JSON.stringify(dash));
+  const dashProbe = spawnSync('ffprobe', ['-v', 'error', '-show_streams', '-of', 'json', dash.path], { encoding: 'utf8', windowsHide: true });
+  assert.equal(dashProbe.status, 0, dashProbe.stderr); assert.deepEqual(JSON.parse(dashProbe.stdout).streams.map(stream => stream.codec_type).sort(), ['audio', 'video']);
+  for (const item of [direct, ...hlsTasks, dash]) {
     const decoded = spawnSync(process.env.FLOWDM_FFMPEG || 'ffmpeg', ['-v', 'error', '-i', item.path, '-f', 'null', '-'], { encoding: 'utf8', windowsHide: true, timeout: 20000 });
     assert.equal(decoded.status, 0, decoded.stderr || decoded.error?.message); assert.equal(decoded.stderr, '');
   }
   events.push('direct-video-and-hls-ts-fmp4-decoded');
+  if (process.env.FLOWDM_LIVE_YOUTUBE) {
+    const youtubePage = await context.newPage();
+    await youtubePage.goto(process.env.FLOWDM_LIVE_YOUTUBE, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await youtubePage.bringToFront(); await popup.reload();
+    const youtubeRow = popup.locator('.media').filter({ hasText: 'YOUTUBE' });
+    await youtubeRow.getByTestId('download-media').waitFor();
+    await popup.screenshot({ path: 'test-results/youtube-browser-popup-v3.png' });
+    await youtubeRow.getByTestId('download-media').click();
+    const youtubeTask = await until(async () => (await tasks()).find(item => item.mediaType === 'youtube' && ['completed', 'failed'].includes(item.status)), 'YouTube browser handoff', 120000);
+    assert.equal(youtubeTask.status, 'completed', JSON.stringify(youtubeTask));
+    const youtubeProbe = spawnSync('ffprobe', ['-v', 'error', '-show_streams', '-of', 'json', youtubeTask.path], { encoding: 'utf8', windowsHide: true });
+    assert.equal(youtubeProbe.status, 0, youtubeProbe.stderr); assert.deepEqual(JSON.parse(youtubeProbe.stdout).streams.map(stream => stream.codec_type).sort(), ['audio', 'video']);
+    events.push('real-youtube-page-popup-to-native-completed');
+    await youtubePage.close(); await page.bringToFront(); await popup.reload();
+  }
   // Authentication stays with browser until consent; optional cookie API alone
   // does not authorize handing credentials to native code.
   await context.addCookies([{ name: 'fixture_session', value: 'allowed', url: origin, httpOnly: true, sameSite: 'Lax' }]);

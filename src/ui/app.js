@@ -68,9 +68,9 @@ function render() {
   $('details').hidden = !task;
   if (task) {
     $('detail-name').textContent = task.filename; $('detail-state').textContent = labels[task.status];
-    $('detail-path').textContent = task.path; $('detail-connections').textContent = task.mediaType === 'hls' ? `${task.media?.completedSegments || 0}/${task.media?.segmentCount || '?'} đoạn HLS` : `${task.segments?.length || task.connections} kết nối`;
+    const streamed = ['hls', 'dash', 'youtube'].includes(task.mediaType); $('detail-path').textContent = task.path; $('detail-connections').textContent = streamed ? `${task.media?.completedSegments || 0}/${task.media?.segmentCount || '?'} đoạn ${task.mediaType.toUpperCase()}` : `${task.segments?.length || task.connections} kết nối`;
     $('detail-hash').textContent = task.sha256 || 'Được tính khi tải hoàn tất';
-    $('detail-error').hidden = !task.error && task.mediaType !== 'hls'; $('detail-error').textContent = task.error || (task.mediaType === 'hls' ? 'Video HLS được tải lại từ đầu khi tiếp tục để giữ đúng nội dung.' : '');
+    $('detail-error').hidden = !task.error && !streamed; $('detail-error').textContent = task.error || (streamed ? `Video ${task.mediaType.toUpperCase()} được tải lại từ đầu khi tiếp tục để giữ đúng nội dung.` : '');
     $('segments').replaceChildren(...(task.segments || []).map((segment, index) => {
       const meter = element('progress', 'meter'); meter.max = Math.max(1, segment.end - segment.start + 1); meter.value = segment.received || 0; meter.title = `Kết nối ${index + 1}: ${bytes(segment.received)}`; return meter;
     }));
@@ -106,4 +106,4 @@ $('add-form').addEventListener('submit', async event => {
   finally { $('submit-download').disabled = false; }
 });
 window.flow.onChange(next => { tasks = next; if (!selected && tasks.length) selected = tasks[0].id; render(); });
-(async () => { const info = await window.flow.info(); if (info.ok) { defaultDirectory = info.data.downloadDir; $('app-version').textContent = `v${info.data.version} · ${info.data.platform}`; $('bridge-status').textContent = info.data.bridgeAvailable ? 'Sẵn sàng nhận liên kết từ trình duyệt' : 'Tích hợp trình duyệt chưa sẵn sàng'; } await refresh(); })().catch(error => toast(error.message));
+(async () => { const info = await window.flow.info(); if (info.ok) { defaultDirectory = info.data.downloadDir; $('app-version').textContent = `v${info.data.version} · ${info.data.platform}`; $('bridge-status').textContent = info.data.bridgeAvailable ? 'Sẵn sàng nhận liên kết từ trình duyệt' : 'Tích hợp trình duyệt chưa sẵn sàng'; if (info.data.mediaTools && !info.data.mediaTools.ready) $('media-type-hint').textContent = `HLS/DASH/YouTube chưa sẵn sàng: ${info.data.mediaTools.error || 'thiếu công cụ media'}`; } await refresh(); })().catch(error => toast(error.message));

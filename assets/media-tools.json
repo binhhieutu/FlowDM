@@ -1,0 +1,20 @@
+{
+  "platform": "win32",
+  "arch": "x64",
+  "entries": {
+    "ytDlp": {
+      "file": "yt-dlp.exe",
+      "version": "2026.10.21",
+      "source": "https://github.com/yt-dlp/yt-dlp/releases/tag/2026.10.21",
+      "bytes": 17880111,
+      "sha256": "33121d192d706e62f684a06f80918e3f3a8ba52ac3a65213b6951c39c7d9f555"
+    },
+    "ffmpeg": {
+      "file": "ffmpeg.exe",
+      "version": "8.1-full_build-www.gyan.dev",
+      "source": "https://www.gyan.dev/ffmpeg/builds/",
+      "bytes": 223360000,
+      "sha256": "d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31"
+    }
+  }
+}

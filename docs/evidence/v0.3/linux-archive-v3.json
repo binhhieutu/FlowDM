@@ -1,0 +1,10 @@
+{
+  "archive": "flowdm-0.3.0.tar.gz",
+  "verifiedPayloadFiles": 71,
+  "executableModes": {
+    "chrome-sandbox": "0o755",
+    "chrome_crashpad_handler": "0o755",
+    "flowdm": "0o755"
+  },
+  "nativeLinuxRun": false
+}

@@ -9,6 +9,7 @@ const { probe, retryRequest, rangeInfo, contentLength } = require('./http-client
 const { atomicJournal, uniqueDestination, openPartial, hashFile, publish, recoverPublished, preflightPublication } = require('./storage.cjs');
 const { loadPlaylist, getResource } = require('../media/hls.cjs');
 const { createValidator } = require('../media/container-check.cjs');
+const { downloadExternal } = require('../media/external.cjs');
 
 const clone = value => structuredClone(value);
 const STATES = ['queued', 'downloading', 'paused', 'completed', 'failed', 'canceled'];
@@ -18,13 +19,15 @@ function plan(total, connections, ranges) {
 }
 
 class DownloadManager extends EventEmitter {
-  constructor({ dataDir, downloadDir, maxConcurrent = 3, maxBytes = 100 * 1024 ** 3, maxPerHost = 3 }) {
+  constructor({ dataDir, downloadDir, maxConcurrent = 3, maxBytes = 100 * 1024 ** 3, maxPerHost = 3, externalDownloader = downloadExternal }) {
     super();
     if (![dataDir, downloadDir].every(value => typeof value === 'string' && path.isAbsolute(value))) throw Error('Data and download directories must be absolute');
     this.dataDir = path.resolve(dataDir); this.downloadDir = path.resolve(downloadDir);
     this.maxConcurrent = integer(maxConcurrent, 1, 16, 'Concurrent downloads');
     this.maxPerHost = integer(maxPerHost, 1, 16, 'Per-host downloads');
     this.maxBytes = integer(maxBytes, 1, Number.MAX_SAFE_INTEGER, 'Size limit');
+    if (typeof externalDownloader !== 'function') throw Error('External media downloader must be a function');
+    this.externalDownloader = externalDownloader;
     this.tasks = new Map(); this.secrets = new Map(); this.running = new Map(); this.pendingAdds = new Set();
     this.journal = path.join(this.dataDir, 'downloads.json');
     this.persistence = Promise.resolve(); this.mutations = Promise.resolve(); this.closed = false; this.initialized = false;
@@ -37,7 +40,7 @@ class DownloadManager extends EventEmitter {
     let saved;
     try { saved = JSON.parse(await fs.readFile(this.journal, 'utf8')); } catch (error) { if (error.code !== 'ENOENT') throw Error(`Cannot read download journal: ${error.message}`); }
     if (saved) {
-      if (![1, 2].includes(saved.version) || !Array.isArray(saved.tasks)) throw Error('Unsupported download journal');
+      if (![1, 2, 3].includes(saved.version) || !Array.isArray(saved.tasks)) throw Error('Unsupported download journal');
       for (const task of saved.tasks) {
         this._validateStored(task);
         const needsPause = task.status === 'downloading' || (task.status === 'queued' && task.requiresHeaders);
@@ -56,7 +59,7 @@ class DownloadManager extends EventEmitter {
   _validateStored(task) {
     if (!task || !/^[a-f0-9-]{36}$/.test(task.id) || !STATES.includes(task.status) || !path.isAbsolute(task.path) || path.basename(task.path) !== task.filename) throw Error('Invalid download journal task');
     checkedUrl(task.url);
-    if (task.mediaType !== undefined && !['direct', 'hls'].includes(task.mediaType)) throw Error('Invalid journal media type');
+    if (task.mediaType !== undefined && !['direct', 'hls', 'dash', 'youtube'].includes(task.mediaType)) throw Error('Invalid journal media type');
     integer(task.connections, 1, 16, 'Connections'); integer(task.speedLimit, 0, Number.MAX_SAFE_INTEGER, 'Speed limit');
     if (!Array.isArray(task.segments) || task.segments.length > 16) throw Error('Invalid journal segments');
     let received = 0, next = 0;
@@ -75,7 +78,7 @@ class DownloadManager extends EventEmitter {
   _notify() { this.emit('change', this.list()); }
   _persist() {
     const snapshot = this.list();
-    const write = this.persistence.catch(() => {}).then(() => atomicJournal(this.journal, snapshot));
+    const write = this.persistence.catch(() => {}).then(() => atomicJournal(this.journal, snapshot, 3));
     this.persistence = write; return write;
   }
   _mutate(operation) {
@@ -167,6 +170,7 @@ class DownloadManager extends EventEmitter {
 
   async _prepare(task, runtime) {
     if (task.mediaType === 'hls') return this._prepareHls(task, runtime);
+    if (['dash', 'youtube'].includes(task.mediaType)) return this._prepareExternal(task, runtime);
     await preflightPublication(task.path);
     const headers = this.secrets.get(task.id) || {};
     const metadata = await probe(task.url, headers, runtime.controller.signal, this.maxBytes);
@@ -198,11 +202,12 @@ class DownloadManager extends EventEmitter {
     try {
       if (await this._recoverPublished(task)) { await this._persist(); return; }
       const prepared = await this._prepare(task, runtime); handle = prepared.handle;
-      if (prepared.playlist) await this._transferHls(task, prepared.playlist, handle, runtime);
+      if (prepared.external) await this._transferExternal(task, runtime);
+      else if (prepared.playlist) await this._transferHls(task, prepared.playlist, handle, runtime);
       else await this._transfer(task, prepared.headers, handle, runtime);
       if (runtime.controller.signal.aborted || task.status !== 'downloading') return;
       if (task.totalBytes !== null && task.downloadedBytes !== task.totalBytes) throw Error('Incomplete download byte count');
-      await handle.sync(); await handle.close(); handle = null;
+      if (handle) { await handle.sync(); await handle.close(); handle = null; }
       task.sha256 = await hashFile(this._partial(task.id));
       if (runtime.controller.signal.aborted || task.status !== 'downloading') return;
       await this._persist();
@@ -238,6 +243,38 @@ class DownloadManager extends EventEmitter {
     const handle = await openPartial(this._partial(task.id), false);
     try { await this._persist(); } catch (error) { await handle.close(); throw error; }
     return { handle, playlist };
+  }
+
+  async _prepareExternal(task) {
+    await preflightPublication(task.path);
+    await fs.unlink(this._partial(task.id)).catch(error => { if (error.code !== 'ENOENT') throw error; });
+    task.segments = [{ index: 0, start: 0, end: null, received: 0 }];
+    task.downloadedBytes = 0; task.totalBytes = null; task.sha256 = null; task.validator = null; task.ranges = false; task.finalUrl = null;
+    task.media = { format: 'mp4', resumePolicy: 'restart', externalTool: 'yt-dlp', completedSegments: 0 };
+    await this._persist();
+    return { external: true };
+  }
+
+  async _transferExternal(task, runtime) {
+    const result = await this.externalDownloader({
+      url: task.url, mediaType: task.mediaType, headers: this.secrets.get(task.id) || {}, output: this._partial(task.id),
+      signal: runtime.controller.signal, maxBytes: this.maxBytes, speedLimit: task.speedLimit,
+      onProgress: progress => {
+        if (runtime.controller.signal.aborted || task.status !== 'downloading') return;
+        const downloaded = Number.isSafeInteger(progress.downloadedBytes) ? Math.min(progress.downloadedBytes, this.maxBytes) : 0;
+        // yt-dlp reports each selected track independently; retain the high-water mark
+        // until the final muxed file gives us the authoritative combined byte count.
+        const reported = Math.max(task.downloadedBytes, downloaded);
+        task.downloadedBytes = reported; task.segments[0].received = reported; runtime.transferred = reported;
+        task.totalBytes = Number.isSafeInteger(progress.totalBytes) ? Math.min(progress.totalBytes, this.maxBytes) : null;
+        task.speed = Math.round(runtime.transferred * 1000 / Math.max(1, Date.now() - runtime.began));
+        this._notify();
+      }
+    });
+    if (!Number.isSafeInteger(result.bytes) || result.bytes < 1 || result.bytes > this.maxBytes) throw Error('External media output exceeds size limit');
+    task.downloadedBytes = result.bytes; task.totalBytes = result.bytes; task.segments[0].received = result.bytes;
+    task.finalUrl = result.finalUrl || null; task.media.completedSegments = 1;
+    await this._persist();
   }
 
   async _transferHls(task, playlist, handle, runtime) {

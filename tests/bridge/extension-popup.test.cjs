@@ -8,8 +8,8 @@ async function popupFixture({allowed=true,url='https://a.test/page',fail=false,a
  await vm.runInNewContext(fs.readFileSync(path.resolve('extension/popup.js'),'utf8'),{document,chrome,URL},{filename:path.resolve('extension/popup.js')});
  return {find:name=>document.querySelector(`[data-testid="${name}"]`),messages,state};
 }
-test('popup shows media, DASH diagnostic and persists capture and credential settings',async()=>{
- const f=await popupFixture();assert.equal(f.find('auto-capture').checked,true);assert.equal(f.find('media-list').children.length,2);assert.equal(f.find('media-list').children[1].children[1].disabled,true);
+test('popup shows selectable DASH and persists capture and credential settings',async()=>{
+ const f=await popupFixture();assert.equal(f.find('auto-capture').checked,true);assert.equal(f.find('media-list').children.length,2);assert.equal(f.find('media-list').children[1].children[1].disabled,false);
  await f.find('auto-capture').onchange({target:{checked:false}});assert.equal(f.state.settings.autoCapture,false);
  await f.find('credentials').onchange({target:{checked:true}});assert.equal(f.state.settings.credentials['https://a.test'],true);
  await f.find('media-list').children[0].children[1].onclick();assert.equal(f.messages.at(-2).type,'flowdm:download');

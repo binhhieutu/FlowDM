@@ -1,0 +1,24 @@
+{
+  "at": "2026-10-23T16:51:34.483Z",
+  "source": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+  "appVersion": "0.3.0",
+  "packaged": true,
+  "path": "I:\\dich_nguoc\\FlowDM\\downloads\\verification-v3\\YouTube-BigBuckBunny (2).mp4",
+  "bytes": 288738744,
+  "sha256": "84e2283f47859c3bb74b8e30e69d393733393cca6f4a3a110a3bae20754e0082",
+  "duration": 634.624,
+  "streams": [
+    {
+      "type": "video",
+      "codec": "h264",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "type": "audio",
+      "codec": "aac"
+    }
+  ],
+  "decodedBeginningAndEnd": true,
+  "wholeFileDecoded": true
+}

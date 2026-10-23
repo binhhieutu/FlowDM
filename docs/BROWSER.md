@@ -1,4 +1,4 @@
-# Cầu nối trình duyệt FlowDM 0.2
+# Cầu nối trình duyệt FlowDM 0.3
 
 Tiện ích Manifest V3 dành cho Chromium tự chuyển tải HTTP/HTTPS sang FlowDM và cho người dùng chọn tải video. Ứng dụng phải đang mở. Windows đóng gói không cần cài Node.js ngoài.
 
@@ -26,13 +26,15 @@ Native host kiểm tra khả năng truy cập trước khi trả ACK: lỗi đă
 
 Timeout là kết quả chưa chắc chắn: tác vụ đến muộn có thể trùng lượt tải trình duyệt đã tiếp tục. Mở FlowDM kiểm tra hàng đợi trước khi gửi lại. Nếu người dùng tiếp tục tải hoặc trình duyệt hoàn tất trong lúc bàn giao, tiện ích không hủy kết quả đó.
 
-## Video và quyền đăng nhập
+## Video, DASH, YouTube và quyền đăng nhập
 
-Tiện ích theo dõi video/audio/source động và phản hồi mạng để tìm tệp trực tiếp, HLS `.m3u8` hoặc MIME tương ứng. Player blob có thể dùng manifest tìm từ mạng; bản thân URL blob không được chuyển cho engine. Phát hiện không tự tải media.
+Tiện ích theo dõi video/audio/source động và phản hồi mạng để tìm tệp trực tiếp, HLS `.m3u8`, DASH `.mpd`/MIME tương ứng, và URL YouTube chuẩn. Player blob có thể dùng manifest tìm từ mạng hoặc nút YouTube của trang; bản thân URL blob không được chuyển cho engine. Phát hiện không tự tải media.
 
-Nhấn **Tải video bằng FlowDM** cạnh media hoặc chọn **Tải bằng FlowDM** trong danh sách popup. Nút trên trang chỉ nhận click thật của người dùng; click do JavaScript trang tạo bị bỏ qua. DASH xuất hiện như chẩn đoán chưa hỗ trợ.
+Nhấn **Tải video bằng FlowDM** cạnh media hoặc nút YouTube trên trang, hay chọn **Tải bằng FlowDM** trong danh sách popup. Nút trên trang chỉ nhận click thật của người dùng; click do JavaScript trang tạo bị bỏ qua. Dán URL MPD hoặc URL YouTube công khai vào FlowDM cũng tự nhận loại tải.
 
-HLS chỉ hỗ trợ VOD có ENDLIST, không mã hóa, các đoạn MPEG-TS hoặc fMP4 với một initialization map. Có thể chọn variant từ master; không ghép audio/video phục vụ riêng, không live, DRM/AES, DASH, chuyển mã hay vượt cơ chế bảo vệ website. Tạm dừng/tiếp tục/thử lại HLS tải lại toàn bộ VOD. Xem [media-report.md](media-report.md) để biết các cấu trúc bị từ chối.
+HLS chỉ hỗ trợ VOD có ENDLIST, không mã hóa, các đoạn MPEG-TS hoặc fMP4 với một initialization map. Có thể chọn variant từ master. DASH chỉ hỗ trợ MPD tĩnh không DRM qua HTTP(S), video/audio tách riêng và ghép MP4; từ chối live, DRM/mã hóa, CDATA, tham chiếu namespace/remote, byte range và cấu trúc ngoài parser hiện có. Tạm dừng/tiếp tục/thử lại HLS hoặc DASH tải lại toàn bộ nội dung.
+
+YouTube chỉ nhận video công khai ở `youtube.com/watch`, `youtube.com/shorts`, `youtu.be` và dạng mobile được chuẩn hóa về URL video tương ứng. Mặc định tải H.264 tối đa 1080p cùng M4A rồi ghép MP4. Không có bộ chọn chất lượng và không tuyên bố hỗ trợ 4K. Không hỗ trợ video đăng nhập/private, age wall, DRM, live, PO token, plugin hay cách vượt bảo vệ website. Tạm dừng/tiếp tục/thử lại YouTube tải lại toàn bộ.
 
 Mặc định không chuyển Cookie, Authorization, Referer hoặc User-Agent. Khi cần đăng nhập:
 
@@ -40,15 +42,17 @@ Mặc định không chuyển Cookie, Authorization, Referer hoặc User-Agent. 
 2. Chọn đúng origin của URL tải rồi bật **Cho phép gửi thông tin đăng nhập cho tên miền đã chọn** và chấp thuận quyền cookies tùy chọn khi trình duyệt hỏi. Cấp quyền trang không tự cấp cho CDN khác.
 3. Chọn tải lại media. Cookie hiện tại được lấy theo URL; User-Agent trình duyệt được bổ sung khi thiếu. Referer chỉ được chuyển khi đã quan sát thấy header do trình duyệt thực sự gửi; không dựng từ URL trang để tránh làm lộ query hoặc vượt Referrer-Policy. Bearer token chỉ lấy từ yêu cầu mạng đã quan sát sau khi consent, nên có thể phải tải lại trang/phát lại video.
 
-Khi quan sát được Cookie/Authorization mà chưa có consent, tải tự động ở lại trình duyệt. Một số Chromium không cung cấp các header này cho webRequest; kiểm tra truy cập native trước ACK vẫn là lớp quyết định, không suy luận rằng header vắng mặt nghĩa là URL công khai.
+Khi quan sát được Cookie/Authorization mà chưa có consent, tải tự động ở lại trình duyệt. Một số Chromium không cung cấp các header này cho webRequest; kiểm tra truy cập native trước ACK vẫn là lớp quyết định, không suy luận rằng header vắng mặt nghĩa là URL công khai. DASH và YouTube luôn bỏ mọi header trình duyệt, gồm Cookie, Authorization, Referer và User-Agent, kể cả khi origin đã được cấp quyền.
 
 Headers chỉ trong bộ nhớ; không ghi vào lịch sử. Bỏ quyền/consent hủy bàn giao còn chờ bằng thế hệ quyền, kể cả khi bật lại ngay. Headers nhạy cảm bị loại khi redirect hoặc tài nguyên chuyển origin. URL có signed query vẫn cần để tải/resume và được lưu trong lịch sử desktop; không chia sẻ thư mục dữ liệu. Danh sách media session có giới hạn và hết hạn, xóa khi điều hướng/đóng tab.
 
 ## Kiểm chứng và giao thức
 
-E2E đã chạy trên Windows với Chrome for Testing 156 và Electron thật: native host sinh từ giao diện, capture tự động, tắt capture, host vắng mặt, fallback đăng nhập, consent cookie, video trực tiếp, HLS TS/fMP4 đúng byte và FFmpeg giải mã. Test dùng profile tạm và bản sao tiện ích cấp sẵn API cookies tùy chọn; consent theo origin của sản phẩm vẫn được bật/tắt và kiểm tra. Điều này không chứng minh hộp xin quyền tương tác đã được tự động hóa trên mọi bản Chrome/Edge.
+E2E 0.3 đã chạy trên Windows với Chrome for Testing 156 và Electron thật: native host sinh từ giao diện, capture tự động, tắt capture, host vắng mặt, fallback đăng nhập, consent cookie, video trực tiếp, HLS TS/fMP4, DASH popup video/audio tách riêng và YouTube công khai. Tải YouTube Big Buck Bunny hoàn tất với 634,624 giây, 288,738,744 byte, H.264 1080p/AAC và FFmpeg giải mã toàn bộ. Test dùng profile tạm và bản sao tiện ích cấp sẵn API cookies tùy chọn; consent theo origin của sản phẩm vẫn được bật/tắt và kiểm tra. Điều này không chứng minh hộp xin quyền tương tác đã được tự động hóa trên mọi bản Chrome/Edge. Báo cáo đóng gói sẽ ở [VERIFICATION_V3.md](VERIFICATION_V3.md); các báo cáo 0.1/0.2 giữ nguyên tính lịch sử.
 
-Chạy `npm test`, `npm run test:coverage` và `npm run test:e2e`. `FLOWDM_BROWSER_EXECUTABLE` chọn Chromium thử; `FLOWDM_FFMPEG` chọn bộ giải mã fixture; `FLOWDM_EXECUTABLE` chọn ứng dụng đóng gói. Xem [browser-capture-report.md](browser-capture-report.md) cho contract UI và kiểm thử giả lập; xem [xác minh bản 0.2](VERIFICATION_V2.md).
+Windows đóng gói kèm yt-dlp 2026.10.21 và FFmpeg 8.1 đã ghim hash, không cần Node.js ngoài. Source ZIP không kèm binary; chuẩn bị bundle Windows bằng `node scripts/prepare-media-tools.cjs "C:\đường-dẫn\ffmpeg.exe"`. Linux/macOS cần yt-dlp và FFmpeg trên `PATH` và chưa chạy kiểm thử native. CI có thể tải Gyan “latest” nhưng so hash ghim nên sẽ từ chối bản upstream khác.
+
+Chạy `npm test`, `npm run test:coverage` và `npm run test:e2e`. `FLOWDM_BROWSER_EXECUTABLE` chọn Chromium thử; `FLOWDM_FFMPEG` chọn bộ giải mã fixture; `FLOWDM_EXECUTABLE` chọn ứng dụng đóng gói. Xem [browser-capture-report.md](browser-capture-report.md) cho contract UI và kiểm thử giả lập; xem [xác minh bản 0.3](VERIFICATION_V3.md) khi báo cáo đóng gói đã được tạo.
 
 Native Messaging dùng frame độ dài 4 byte theo byte order máy + JSON UTF-8, tối đa 1 MiB; stdout chỉ chứa frame. Request:
 
@@ -56,6 +60,6 @@ Native Messaging dùng frame độ dài 4 byte theo byte order máy + JSON UTF-8
 {"schema":1,"request_id":"unique-id","op":"add","payload":{"url":"https://example.com/movie.m3u8","mediaType":"hls"}}
 ```
 
-Payload còn cho phép `filename` và `headers` giới hạn; `mediaType` là `direct` hoặc `hls`. ACK thành công là `{"request_id":"unique-id","ok":true,"payload":{"id":"task-id"}}`. Trường dư, URL có credentials, scheme khác HTTP(S) hoặc headers ngoài danh sách cho phép bị từ chối.
+Payload còn cho phép `filename` và `headers` giới hạn; `mediaType` là `direct`, `hls`, `dash` hoặc `youtube`. DASH/YouTube không nhận browser headers. ACK thành công là `{"request_id":"unique-id","ok":true,"payload":{"id":"task-id"}}`. Trường dư, URL có credentials, scheme khác HTTP(S) hoặc headers ngoài danh sách cho phép bị từ chối.
 
 Host chuyển tới named pipe Windows/Unix socket có secret ngẫu nhiên mỗi phiên; không mở API TCP quản trị. Request ID chống lặp trong bộ nhớ desktop, không phải bảo đảm exactly-once bền vững qua restart. Dùng thư mục dữ liệu riêng của tài khoản, không đặt trên share/public. Không tuyên bố bảo vệ khỏi mã độc chạy cùng tài khoản.

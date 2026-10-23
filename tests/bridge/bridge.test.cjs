@@ -58,7 +58,7 @@ test('schema, operations, credentials, URLs, fields and request ids are rejected
 test('v2 payload permits explicit direct/HLS metadata and bounded allowlisted headers', () => {
   const payload={url:'https://example.com/video.m3u8',filename:'Bài giảng.mp4',mediaType:'hls',headers:{Referer:'https://example.com/',Cookie:'sid=private',Authorization:'Bearer private','User-Agent':'FlowDM'}};
   assert.equal(validRequest({...request(),payload}),true);
-  const invalid=[{mediaType:'dash'},{filename:'../bad'},{filename:'x\\bad'},{filename:'CON.txt'},{filename:'nul'},{filename:'x.'},{filename:'a\r\nb'},{filename:'x'.repeat(181)},{filename:''},{headers:{Host:'evil'}},{headers:{Cookie:'x\r\nInjected: yes'}},{headers:{Cookie:'x\u0000'}},{headers:{Cookie:5}},{headers:{Cookie:'x'.repeat(65536)}},{headers:{Cookie:'a',cookie:'b'}},{headers:[]},{extra:true}];
+  const invalid=[{mediaType:'unknown'},{filename:'../bad'},{filename:'x\\bad'},{filename:'CON.txt'},{filename:'nul'},{filename:'x.'},{filename:'a\r\nb'},{filename:'x'.repeat(181)},{filename:''},{headers:{Host:'evil'}},{headers:{Cookie:'x\r\nInjected: yes'}},{headers:{Cookie:'x\u0000'}},{headers:{Cookie:5}},{headers:{Cookie:'x'.repeat(65536)}},{headers:{Cookie:'a',cookie:'b'}},{headers:[]},{extra:true}];
   for(const extra of invalid)assert.equal(validRequest({...request(),payload:{...payload,...extra}}),false,JSON.stringify(extra));
   assert.equal(validRequest(request('long','https://example.com/'+ 'a'.repeat(16384))),false);
 });

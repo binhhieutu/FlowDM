@@ -1,6 +1,6 @@
 {
   "name": "flowdm",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Cross-platform HTTP/HTTPS download manager",
   "main": "src/main.cjs",
   "private": true,
@@ -11,7 +11,7 @@
   },
   "scripts": {
     "start": "electron .",
-    "test": "node --test tests/core/*.test.cjs tests/media/*.test.cjs tests/bridge/*.test.cjs tests/browser/*.test.cjs",
+    "test": "node --test tests/core/*.test.cjs tests/media/*.test.cjs tests/bridge/*.test.cjs tests/browser/*.test.cjs tests/tools/*.test.cjs",
     "test:coverage": "node scripts/coverage.cjs",
     "test:e2e": "node --test --test-concurrency=1 tests/e2e/*.test.cjs",
     "pack:win": "electron-builder --win --x64 --dir --publish=never",
@@ -44,7 +44,16 @@
         "portable"
       ],
       "icon": "assets/icon.ico",
-      "signExecutable": false
+      "signExecutable": false,
+      "extraResources": [
+        {
+          "from": "vendor/media-tools",
+          "to": "media-tools",
+          "filter": [
+            "**/*"
+          ]
+        }
+      ]
     },
     "linux": {
       "target": [
@@ -59,6 +68,9 @@
       ],
       "category": "public.app-category.utilities",
       "identity": null
+    },
+    "portable": {
+      "useZip": true
     }
   }
 }

@@ -39,7 +39,7 @@ function normalizePayload(payload) {
     if(typeof name!=='string'||!name.length||name.length>180||/[<>:"/\\|?*\u0000-\u001f\u007f]/.test(name)||/[. ]$/.test(name)||/^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(name)||['.','..'].includes(name))return null;
     result.filename=name;
   }
-  if(Object.hasOwn(payload,'mediaType')) {if(!['direct','hls'].includes(payload.mediaType))return null;result.mediaType=payload.mediaType;}
+  if(Object.hasOwn(payload,'mediaType')) {if(!['direct','hls','dash','youtube'].includes(payload.mediaType))return null;result.mediaType=payload.mediaType;}
   if(Object.hasOwn(payload,'headers')) {
     if(!plainObject(payload.headers)||Object.keys(payload.headers).length>8)return null;
     const pairs=Object.entries(payload.headers).map(([name,value])=>[name.toLowerCase(),value]).sort(([a],[b])=>a.localeCompare(b));

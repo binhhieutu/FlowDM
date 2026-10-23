@@ -7,3 +7,6 @@ coverage-hls/
 test-results/
 *.log
 /audit.json
+vendor/
+/youtube-probe-v3.json
+downloads/

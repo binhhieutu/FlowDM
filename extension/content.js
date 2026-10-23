@@ -8,8 +8,10 @@
   try{
    const urls=sources(element);
    await chrome.runtime.sendMessage({type:'flowdm:media',items:urls.map(url=>({url,mime:mime(element),title:document.title}))});
+   const pageYoutube=FlowDMMedia.youtubeUrl(globalThis.location?.href||'');
+   if(pageYoutube)await chrome.runtime.sendMessage({type:'flowdm:youtube',url:pageYoutube,title:document.title});
    const options=await chrome.runtime.sendMessage({type:'flowdm:options'});
-   const selected=urls.length?{url:urls[0],mediaType:FlowDMMedia.classify(urls[0],mime(element))}:(options.items||[]).find(item=>item.mediaType==='hls'||item.mediaType==='direct');
+   const selected=pageYoutube?{url:pageYoutube,mediaType:'youtube'}:urls.length?{url:urls[0],mediaType:FlowDMMedia.classify(urls[0],mime(element))}:(options.items||[]).find(item=>['hls','dash','direct'].includes(item.mediaType));
    if(!selected){button.textContent='Chưa phát hiện liên kết tải; hãy phát video';return;}
    const result=await chrome.runtime.sendMessage({type:'flowdm:download',url:selected.url,mediaType:selected.mediaType});
    button.textContent=result.ok?'Đã chuyển sang FlowDM':'Mở FlowDM và kiểm tra cầu nối';
@@ -28,6 +30,7 @@
    }
   }
   if(items.length)chrome.runtime.sendMessage({type:'flowdm:media',items:items.slice(0,30)}).catch(()=>{});
+  const pageYoutube=FlowDMMedia.youtubeUrl(globalThis.location?.href||'');if(pageYoutube&&document.querySelector('video'))chrome.runtime.sendMessage({type:'flowdm:youtube',url:pageYoutube,title:document.title}).catch(()=>{});
  }
  function schedule(){if(!queued){queued=true;queueMicrotask(report);}}
  new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['src','type']});

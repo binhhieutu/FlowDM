@@ -20,6 +20,14 @@ jobs:
         run: |
           npx playwright install chromium
           choco install ffmpeg --no-progress -y
+          curl.exe -L --fail https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-full.7z -o ffmpeg-build.7z
+          & 'C:\Program Files\7-Zip\7z.exe' x ffmpeg-build.7z -o.tmp/ffmpeg-build -y
+          $pinned = Get-ChildItem .tmp/ffmpeg-build -Recurse -Filter ffmpeg.exe | Select-Object -First 1
+          node scripts/prepare-media-tools.cjs $pinned.FullName
+      - if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - if: runner.os == 'macOS'
+        run: brew install ffmpeg
       - if: runner.os == 'Windows'
         run: node --test tests/e2e/browser.test.cjs
       - if: runner.os != 'Linux'
