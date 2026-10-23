@@ -10,7 +10,7 @@ function walk(directory) {
 for (const platform of ['win-unpacked', 'linux-unpacked']) {
   const archive = path.join(root, 'dist', platform, 'resources', 'app.asar');
   let verified = 0;
-  for (const filename of [...walk('src'), ...walk('assets')]) {
+  for (const filename of [...walk('src'), ...walk('assets'), ...walk('extension')]) {
     const actual = asar.extractFile(archive, filename.split('/').join(path.sep)); const expected = fs.readFileSync(path.join(root, filename));
     if (!actual.equals(expected)) throw new Error(`${platform}: stale or corrupted ${filename}`);
     verified++;

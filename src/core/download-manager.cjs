@@ -7,6 +7,8 @@ const { setTimeout: delay } = require('node:timers/promises');
 const { inputOptions, integer, checkedUrl } = require('./policy.cjs');
 const { probe, retryRequest, rangeInfo, contentLength } = require('./http-client.cjs');
 const { atomicJournal, uniqueDestination, openPartial, hashFile, publish, recoverPublished, preflightPublication } = require('./storage.cjs');
+const { loadPlaylist, getResource } = require('../media/hls.cjs');
+const { createValidator } = require('../media/container-check.cjs');
 
 const clone = value => structuredClone(value);
 const STATES = ['queued', 'downloading', 'paused', 'completed', 'failed', 'canceled'];
@@ -23,7 +25,7 @@ class DownloadManager extends EventEmitter {
     this.maxConcurrent = integer(maxConcurrent, 1, 16, 'Concurrent downloads');
     this.maxPerHost = integer(maxPerHost, 1, 16, 'Per-host downloads');
     this.maxBytes = integer(maxBytes, 1, Number.MAX_SAFE_INTEGER, 'Size limit');
-    this.tasks = new Map(); this.secrets = new Map(); this.running = new Map();
+    this.tasks = new Map(); this.secrets = new Map(); this.running = new Map(); this.pendingAdds = new Set();
     this.journal = path.join(this.dataDir, 'downloads.json');
     this.persistence = Promise.resolve(); this.mutations = Promise.resolve(); this.closed = false; this.initialized = false;
   }
@@ -35,7 +37,7 @@ class DownloadManager extends EventEmitter {
     let saved;
     try { saved = JSON.parse(await fs.readFile(this.journal, 'utf8')); } catch (error) { if (error.code !== 'ENOENT') throw Error(`Cannot read download journal: ${error.message}`); }
     if (saved) {
-      if (saved.version !== 1 || !Array.isArray(saved.tasks)) throw Error('Unsupported download journal');
+      if (![1, 2].includes(saved.version) || !Array.isArray(saved.tasks)) throw Error('Unsupported download journal');
       for (const task of saved.tasks) {
         this._validateStored(task);
         const needsPause = task.status === 'downloading' || (task.status === 'queued' && task.requiresHeaders);
@@ -54,6 +56,7 @@ class DownloadManager extends EventEmitter {
   _validateStored(task) {
     if (!task || !/^[a-f0-9-]{36}$/.test(task.id) || !STATES.includes(task.status) || !path.isAbsolute(task.path) || path.basename(task.path) !== task.filename) throw Error('Invalid download journal task');
     checkedUrl(task.url);
+    if (task.mediaType !== undefined && !['direct', 'hls'].includes(task.mediaType)) throw Error('Invalid journal media type');
     integer(task.connections, 1, 16, 'Connections'); integer(task.speedLimit, 0, Number.MAX_SAFE_INTEGER, 'Speed limit');
     if (!Array.isArray(task.segments) || task.segments.length > 16) throw Error('Invalid journal segments');
     let received = 0, next = 0;
@@ -86,8 +89,18 @@ class DownloadManager extends EventEmitter {
       const options = inputOptions(input, this.downloadDir);
       const destination = await uniqueDestination(options.directory, options.filename, new Set(this.list().map(task => task.path.toLowerCase())));
       const task = { id: crypto.randomUUID(), url: options.url, ...destination, status: 'queued', totalBytes: null, downloadedBytes: 0, speed: 0, error: null, connections: options.connections, segments: [], createdAt: new Date().toISOString(), startAt: options.startAt, speedLimit: options.speedLimit, finalUrl: null, sha256: null, validator: null, ranges: false, requiresHeaders: Object.keys(options.headers).length > 0 };
+      task.mediaType = options.mediaType;
+      this.pendingAdds.add(task.id);
       this.tasks.set(task.id, task); this.secrets.set(task.id, options.headers);
-      await this._persist(); this._notify(); this._pump(); return clone(task);
+      try { await this._persist(); }
+      catch (error) {
+        this.tasks.delete(task.id); this.secrets.delete(task.id);
+        // A running download may have queued a snapshot while this add was pending.
+        // Queue its removal after those snapshots; retain the original add failure.
+        await this._persist().catch(() => {});
+        throw error;
+      } finally { this.pendingAdds.delete(task.id); }
+      this._notify(); this._pump(); return clone(task);
     });
   }
 
@@ -142,7 +155,7 @@ class DownloadManager extends EventEmitter {
     if (this.closed || !this.initialized) return;
     for (const task of this.tasks.values()) {
       if (this.running.size >= this.maxConcurrent) break;
-      if (task.status !== 'queued' || this.running.has(task.id) || (task.startAt && task.startAt > Date.now())) continue;
+      if (task.status !== 'queued' || this.pendingAdds.has(task.id) || this.running.has(task.id) || (task.startAt && task.startAt > Date.now())) continue;
       const host = new URL(task.url).host;
       if ([...this.running.values()].filter(runtime => runtime.host === host).length >= this.maxPerHost) continue;
       const runtime = { controller: new AbortController(), host, transferred: 0, began: Date.now(), lastEvent: 0 };
@@ -153,6 +166,7 @@ class DownloadManager extends EventEmitter {
   }
 
   async _prepare(task, runtime) {
+    if (task.mediaType === 'hls') return this._prepareHls(task, runtime);
     await preflightPublication(task.path);
     const headers = this.secrets.get(task.id) || {};
     const metadata = await probe(task.url, headers, runtime.controller.signal, this.maxBytes);
@@ -184,7 +198,8 @@ class DownloadManager extends EventEmitter {
     try {
       if (await this._recoverPublished(task)) { await this._persist(); return; }
       const prepared = await this._prepare(task, runtime); handle = prepared.handle;
-      await this._transfer(task, prepared.headers, handle, runtime);
+      if (prepared.playlist) await this._transferHls(task, prepared.playlist, handle, runtime);
+      else await this._transfer(task, prepared.headers, handle, runtime);
       if (runtime.controller.signal.aborted || task.status !== 'downloading') return;
       if (task.totalBytes !== null && task.downloadedBytes !== task.totalBytes) throw Error('Incomplete download byte count');
       await handle.sync(); await handle.close(); handle = null;
@@ -204,8 +219,58 @@ class DownloadManager extends EventEmitter {
 
   async _recoverPublished(task) {
     if (['completed', 'canceled'].includes(task.status) || !await recoverPublished(task)) return false;
+    await fs.unlink(this._partial(task.id)).catch(error => { if (error.code !== 'ENOENT') throw error; });
     task.status = 'completed'; task.totalBytes = task.downloadedBytes; task.error = null; task.speed = 0;
     return true;
+  }
+
+  async _prepareHls(task, runtime) {
+    const playlist = await loadPlaylist(task.url, this.secrets.get(task.id) || {}, runtime.controller.signal);
+    if (path.extname(task.filename) !== playlist.extension) {
+      const destination = await uniqueDestination(path.dirname(task.path), `${path.parse(task.filename).name}${playlist.extension}`, new Set(this.list().filter(item => item.id !== task.id).map(item => item.path.toLowerCase())));
+      task.path = destination.path; task.filename = destination.filename;
+    }
+    await preflightPublication(task.path);
+    await fs.unlink(this._partial(task.id)).catch(error => { if (error.code !== 'ENOENT') throw error; });
+    task.segments = plan(null, 1, false); task.downloadedBytes = 0; task.totalBytes = null;
+    task.sha256 = null; task.validator = null; task.ranges = false; task.finalUrl = playlist.finalUrl;
+    task.media = { format: playlist.extension.slice(1), segmentCount: playlist.segmentCount, completedSegments: 0, resumePolicy: 'restart' };
+    const handle = await openPartial(this._partial(task.id), false);
+    try { await this._persist(); } catch (error) { await handle.close(); throw error; }
+    return { handle, playlist };
+  }
+
+  async _transferHls(task, playlist, handle, runtime) {
+    const signal = runtime.controller.signal;
+    for (const [index, url] of playlist.resources.entries()) {
+      const { response } = await getResource(url, playlist.context, signal);
+      const validator = createValidator(playlist.extension === '.ts' ? 'ts' : index === 0 ? 'mp4-init' : 'mp4-fragment', this.maxBytes);
+      let received = 0;
+      try {
+        const length = contentLength(response);
+        if (length !== null && (length === 0 || length > this.maxBytes - task.downloadedBytes)) throw Error('HLS resource exceeds size limit or is empty');
+        for await (const chunk of response) {
+          if (signal.aborted) throw Object.assign(Error('Aborted'), { name: 'AbortError' });
+          if (chunk.length > this.maxBytes - task.downloadedBytes || (length !== null && received + chunk.length > length)) throw Error('HLS response exceeds expected size or size limit');
+          validator.push(chunk);
+          runtime.transferred += chunk.length;
+          if (task.speedLimit) await delay(Math.max(0, runtime.transferred * 1000 / task.speedLimit - (Date.now() - runtime.began)), undefined, { signal });
+          let written = 0;
+          while (written < chunk.length) {
+            const result = await handle.write(chunk, written, chunk.length - written, task.downloadedBytes + written);
+            if (!result.bytesWritten) throw Error('Disk write made no progress');
+            written += result.bytesWritten;
+          }
+          await handle.sync(); received += written; task.downloadedBytes += written; task.segments[0].received = task.downloadedBytes;
+          task.speed = Math.round(runtime.transferred * 1000 / Math.max(1, Date.now() - runtime.began));
+          await this._persist(); this._notify();
+        }
+        if (!received || (length !== null && received !== length)) throw Error('Truncated or empty HLS resource');
+        validator.finish();
+        if (playlist.extension !== '.mp4' || index > 0) task.media.completedSegments++;
+      } finally { response.destroy(); }
+    }
+    task.totalBytes = task.downloadedBytes;
   }
 
   async _transfer(task, headers, handle, runtime) {

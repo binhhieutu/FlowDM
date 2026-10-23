@@ -7,7 +7,7 @@ const { createReadStream, constants } = require('node:fs');
 async function atomicJournal(filename, tasks) {
   const temporary = `${filename}.${crypto.randomUUID()}.tmp`;
   const handle = await fs.open(temporary, 'wx', 0o600);
-  try { await handle.writeFile(JSON.stringify({ version: 1, tasks })); await handle.sync(); } finally { await handle.close(); }
+  try { await handle.writeFile(JSON.stringify({ version: 2, tasks })); await handle.sync(); } finally { await handle.close(); }
   try { await fs.rename(temporary, filename); } catch (error) { await fs.unlink(temporary).catch(() => {}); throw error; }
 }
 async function uniqueDestination(directory, filename, reserved) {

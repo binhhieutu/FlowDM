@@ -1,57 +1,61 @@
-# Cầu nối trình duyệt FlowDM (tùy chọn)
+# Cầu nối trình duyệt FlowDM 0.2
 
-Tiện ích Manifest V3 chỉ gửi URL HTTP/HTTPS khi chọn **Tải bằng FlowDM** trong menu chuột phải trên liên kết, video hoặc audio có URL trực tiếp. Ứng dụng FlowDM phải đang mở. Không chặn tải của trình duyệt, đọc cookie, chuyển thông tin đăng nhập hoặc tự nhận diện luồng HLS/DASH/blob. Video cần cookie/DRM không được hỗ trợ.
+Tiện ích Manifest V3 dành cho Chromium tự chuyển tải HTTP/HTTPS sang FlowDM và cho người dùng chọn tải video. Ứng dụng phải đang mở. Windows đóng gói không cần cài Node.js ngoài.
 
-## Cài thủ công Chrome / Edge
+## Cài và gỡ bằng giao diện
 
-Cần Node.js 22 trở lên cài trên máy. Bản desktop không tự đăng ký host hay sửa profile/registry. Các lệnh dưới đây là hướng dẫn để người dùng tự chạy khi muốn bật tính năng.
+1. Trong FlowDM, mở **Kết nối trình duyệt**, chọn Google Chrome, Microsoft Edge, Chromium hoặc Chrome for Testing tương ứng.
+2. Nhấn **Mở thư mục tiện ích** để xuất bản tiện ích đi kèm ứng dụng.
+3. Vào `chrome://extensions` hoặc `edge://extensions`, bật Developer mode, chọn **Load unpacked / Tải tiện ích đã giải nén**, rồi chọn đúng thư mục vừa mở.
+4. Sao chép ID tiện ích gồm 32 ký tự a–p, dán vào FlowDM và nhấn **Kết nối**. Ghim tiện ích trên thanh công cụ nếu muốn mở popup nhanh.
+5. Thử một tệp HTTP/HTTPS. Popup/huy hiệu và danh sách FlowDM hiển thị kết quả; kiểm tra tác vụ trong ứng dụng.
 
-1. Vào `chrome://extensions` hoặc `edge://extensions`, bật Developer mode và Load unpacked thư mục `extension` của mã nguồn FlowDM. Ghi ID gồm 32 ký tự của tiện ích. Không dùng ID ví dụ bên dưới.
-2. Chọn thư mục dữ liệu riêng của tài khoản. Để đồng nhất host và desktop, có thể đặt biến `FLOWDM_DATA_DIR` trước khi khởi chạy FlowDM từ cùng PowerShell:
+FlowDM chỉ đăng ký native host cho tài khoản hiện tại và đúng ID tiện ích. Trên Windows, ứng dụng tạo bản runtime Electron/Node ở vị trí ổn định trong dữ liệu người dùng; host không phụ thuộc đường dẫn giải nén tạm của portable hoặc Node.js cài riêng. Không đổi trang chủ hay sửa các tiện ích khác.
 
-   ```powershell
-   $env:FLOWDM_DATA_DIR = Join-Path $env:LOCALAPPDATA 'FlowDM\state'
-   npm start
-   ```
+Để gỡ, chọn đúng trình duyệt rồi **Ngắt kết nối** trong FlowDM và gỡ tiện ích trong trình duyệt. Ngắt kết nối phục hồi đăng ký trước đó khi giá trị hiện tại vẫn thuộc FlowDM; nếu bên khác đã sửa, ứng dụng báo lỗi thay vì ghi đè. Giữ thư mục runtime/bundle khi đang kết nối. Firefox chưa được hỗ trợ. Thiết lập native trên Linux/macOS có mã triển khai nhưng chưa được xác minh native trong đợt này.
 
-   Khi chạy bản đóng gói, đặt cùng biến này trước khi mở file `.exe`. Có thể dùng thư mục dữ liệu desktop hiện tại thay cho giá trị ví dụ; lấy đúng thư mục chứa `browser-bridge.json` khi ứng dụng đang mở. Không dùng thư mục chia sẻ/public cho dữ liệu ứng dụng hoặc bundle host.
+Nếu dùng IDM, tắt tích hợp IDM ở trình duyệt dành cho FlowDM trước khi thử tải. Trên máy kiểm thử, IDM còn chặn Chrome thường dù không có tiện ích IDM. Kiểm thử FlowDM đã dùng bản Chrome for Testing đổi tên và profile riêng; không thay đổi IDM hay profile thật của chủ máy.
 
-3. Từ thư mục mã nguồn, tạo một bundle host ở thư mục mới bằng lệnh rõ ràng:
+## Tự bắt tải và dự phòng
 
-   ```powershell
-   node src/bridge/install.cjs --output "C:\Users\YOUR_USER\AppData\Local\FlowDM\browser-host" --data-dir "C:\Users\YOUR_USER\AppData\Local\FlowDM\state" --extension-id YOUR_32_CHARACTER_EXTENSION_ID --node "C:\Program Files\nodejs\node.exe"
-   ```
+**Tự bắt tải xuống HTTP(S)** bật mặc định khi cài tiện ích. Tắt trong popup để trình duyệt tiếp tục tải bình thường; menu chuột phải **Tải bằng FlowDM** vẫn là thao tác chủ động.
 
-   Thay mọi đường dẫn và ID bằng giá trị thực. Công cụ chỉ tạo file trong `--output`, không đăng ký host. Bundle chứa bản sao độc lập của host và launcher `.cmd` (Windows) hoặc `.sh` (POSIX). Thư mục đầu ra đã có bundle sẽ báo lỗi, tránh ghi đè. Giữ nguyên vị trí Node và bundle sau khi đăng ký.
+Tiện ích bỏ qua incognito, URL blob/data/nội bộ trình duyệt, tải nguy hiểm, tải đã hoàn tất và yêu cầu không phải GET khi nhận diện được. Với tải phù hợp, tiện ích tạm dừng rồi kiểm tra lại trạng thái. Lỗi pause sớm lúc Chromium chưa gán tên tệp được thử lại trong khoảng 400 ms; không lấy quyền sở hữu khi chưa xác nhận pause.
 
-4. Windows: tự chạy lệnh đăng ký **tài khoản hiện tại** cho trình duyệt cần dùng (thay đường dẫn JSON):
+Native host kiểm tra khả năng truy cập trước khi trả ACK: lỗi đăng nhập/HTTP hoặc phản hồi HTML không phù hợp bị từ chối. Thành công chỉ được công nhận khi response khớp request ID và có ID tác vụ đã lưu. Tiện ích chỉ hủy tải gốc nếu nó vẫn đang pause/in-progress sau ACK. Không có ACK hợp lệ, host vắng mặt hoặc timeout sẽ giữ/tiếp tục tải trình duyệt. Lỗi server phát sinh sau khi tác vụ đã được tiếp nhận thuộc hàng đợi FlowDM.
 
-   ```powershell
-   reg add "HKCU\Software\Google\Chrome\NativeMessagingHosts\local.flowdm.bridge" /ve /t REG_SZ /d "C:\Users\YOUR_USER\AppData\Local\FlowDM\browser-host\local.flowdm.bridge.json" /f
-   ```
+Timeout là kết quả chưa chắc chắn: tác vụ đến muộn có thể trùng lượt tải trình duyệt đã tiếp tục. Mở FlowDM kiểm tra hàng đợi trước khi gửi lại. Nếu người dùng tiếp tục tải hoặc trình duyệt hoàn tất trong lúc bàn giao, tiện ích không hủy kết quả đó.
 
-   Với Edge, thay `Google\Chrome` bằng `Microsoft\Edge`. Trên Linux, tự chép JSON tới `~/.config/google-chrome/NativeMessagingHosts/local.flowdm.bridge.json`; macOS Chrome dùng `~/Library/Application Support/Google/Chrome/NativeMessagingHosts/local.flowdm.bridge.json`. Đường dẫn `path` trong JSON vẫn trỏ tuyệt đối tới launcher trong bundle. Giữ launcher có quyền thực thi. Firefox chưa có manifest tương thích.
+## Video và quyền đăng nhập
 
-5. Mở FlowDM, chọn menu chuột phải trên một liên kết tải HTTP/HTTPS. Huy hiệu `✓` xác nhận desktop đã nhận và trả ID tác vụ; kiểm tra tiến trình trong ứng dụng. Huy hiệu `!` nghĩa là chưa xác nhận: mở ứng dụng, kiểm tra cài đặt và danh sách trước khi gửi lại. Không tự gửi lại bằng ID mới nếu lần trước bị timeout vì thao tác thêm vẫn có thể hoàn tất.
+Tiện ích theo dõi video/audio/source động và phản hồi mạng để tìm tệp trực tiếp, HLS `.m3u8` hoặc MIME tương ứng. Player blob có thể dùng manifest tìm từ mạng; bản thân URL blob không được chuyển cho engine. Phát hiện không tự tải media.
 
-Gỡ: xóa tiện ích, tự xóa khóa registry đã tạo hoặc JSON ở thư mục NativeMessagingHosts, rồi xóa bundle host. Không cần xóa lịch sử tải desktop.
+Nhấn **Tải video bằng FlowDM** cạnh media hoặc chọn **Tải bằng FlowDM** trong danh sách popup. Nút trên trang chỉ nhận click thật của người dùng; click do JavaScript trang tạo bị bỏ qua. DASH xuất hiện như chẩn đoán chưa hỗ trợ.
 
-## Hợp đồng và bảo mật
+HLS chỉ hỗ trợ VOD có ENDLIST, không mã hóa, các đoạn MPEG-TS hoặc fMP4 với một initialization map. Có thể chọn variant từ master; không ghép audio/video phục vụ riêng, không live, DRM/AES, DASH, chuyển mã hay vượt cơ chế bảo vệ website. Tạm dừng/tiếp tục/thử lại HLS tải lại toàn bộ VOD. Xem [media-report.md](media-report.md) để biết các cấu trúc bị từ chối.
 
-Native Messaging dùng độ dài 4 byte theo byte order máy, sau đó JSON UTF-8, tối đa 1 MiB/frame; không phải JSONL. Host stdout chỉ chứa các frame; lỗi giao thức ghi stderr. Hợp đồng duy nhất:
+Mặc định không chuyển Cookie, Authorization, Referer hoặc User-Agent. Khi cần đăng nhập:
+
+1. Mở popup, chọn **Trang được cấp quyền đăng nhập**. Danh sách gồm origin trang đang mở và origin tài nguyên media/CDN đã phát hiện.
+2. Chọn đúng origin của URL tải rồi bật **Cho phép gửi thông tin đăng nhập cho tên miền đã chọn** và chấp thuận quyền cookies tùy chọn khi trình duyệt hỏi. Cấp quyền trang không tự cấp cho CDN khác.
+3. Chọn tải lại media. Cookie hiện tại được lấy theo URL; User-Agent trình duyệt được bổ sung khi thiếu. Referer chỉ được chuyển khi đã quan sát thấy header do trình duyệt thực sự gửi; không dựng từ URL trang để tránh làm lộ query hoặc vượt Referrer-Policy. Bearer token chỉ lấy từ yêu cầu mạng đã quan sát sau khi consent, nên có thể phải tải lại trang/phát lại video.
+
+Khi quan sát được Cookie/Authorization mà chưa có consent, tải tự động ở lại trình duyệt. Một số Chromium không cung cấp các header này cho webRequest; kiểm tra truy cập native trước ACK vẫn là lớp quyết định, không suy luận rằng header vắng mặt nghĩa là URL công khai.
+
+Headers chỉ trong bộ nhớ; không ghi vào lịch sử. Bỏ quyền/consent hủy bàn giao còn chờ bằng thế hệ quyền, kể cả khi bật lại ngay. Headers nhạy cảm bị loại khi redirect hoặc tài nguyên chuyển origin. URL có signed query vẫn cần để tải/resume và được lưu trong lịch sử desktop; không chia sẻ thư mục dữ liệu. Danh sách media session có giới hạn và hết hạn, xóa khi điều hướng/đóng tab.
+
+## Kiểm chứng và giao thức
+
+E2E đã chạy trên Windows với Chrome for Testing 156 và Electron thật: native host sinh từ giao diện, capture tự động, tắt capture, host vắng mặt, fallback đăng nhập, consent cookie, video trực tiếp, HLS TS/fMP4 đúng byte và FFmpeg giải mã. Test dùng profile tạm và bản sao tiện ích cấp sẵn API cookies tùy chọn; consent theo origin của sản phẩm vẫn được bật/tắt và kiểm tra. Điều này không chứng minh hộp xin quyền tương tác đã được tự động hóa trên mọi bản Chrome/Edge.
+
+Chạy `npm test`, `npm run test:coverage` và `npm run test:e2e`. `FLOWDM_BROWSER_EXECUTABLE` chọn Chromium thử; `FLOWDM_FFMPEG` chọn bộ giải mã fixture; `FLOWDM_EXECUTABLE` chọn ứng dụng đóng gói. Xem [browser-capture-report.md](browser-capture-report.md) cho contract UI và kiểm thử giả lập; xem [xác minh bản 0.2](VERIFICATION_V2.md).
+
+Native Messaging dùng frame độ dài 4 byte theo byte order máy + JSON UTF-8, tối đa 1 MiB; stdout chỉ chứa frame. Request:
 
 ```json
-{"schema":1,"request_id":"unique-id","op":"add","payload":{"url":"https://example.com/file.zip"}}
+{"schema":1,"request_id":"unique-id","op":"add","payload":{"url":"https://example.com/movie.m3u8","mediaType":"hls"}}
 ```
 
-Phản hồi thành công: `{"request_id":"unique-id","ok":true,"payload":{"id":"task-id"}}`. Lỗi chỉ có mã ngắn; không gửi stack/path nội bộ. Request ID từ 1–128 ký tự ASCII chữ/số/`_`/`-`. Trường dư, URL có credentials và scheme khác HTTP/HTTPS bị từ chối. URL có signed query vẫn được chuyển và được desktop lưu theo chính sách lưu tác vụ.
+Payload còn cho phép `filename` và `headers` giới hạn; `mediaType` là `direct` hoặc `hls`. ACK thành công là `{"request_id":"unique-id","ok":true,"payload":{"id":"task-id"}}`. Trường dư, URL có credentials, scheme khác HTTP(S) hoặc headers ngoài danh sách cho phép bị từ chối.
 
-Host chuyển tới named pipe Windows hoặc Unix socket, không mở cổng TCP. Mỗi lần desktop khởi động tạo secret ngẫu nhiên 256 bit, so sánh constant-time; file cấu hình ở dataDir, POSIX mode 0600 và socket 0600. Windows dựa vào thư mục dữ liệu riêng của tài khoản và secret; không tuyên bố chống tiến trình độc hại chạy cùng tài khoản. Không đặt dataDir trên share/public. `close()` đóng các kết nối và xóa cấu hình của phiên hiện tại.
-
-Desktop giữ tối đa 512 request ID, ưu tiên không loại bỏ thao tác đang chờ. Cùng ID/cùng URL được trả cùng kết quả, cùng ID/URL khác bị từ chối. Bộ nhớ đệm hết hiệu lực khi desktop khởi động lại hoặc khi kết quả cũ bị thay thế; đây không phải đảm bảo exactly-once bền vững. Callback được giới hạn 3 giây, host đợi IPC tối đa 4,5 giây. Lỗi timeout là kết quả chưa chắc chắn, không hủy tác vụ thêm đang chạy.
-
-Tài liệu giao thức/đăng ký: [Chrome Native Messaging](https://developer.chrome.com/docs/extensions/develop/concepts/native-messaging), [Edge Native Messaging](https://learn.microsoft.com/en-us/microsoft-edge/extensions-chromium/developer-guide/native-messaging). Launcher batch theo mô hình [mẫu host chính thức Chrome](https://github.com/GoogleChrome/chrome-extensions-samples/tree/main/api-samples/nativeMessaging/host).
-
-## Phạm vi đã kiểm thử
-
-Đã kiểm thử trên Windows bằng node:test: frame Unicode, prefix/payload chia nhỏ, nhiều frame, JSON/UTF-8 lỗi, kích thước quá giới hạn, xác thực, schema/URL, chống thêm trùng, callback lỗi/timeout, đóng server, subprocess host thật và desktop vắng mặt. Extension được kiểm tra với API trình duyệt giả lập, bundle được tạo trong thư mục tạm. Không đăng ký host lên máy thật; chưa tuyên bố đã thử menu Chrome/Edge thực tế hoặc native POSIX. Chạy `node --test tests/bridge/*.test.cjs` để lặp lại.
+Host chuyển tới named pipe Windows/Unix socket có secret ngẫu nhiên mỗi phiên; không mở API TCP quản trị. Request ID chống lặp trong bộ nhớ desktop, không phải bảo đảm exactly-once bền vững qua restart. Dùng thư mục dữ liệu riêng của tài khoản, không đặt trên share/public. Không tuyên bố bảo vệ khỏi mã độc chạy cùng tài khoản.

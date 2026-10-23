@@ -3,7 +3,7 @@ const fs=require('node:fs/promises');
 const path=require('node:path');
 const os=require('node:os');
 const crypto=require('node:crypto');
-const {FrameDecoder,encodeFrame,validRequest}=require('./protocol.cjs');
+const {FrameDecoder,encodeFrame,validRequest,normalizePayload}=require('./protocol.cjs');
 const CONFIG_NAME='browser-bridge.json';
 const errorReply=(request,error)=>({request_id:typeof request?.request_id==='string'?request.request_id.slice(0,128):null,ok:false,error});
 async function createBridge({dataDir,onAdd,timeoutMs=3000}) {
@@ -21,8 +21,10 @@ async function createBridge({dataDir,onAdd,timeoutMs=3000}) {
     if (!authenticate(message?.secret)) return errorReply(message?.request,'UNAUTHORIZED');
     const request=message.request;
     if (!validRequest(request)) return errorReply(request,'INVALID_REQUEST');
+    const payload=normalizePayload(request.payload);
+    const fingerprint=crypto.createHash('sha256').update(JSON.stringify(payload)).digest('hex');
     const prior=seen.get(request.request_id);
-    if (prior) return prior.url===request.payload.url?prior.promise:errorReply(request,'REQUEST_ID_CONFLICT');
+    if (prior) return prior.fingerprint===fingerprint?prior.promise:errorReply(request,'REQUEST_ID_CONFLICT');
     // Bound request retention; pending operations are never evicted.
     if (seen.size>=512) {
       const expired=[...seen].find(([,entry])=>entry.settled);
@@ -32,13 +34,13 @@ async function createBridge({dataDir,onAdd,timeoutMs=3000}) {
     const promise=(async()=>{
       let timer;
       try {
-        const task=await Promise.race([Promise.resolve().then(()=>onAdd({...request.payload})),new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('ADD_TIMEOUT')),timeoutMs);})]);
-        if (!task || typeof task.id!=='string') throw new Error('Invalid task');
+        const task=await Promise.race([Promise.resolve().then(()=>onAdd(structuredClone(payload))),new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('ADD_TIMEOUT')),timeoutMs);})]);
+        if (!task || typeof task.id!=='string' || !task.id.length || task.id.length>128 || /[\u0000-\u001f\u007f]/.test(task.id)) throw new Error('Invalid task');
         return {request_id:request.request_id,ok:true,payload:{id:task.id}};
       } catch(error) { return errorReply(request,error.message==='ADD_TIMEOUT'?'ADD_TIMEOUT':'ADD_FAILED'); }
       finally {clearTimeout(timer);}
     })();
-    const entry={url:request.payload.url,promise,settled:false};
+    const entry={fingerprint,promise,settled:false};
     seen.set(request.request_id,entry);promise.then(()=>{entry.settled=true;});return promise;
   }
   const server=net.createServer(socket=>{

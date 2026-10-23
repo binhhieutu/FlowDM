@@ -9,7 +9,7 @@ const http = require('node:http');
 const crypto = require('node:crypto');
 const assert = require('node:assert/strict');
 (async () => {
-  const executable = path.resolve(process.argv[2] || 'dist/FlowDM 0.1.0.exe');
+  const executable = path.resolve(process.argv[2] || `dist/FlowDM ${require('../package.json').version}.exe`);
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'flowdm-portable-'));
   const content = crypto.randomBytes(2 * 1024 * 1024); let instance;
   const server = http.createServer((req, res) => {

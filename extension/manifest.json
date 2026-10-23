@@ -1,9 +1,10 @@
 {
-  "manifest_version": 3,
-  "name": "FlowDM Browser Bridge",
-  "version": "0.1.0",
-  "description": "Gửi liên kết tải xuống tới FlowDM khi bạn chọn trong menu chuột phải.",
-  "permissions": ["contextMenus", "nativeMessaging"],
-  "background": {"service_worker": "background.js"},
-  "action": {"default_title": "FlowDM — chọn liên kết bằng menu chuột phải"}
+ "manifest_version":3,"name":"FlowDM Browser Bridge","version":"0.2.0",
+ "description":"Tự chuyển tải xuống HTTP(S) sang FlowDM và chọn tải video không DRM.",
+ "permissions":["contextMenus","nativeMessaging","downloads","storage","webRequest","activeTab"],
+ "optional_permissions":["cookies"],"optional_host_permissions":["http://*/*","https://*/*"],
+ "host_permissions":["http://*/*","https://*/*"],
+ "background":{"service_worker":"background.js"},
+ "action":{"default_title":"FlowDM","default_popup":"popup.html"},
+ "content_scripts":[{"matches":["http://*/*","https://*/*"],"js":["media.js","content.js"],"run_at":"document_idle"}]
 }

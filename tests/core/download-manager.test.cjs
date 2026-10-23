@@ -388,12 +388,15 @@ test('recognizes fully published crash checkpoints without network using persist
     const saved = JSON.parse(await fs.readFile(journal, 'utf8'));
     Object.assign(saved.tasks[0], { url: 'http://127.0.0.1:1/offline', status: savedState, totalBytes: bytes.length, downloadedBytes: bytes.length, segments: [{ index: 0, start: 0, end: bytes.length - 1, received: bytes.length }], sha256: crypto.createHash('sha256').update(bytes).digest('hex') });
     await fs.writeFile(journal, JSON.stringify(saved)); await fs.writeFile(task.path, bytes);
+    const obsoletePartial = path.join(root, 'data', `${task.id}.part`);
+    await fs.writeFile(obsoletePartial, 'obsolete checkpoint');
     const restored = new DownloadManager({ dataDir: path.join(root, 'data'), downloadDir: path.join(root, 'files') });
     try {
       await restored.init();
       assert.equal(restored.list()[0].status, 'completed');
       assert.equal((await restored.resume(task.id)).status, 'completed');
       assert.deepEqual(await fs.readFile(task.path), bytes);
+      await assert.rejects(fs.stat(obsoletePartial), { code: 'ENOENT' });
     } finally { await restored.close(); }
   }
 });
@@ -452,4 +455,52 @@ test('published recovery rejects size mismatches and non-file destinations', asy
   assert.equal(await recoverPublished({ ...task, downloadedBytes: bytes.length - 1, totalBytes: bytes.length - 1 }), false);
   assert.equal(await recoverPublished({ ...task, path: root }), false);
   assert.equal(await recoverPublished({ ...task, totalBytes: null }), true);
+});
+
+test('migrates version 1 direct queued and paused tasks unchanged into version 2 journal', async t => {
+  const { manager, root, url } = await fixture(t);
+  await manager.add({ url, startAt: Date.now() + 60000 });
+  const paused = await manager.add({ url, filename: 'paused.bin', startAt: Date.now() + 60000 });
+  await manager.pause(paused.id); await manager.close();
+  const journal = path.join(root, 'data', 'downloads.json');
+  const legacy = JSON.parse(await fs.readFile(journal, 'utf8'));
+  legacy.version = 1;
+  for (const task of legacy.tasks) delete task.mediaType;
+  await fs.writeFile(journal, JSON.stringify(legacy));
+  const restored = new DownloadManager({ dataDir: path.join(root, 'data'), downloadDir: path.join(root, 'files') });
+  try {
+    await restored.init();
+    const migrated = JSON.parse(await fs.readFile(journal, 'utf8'));
+    assert.equal(migrated.version, 2);
+    assert.deepEqual(migrated.tasks, legacy.tasks);
+  } finally { await restored.close(); }
+});
+
+test('new downloads wait for initial durable journal and rejected adds cannot start later', async t => {
+  let requests = 0;
+  const { manager, root, url } = await fixture(t, (req, res) => { requests++; serve(req, res); });
+  const persist = manager._persist.bind(manager);
+  let enter, release;
+  const entered = new Promise(resolve => { enter = resolve; });
+  let intercepted = false;
+  manager._persist = () => {
+    if (intercepted) return persist();
+    intercepted = true; enter();
+    return new Promise((resolve, reject) => { release = { resolve, reject }; });
+  };
+  const adding = manager.add({ url, headers: { Cookie: 'session-only' } });
+  await entered;
+  manager._pump(); await new Promise(resolve => setTimeout(resolve, 30));
+  const prematureRequests = requests, prematureRunning = manager.running.size;
+  manager._persist = persist;
+  release.reject(Object.assign(Error('Journal disk full'), { code: 'ENOSPC' }));
+  await assert.rejects(adding, { code: 'ENOSPC' });
+  assert.equal(prematureRequests, 0, 'pending initial journal must block network activity');
+  assert.equal(prematureRunning, 0);
+  manager._pump(); await new Promise(resolve => setTimeout(resolve, 30));
+  assert.deepEqual(manager.list(), []); assert.equal(manager.secrets.size, 0); assert.equal(requests, 0);
+  assert.equal(manager.pendingAdds.size, 0);
+  assert.deepEqual(JSON.parse(await fs.readFile(path.join(root, 'data', 'downloads.json'), 'utf8')).tasks, []);
+  const successful = await manager.add({ url });
+  assert.equal((await status(manager, successful.id, ['completed', 'failed'])).status, 'completed');
 });

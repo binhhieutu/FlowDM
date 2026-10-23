@@ -1,15 +1,17 @@
 {
   "name": "flowdm",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Cross-platform HTTP/HTTPS download manager",
   "main": "src/main.cjs",
   "private": true,
   "author": "FlowDM contributors",
   "license": "MIT",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "start": "electron .",
-    "test": "node --test tests/core/*.test.cjs tests/bridge/*.test.cjs",
+    "test": "node --test tests/core/*.test.cjs tests/media/*.test.cjs tests/bridge/*.test.cjs tests/browser/*.test.cjs",
     "test:coverage": "node scripts/coverage.cjs",
     "test:e2e": "node --test --test-concurrency=1 tests/e2e/*.test.cjs",
     "pack:win": "electron-builder --win --x64 --dir --publish=never",
@@ -26,12 +28,37 @@
   "build": {
     "appId": "local.flowdm.desktop",
     "productName": "FlowDM",
-    "directories": { "output": "dist" },
-    "files": ["src/**/*", "assets/**/*", "package.json"],
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "extension/**/*",
+      "package.json"
+    ],
     "asar": true,
     "afterAllArtifactBuild": "scripts/fix-linux-archive.cjs",
-    "win": { "target": ["portable"], "icon": "assets/icon.ico", "signExecutable": false },
-    "linux": { "target": ["tar.gz"], "category": "Network", "icon": "assets/icon.png" },
-    "mac": { "target": ["zip"], "category": "public.app-category.utilities", "identity": null }
+    "win": {
+      "target": [
+        "portable"
+      ],
+      "icon": "assets/icon.ico",
+      "signExecutable": false
+    },
+    "linux": {
+      "target": [
+        "tar.gz"
+      ],
+      "category": "Network",
+      "icon": "assets/icon.png"
+    },
+    "mac": {
+      "target": [
+        "zip"
+      ],
+      "category": "public.app-category.utilities",
+      "identity": null
+    }
   }
 }

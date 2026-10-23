@@ -15,10 +15,10 @@ function run(args, env = process.env) {
   if (result.error) throw result.error;
   if (result.status !== 0) process.exit(result.status || 1);
 }
-const files = ['core', 'bridge'].flatMap(group => fs.readdirSync(path.join(root, 'tests', group)).filter(file => file.endsWith('.test.cjs')).map(file => `tests/${group}/${file}`));
-run([c8, `--temp-directory=${unit}`, '--include=src/core/**', '--include=src/bridge/**', '--all', '--reporter=json-summary', process.execPath, '--test', ...files]);
+const files = ['core', 'media', 'bridge', 'browser'].flatMap(group => fs.readdirSync(path.join(root, 'tests', group)).filter(file => file.endsWith('.test.cjs')).map(file => `tests/${group}/${file}`));
+run([c8, `--temp-directory=${unit}`, '--include=src/**', '--include=extension/**', '--all', '--reporter=json-summary', process.execPath, '--test', ...files]);
 run(['--test', '--test-concurrency=1', 'tests/e2e/desktop.test.cjs'], { ...process.env, FLOWDM_COVERAGE_DIR: desktop });
 for (const directory of [unit, desktop]) for (const file of fs.readdirSync(directory)) {
   if (file.startsWith('coverage-') && file.endsWith('.json')) fs.copyFileSync(path.join(directory, file), path.join(merged, file));
 }
-run([c8, 'report', `--temp-directory=${merged}`, '--include=src/**', '--all', '--reporter=text', '--reporter=json-summary', '--reporter=lcov', '--check-coverage', '--lines=80', '--statements=80', '--branches=80', '--functions=80']);
+run([c8, 'report', `--temp-directory=${merged}`, '--include=src/**', '--include=extension/**', '--all', '--reporter=text', '--reporter=json-summary', '--reporter=lcov', '--check-coverage', '--lines=80', '--statements=80', '--branches=80', '--functions=80']);

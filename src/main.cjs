@@ -3,12 +3,14 @@ const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const { DownloadManager } = require('./core/download-manager.cjs');
 const { createBridge } = require('./bridge/server.cjs');
+const { createBrowserSetup } = require('./browser/setup.cjs');
+const { createBrowserAdmission } = require('./browser/admission.cjs');
 
 const dataDir = process.env.FLOWDM_DATA_DIR || path.join(app.getPath('userData'), 'state');
 if (process.env.FLOWDM_DATA_DIR) app.setPath('userData', path.dirname(dataDir));
 const downloadDir = process.env.FLOWDM_DOWNLOAD_DIR || path.join(app.getPath('downloads'), 'FlowDM');
 const uiFile = path.join(__dirname, 'ui', 'index.html');
-let manager; let win; let bridge; let closing = false; let bridgeError = null;
+let manager; let win; let bridge; let browserSetup; let closing = false; let bridgeError = null;
 
 if (!app.requestSingleInstanceLock()) app.quit();
 else {
@@ -16,7 +18,8 @@ else {
   app.whenReady().then(async () => {
     manager = new DownloadManager({ dataDir, downloadDir, maxConcurrent: 3 });
     await manager.init();
-    bridge = await createBridge({ dataDir, onAdd: payload => manager.add(payload) }).catch(error => { bridgeError = error.message; return null; });
+    browserSetup = createBrowserSetup({ appDir: app.getAppPath(), dataDir, userDataDir: app.getPath('userData'), executablePath: process.execPath });
+    bridge = await createBridge({ dataDir, onAdd: createBrowserAdmission(manager) }).catch(error => { bridgeError = error.message; return null; });
     installHandlers(); createWindow();
     manager.on('change', tasks => { if (win && !win.isDestroyed()) win.webContents.send('flow:changed', tasks); });
     app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
@@ -43,11 +46,15 @@ function installHandlers() {
     try { return { ok: true, data: await action(input) }; }
     catch (error) { return { ok: false, error: error.message }; }
   });
-  handle('info', () => ({ version: app.getVersion(), platform: process.platform, downloadDir, bridgeAvailable: !!bridge, bridgeError }));
+  handle('info', async () => ({ version: app.getVersion(), platform: process.platform, downloadDir, bridgeAvailable: !!bridge, bridgeError, browser: await browserSetup.info() }));
+  handle('browserInfo', () => browserSetup.info());
+  handle('browserExport', async () => { const directory = await browserSetup.prepareExtension(); const error = await shell.openPath(directory); if (error) throw new Error(error); return directory; });
+  handle('browserConnect', input => browserSetup.connect(input || {}));
+  handle('browserDisconnect', browser => browserSetup.disconnect(browser));
   handle('list', () => manager.list());
   handle('add', input => {
     if (!input || typeof input !== 'object' || Array.isArray(input)) throw new Error('Thông tin tải không hợp lệ.');
-    const allowed = ['url', 'filename', 'connections', 'directory', 'startAt', 'speedLimit'];
+    const allowed = ['url', 'filename', 'connections', 'directory', 'startAt', 'speedLimit', 'mediaType'];
     if (Object.keys(input).some(key => !allowed.includes(key))) throw new Error('Tham số không được hỗ trợ.');
     return manager.add(input);
   });
@@ -72,5 +79,5 @@ app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(
 app.on('before-quit', event => {
   if (closing || !manager) return;
   event.preventDefault(); closing = true;
-  Promise.allSettled([manager.close(), bridge?.close()]).then(() => app.quit());
+  Promise.allSettled([manager.close(), bridge?.close(), browserSetup?.waitForIdle()]).then(() => app.quit());
 });

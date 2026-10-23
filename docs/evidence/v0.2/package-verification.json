@@ -1,0 +1,12 @@
+[
+  {
+    "platform": "win-unpacked",
+    "filesVerified": 31,
+    "asarSha256": "6240809659b4f8ab7f243fbad13ca78487c2cbf67be646a1292236129a8724e9"
+  },
+  {
+    "platform": "linux-unpacked",
+    "filesVerified": 31,
+    "asarSha256": "6240809659b4f8ab7f243fbad13ca78487c2cbf67be646a1292236129a8724e9"
+  }
+]

@@ -22,7 +22,7 @@ async function request(url, headers, signal, redirects = 0) {
     const safeHeaders = next.origin === parsed.origin ? headers : Object.fromEntries(Object.entries(headers).filter(([key]) => !['authorization', 'cookie', 'proxy-authorization', 'referer'].includes(key.toLowerCase())));
     return request(next.href, safeHeaders, signal, redirects + 1);
   }
-  return { response, finalUrl: parsed.href };
+  return { response, finalUrl: parsed.href, requestHeaders: { ...headers } };
 }
 async function retryRequest(url, headers, signal) {
   for (let attempt = 0; ; attempt++) {

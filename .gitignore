@@ -2,6 +2,7 @@ node_modules/
 dist/
 coverage/
 coverage-all/
+coverage-hls/
 .tmp/
 test-results/
 *.log

@@ -1,66 +1,55 @@
-# FlowDM
+# FlowDM 0.2
 
-Ứng dụng tải HTTP/HTTPS desktop mới cho Windows, Linux và macOS, xây từ đặc tả hành vi đã rút ra trong dự án phân tích IDM. Không dùng mã nguồn, thư viện hay hình ảnh IDM. Bản 0.1 dành cho tải tệp trực tiếp; xem [thiết kế](docs/DESIGN.md) và [bằng chứng kiểm thử](docs/VERIFICATION.md).
+Ứng dụng tải HTTP/HTTPS desktop với tiện ích Chromium tự bắt tải xuống và chọn tải video HLS VOD. Mã nguồn và nhận diện riêng; không dùng mã hay tài sản IDM và không tuyên bố đủ mọi tính năng IDM.
 
 ## Dùng trên Windows
 
-Mở `dist/FlowDM 0.1.0.exe` (portable), hoặc `dist/win-unpacked/FlowDM.exe`. Không cần Node.js để chạy bản đóng gói. Nhấn **Thêm liên kết**, dán URL, chọn thư mục/tên tệp, số kết nối và bắt đầu. Có thể tạm dừng, tiếp tục, hủy, mở vị trí tệp, tìm kiếm/lọc danh sách, hẹn giờ và giới hạn tốc độ. Hủy xóa dữ liệu tạm; xóa khỏi danh sách không xóa tệp đã hoàn tất.
+Mở `dist/FlowDM 0.2.0.exe` hoặc `dist/win-unpacked/FlowDM.exe`. Bản đóng gói không cần cài Node.js. Nhấn **Thêm liên kết** để chọn URL, thư mục, tên tệp và số kết nối. Có tạm dừng/tiếp tục, hủy/thử lại, tìm kiếm/lọc, hẹn giờ, giới hạn tốc độ và SHA-256 sau tải. Không tự mở hay chạy tệp tải về; không ghi đè tệp có sẵn.
 
-Tải đang chạy được chuyển sang tạm dừng khi đóng/khởi động lại; nhấn **Tiếp tục** để phục hồi. Tải nhiều kết nối và giữ lại byte khi resume yêu cầu server hỗ trợ Range và ETag mạnh. Nếu ETag đổi, ứng dụng báo lỗi và yêu cầu thêm lại để không trộn hai phiên bản. Server chỉ có Last-Modified hoặc không có validator an toàn dùng một luồng; tiếp tục sẽ tải lại từ đầu. Không ghi đè tệp có sẵn; tên trùng được thêm số. SHA-256 được tính sau tải (giúp so sánh với hash nhà phát hành, không tự chứng minh tệp đáng tin).
+Tải tệp nhiều kết nối và resume giữ byte cần server hỗ trợ Range và validator an toàn. Khi không thể xác minh cùng phiên bản, ứng dụng tải lại an toàn hoặc báo lỗi thay vì trộn dữ liệu. HLS tiếp tục/thử lại từ đầu toàn bộ video. Hủy xóa dữ liệu tạm; xóa lịch sử không xóa tệp đã hoàn tất.
 
-Giới hạn tốc độ áp dụng mỗi lượt tải, đơn vị KiB/s; tổng tốc độ có thể lớn hơn khi tải nhiều tệp. Hẹn giờ theo giờ máy, lưu thành một thời điểm tuyệt đối; máy và ứng dụng phải đang hoạt động. Không tự đánh thức máy hoặc chạy dịch vụ nền. Dữ liệu tạm nằm trong thư mục dữ liệu ứng dụng nên cần đủ chỗ trên ổ đó và ổ đích.
+Giới hạn tốc độ tính theo từng lượt tải, đơn vị KiB/s. Lịch hẹn dùng giờ máy; máy và FlowDM phải đang hoạt động. Không có dịch vụ nền tự đánh thức máy.
 
-## Chạy mã nguồn trên ba hệ điều hành
+## Kết nối trình duyệt
 
-Cần Node.js 22 trở lên và môi trường desktop đồ họa. Từ thư mục này:
+1. Mở **Kết nối trình duyệt** trong FlowDM, chọn Chrome/Edge/Chromium phù hợp rồi nhấn **Mở thư mục tiện ích**.
+2. Vào `chrome://extensions` hoặc `edge://extensions`, bật Developer mode, chọn **Load unpacked / Tải tiện ích đã giải nén** và chọn thư mục vừa xuất.
+3. Sao chép ID 32 ký tự của tiện ích, dán vào FlowDM và nhấn **Kết nối**. Giữ ứng dụng đang mở.
+
+Windows dùng runtime Electron/Node được sao chép vào vị trí ổn định dành cho native host; không cần Node.js ngoài. Đăng ký chỉ áp dụng cho tài khoản hiện tại. **Ngắt kết nối** hoàn lại đăng ký trước đó nếu mục đăng ký vẫn do FlowDM quản lý. Xem [hướng dẫn trình duyệt](docs/BROWSER.md).
+
+Tự bắt tải HTTP(S) bật mặc định khi cài tiện ích và có thể tắt trong popup. Trình duyệt chỉ hủy lượt tải sau khi FlowDM kiểm tra truy cập, lưu tác vụ và trả xác nhận đúng ID. Cầu nối vắng mặt, lỗi truy cập/đăng nhập, phản hồi HTML không phù hợp hoặc hết thời gian chờ sẽ giữ/tiếp tục lượt tải trình duyệt. Timeout vẫn có thể tạo một tác vụ đến muộn; kiểm tra hàng đợi trước khi gửi lại.
+
+Cookie, Authorization, Referer và User-Agent mặc định không được chuyển. Nếu cần đăng nhập, mở popup, chọn đúng tên miền của trang hoặc tài nguyên/CDN rồi bật quyền rõ ràng. Cookie được lấy theo URL với quyền tùy chọn; bearer token cần một yêu cầu mạng mới sau khi cấp quyền. Headers chỉ ở bộ nhớ và bị bỏ khi chuyển sang origin khác.
+
+Tiện ích nhận diện video/audio/source động và các manifest mạng, kể cả player dùng blob. Nhấn **Tải video bằng FlowDM** cạnh media hoặc chọn mục trong popup. Phát hiện media không tự tải mọi luồng. Hỗ trợ tệp trực tiếp và HLS VOD không mã hóa dạng MPEG-TS hoặc fMP4. Chưa hỗ trợ live, DRM/mã hóa, DASH, audio/video tách riêng hay quy tắc trích xuất riêng cho từng website. HLS ghép theo thứ tự nguồn, không chuyển mã/remux; xem [phạm vi media](docs/media-report.md).
+
+Nếu đang dùng IDM, tắt tích hợp IDM cho trình duyệt dùng FlowDM để tránh hai trình quản lý cùng bắt một tải. Kiểm thử thấy IDM vẫn can thiệp Chrome thường dù đã bỏ tiện ích IDM. Không cần thay đổi profile thật để thử bản này.
+
+## Dữ liệu và tương thích
+
+- `downloads.json` và dữ liệu tạm nằm ở `app.getPath('userData')/state`; đích mặc định là `Downloads/FlowDM`. Có thể đặt `FLOWDM_DATA_DIR` và `FLOWDM_DOWNLOAD_DIR` bằng đường dẫn tuyệt đối.
+- URL, gồm signed query/token cần để resume, được lưu trong lịch sử. Không chia sẻ thư mục dữ liệu. Headers nhạy cảm không được lưu; tải cần đăng nhập có thể phải thêm lại sau khi khởi động.
+- Journal 0.2 ghi schema v2 và đọc được schema v1. Bản 0.1 từ chối v2: sao lưu thư mục dữ liệu trước khi nâng cấp nếu cần quay lại bản cũ.
+- Giới hạn mặc định 100 GiB/tệp, ba lượt tải đồng thời, tối đa ba lượt/host; UI chọn 1/2/4/8 kết nối. Server không hỗ trợ Range dùng một luồng. Cần chỗ trống cho dữ liệu tạm và tệp cuối.
+- Đích cần filesystem hỗ trợ hard link như NTFS/ext4/APFS; FAT/exFAT chưa hỗ trợ. Không có FTP, proxy xác thực, site grabber, nhập dữ liệu IDM hay tự cập nhật.
+
+## Chạy nguồn, build và kiểm thử
+
+Cần Node.js 22+ và phiên desktop đồ họa:
 
 ```sh
 npm ci
 npm start
-```
-
-Linux cần các thư viện hệ thống mà Electron/Chromium yêu cầu (GTK, NSS, libgbm, ALSA), phiên X11/Wayland và sandbox Chromium hoạt động. Không chạy bằng root. Một số distro hạn chế user namespaces cần quản trị viên cấu hình sandbox theo chính sách máy; không tắt sandbox để chạy. Gói tar chưa có trình cài thiết lập sandbox hệ thống; chưa được xác minh trên máy Linux thật. macOS cần phiên đồ họa của người dùng; bản chưa ký/notarize cần tự build từ nguồn hoặc phê duyệt theo chính sách hệ điều hành.
-
-Đóng gói trên nền tảng tương ứng:
-
-```sh
-npm run dist:win
-npm run dist:linux
-npm run dist:mac
-```
-
-Windows x64 portable; Linux x64 tar.gz (`tar -xzf ...`, chạy `./flowdm`); macOS ZIP Intel x64 và Apple Silicon arm64. Artifact chỉ được xác nhận tạo thành công khi có trong báo cáo kiểm thử. [CI matrix](.github/workflows/desktop.yml) chạy kiểm thử và build trên ba OS khi bạn đưa dự án lên repository riêng; chưa được gửi/chạy lên dịch vụ bên ngoài trong phiên làm việc này. Đóng gói macOS/ký mã phụ thuộc công cụ nền tảng; [electron-builder multi-platform](https://www.electron.build/docs/features/multi-platform-build/).
-
-## Trình duyệt (tùy chọn)
-
-Tiện ích MV3 có menu **Tải bằng FlowDM** cho liên kết/video/audio có URL HTTP/HTTPS trực tiếp. Cài bằng hướng dẫn [BROWSER.md](docs/BROWSER.md). Host cần Node.js 22+, ứng dụng đang mở và đăng ký thủ công; desktop không tự sửa registry/trình duyệt. Không tự hủy lượt tải của trình duyệt. Chưa xác minh cài host trên trình duyệt thật.
-
-## Dữ liệu và phạm vi
-
-- File tác vụ `downloads.json` và các `.part` nằm ở `app.getPath('userData')/state`; đích mặc định là `Downloads/FlowDM`. Có thể đặt `FLOWDM_DATA_DIR` và `FLOWDM_DOWNLOAD_DIR` thành đường dẫn tuyệt đối khi chạy để dùng thư mục riêng.
-- URL nguyên gốc, bao gồm signed query/token trong URL, được lưu để resume. Không chia sẻ thư mục dữ liệu. HTTP không mã hóa; ưu tiên HTTPS. Headers nhạy cảm chỉ trong bộ nhớ; tải cần headers phải thêm lại sau khởi động. Giao diện và tiện ích chưa cung cấp nhập cookie/header.
-- Hỗ trợ file đến 100 GiB (giới hạn engine), tối đa 3 lượt tải và 3 lượt tải mỗi host, mỗi lượt tối đa 16 kết nối (giao diện chọn 1/2/4/8). Server không hỗ trợ Range dùng một luồng. Không tự mở/chạy tệp tải về.
-- Thư mục đích cần filesystem hỗ trợ hard link (NTFS, ext4, APFS…). FAT/exFAT chưa hỗ trợ; ứng dụng kiểm tra và báo `UNSUPPORTED_DESTINATION_FILESYSTEM` trước khi tải. Sau một số tình huống mất điện ngay khi công bố file, bản sao `.part` có thể còn lại dù lịch sử đã phục hồi hoàn tất; đây là khoản dọn dữ liệu tạm còn cần cải thiện, không ảnh hưởng nội dung file cuối.
-- Chưa có FTP, proxy xác thực, site grabber, ghép HLS/DASH, tải DRM, bộ quy tắc riêng YouTube, import dữ liệu IDM, tự cập nhật hoặc tự bắt mọi lượt tải trình duyệt. Không tuyên bố tương đương đầy đủ IDM.
-
-## Kiểm thử
-
-```sh
 npm test
 npm run test:coverage
 npm run test:e2e
 ```
 
-E2E mở Electron thật, tải từ server fixture cục bộ, pause, đóng/mở lại, resume, so sánh byte và SHA-256, kiểm tra URL lỗi và cấu hình sandbox. Linux CI dùng `xvfb-run --auto-servernum npm run test:e2e`. Không cần truy cập IDM hoặc tài khoản bên ngoài. Kiểm thử bản đóng gói Windows bằng PowerShell:
+Đóng gói bằng `npm run dist:win`, `npm run dist:linux` hoặc `npm run dist:mac`. Windows là nền tảng đã chạy kiểm thử desktop và trình duyệt thật; xem kết quả tại [VERIFICATION_V2.md](docs/VERIFICATION_V2.md). Linux x64 tar.gz đã build nhưng chưa chạy native trên Linux; macOS chưa build/chạy. Linux cần thư viện Electron, X11/Wayland và sandbox hoạt động; không tắt sandbox hoặc chạy root để bỏ qua lỗi môi trường. Bản chưa ký/notarize có thể cần phê duyệt theo chính sách hệ điều hành.
 
-```powershell
-$env:FLOWDM_EXECUTABLE = (Resolve-Path '.\dist\win-unpacked\FlowDM.exe').Path
-npm run test:e2e
-Remove-Item Env:FLOWDM_EXECUTABLE
-```
+E2E trình duyệt thật dùng Chrome for Testing 156 và Electron, kiểm tra tự bắt tải, tắt bắt tải, host vắng mặt, đăng nhập khi chưa/có consent, nút media chống click giả, byte tệp trực tiếp/HLS TS/fMP4 và giải mã bằng FFmpeg. Profile thử dùng bản Chromium được đổi tên để tránh hook IDM; IDM và profile thật của chủ máy không bị chỉnh sửa. Bản sao tiện ích thử được cấp sẵn API cookies tùy chọn để tránh hộp quyền tự động, còn consent theo origin của sản phẩm vẫn được kiểm tra bật/tắt.
 
-`npm run test:coverage` chạy cả unit/integration và Electron E2E, gộp V8 coverage của tiến trình chính và giao diện; ngưỡng tổng tối thiểu 80% dòng/statement/nhánh/hàm. Linux chạy lệnh này trong `xvfb-run --auto-servernum`. Kiểm tra portable thật bằng `node scripts/smoke-portable.cjs` trên Windows; script dùng cổng debug loopback tạm và đóng tiến trình sau khi so sánh byte. Kiểm tra HTTPS ngoài Internet tùy chọn: `node scripts/smoke-https.cjs`. Không đưa live-network smoke vào bộ test offline.
+Có thể cấu hình E2E bằng `FLOWDM_BROWSER_EXECUTABLE`, `FLOWDM_FFMPEG` và `FLOWDM_EXECUTABLE`; FFmpeg chỉ dùng xác minh fixture media, không phải phụ thuộc chạy FlowDM. Nguồn fixture: [video/README.md](tests/fixtures/video/README.md). Kết quả bản 0.2 nằm trong [VERIFICATION_V2.md](docs/VERIFICATION_V2.md); [VERIFICATION.md](docs/VERIFICATION.md) là bằng chứng lịch sử 0.1, không phải xác nhận 0.2.
 
-## Kiến trúc
-
-`src/core`: HTTP, chia đoạn, state machine và journal. `src/main.cjs`: lifecycle/IPC. `src/ui`: giao diện tài nguyên nội bộ, CSP và DOM text an toàn. `src/bridge`: Native Messaging/IPC xác thực. [Electron security](https://www.electronjs.org/docs/latest/tutorial/security/) và [Playwright Electron](https://playwright.dev/docs/api/class-electron) là tài liệu tham chiếu kiểm thử desktop.
+Kiến trúc: `src/core` tải/journal; `src/media` HLS; `src/browser` thiết lập và kiểm tra tiếp nhận; `src/bridge` Native Messaging/IPC; `src/ui` giao diện Electron sandbox. Xem [DESIGN.md](docs/DESIGN.md) và [browser-capture-report.md](docs/browser-capture-report.md).

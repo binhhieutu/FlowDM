@@ -57,6 +57,18 @@ test('desktop downloads exact bytes, pause/resume, persists, rejects invalid URL
   assert.equal(await page.evaluate(() => typeof window.require), 'undefined');
   const prefs = await desktop.app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].webContents.getLastWebPreferences());
   assert.equal(prefs.contextIsolation, true); assert.equal(prefs.sandbox, true); assert.equal(prefs.nodeIntegration, false);
+  await desktop.app.evaluate(({ shell }) => { shell.openPath = async () => ''; });
+  await page.getByRole('button', { name: 'Kết nối trình duyệt', exact: true }).click();
+  await page.getByRole('button', { name: 'Mở thư mục tiện ích', exact: true }).click();
+  await page.getByText('Đã mở thư mục.', { exact: false }).waitFor();
+  assert.equal(JSON.parse(await fs.readFile(path.join(root, 'browser-extension', 'manifest.json'), 'utf8')).version, '0.2.0');
+  await page.getByLabel('ID tiện ích FlowDM').fill('bad');
+  await page.getByRole('button', { name: 'Kết nối', exact: true }).click();
+  await page.getByText('ID tiện ích phải gồm đúng 32 ký tự a–p.', { exact: true }).waitFor();
+  await page.getByLabel('Trình duyệt', { exact: true }).selectOption('edge');
+  await page.getByText('edge://extensions', { exact: true }).waitFor();
+  await page.getByRole('button', { name: 'Ngắt kết nối', exact: true }).click();
+  await page.getByRole('button', { name: 'Đóng kết nối trình duyệt', exact: true }).click();
   await page.getByRole('button', { name: 'Thêm liên kết', exact: true }).click();
   await page.getByLabel('Địa chỉ tải').fill(`http://127.0.0.1:${server.address().port}/fixture.bin`);
   await page.getByLabel('Tên tệp').fill('fixture.bin');

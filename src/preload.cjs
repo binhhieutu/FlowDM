@@ -6,6 +6,10 @@ contextBridge.exposeInMainWorld('flow', {
   action: (id, action) => ipcRenderer.invoke('flow:action', { id, action }),
   chooseDirectory: () => ipcRenderer.invoke('flow:chooseDirectory'),
   openFolder: () => ipcRenderer.invoke('flow:openFolder'),
+  browserInfo: () => ipcRenderer.invoke('flow:browserInfo'),
+  browserExport: () => ipcRenderer.invoke('flow:browserExport'),
+  browserConnect: input => ipcRenderer.invoke('flow:browserConnect', input),
+  browserDisconnect: browser => ipcRenderer.invoke('flow:browserDisconnect', browser),
   onChange: callback => {
     const listener = (_event, tasks) => callback(tasks);
     ipcRenderer.on('flow:changed', listener);

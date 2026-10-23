@@ -68,9 +68,9 @@ function render() {
   $('details').hidden = !task;
   if (task) {
     $('detail-name').textContent = task.filename; $('detail-state').textContent = labels[task.status];
-    $('detail-path').textContent = task.path; $('detail-connections').textContent = `${task.segments?.length || task.connections} kết nối`;
+    $('detail-path').textContent = task.path; $('detail-connections').textContent = task.mediaType === 'hls' ? `${task.media?.completedSegments || 0}/${task.media?.segmentCount || '?'} đoạn HLS` : `${task.segments?.length || task.connections} kết nối`;
     $('detail-hash').textContent = task.sha256 || 'Được tính khi tải hoàn tất';
-    $('detail-error').hidden = !task.error; $('detail-error').textContent = task.error || '';
+    $('detail-error').hidden = !task.error && task.mediaType !== 'hls'; $('detail-error').textContent = task.error || (task.mediaType === 'hls' ? 'Video HLS được tải lại từ đầu khi tiếp tục để giữ đúng nội dung.' : '');
     $('segments').replaceChildren(...(task.segments || []).map((segment, index) => {
       const meter = element('progress', 'meter'); meter.max = Math.max(1, segment.end - segment.start + 1); meter.value = segment.received || 0; meter.title = `Kết nối ${index + 1}: ${bytes(segment.received)}`; return meter;
     }));
@@ -94,6 +94,7 @@ $('add-form').addEventListener('submit', async event => {
   event.preventDefault(); $('form-error').hidden = true; $('submit-download').disabled = true;
   try {
     const input = { url: $('url').value.trim(), connections: Number($('connections').value), speedLimit: Number($('speed-limit').value) * 1024 };
+    if ($('media-type').value !== 'auto') input.mediaType = $('media-type').value;
     if ($('filename').value.trim()) input.filename = $('filename').value.trim();
     if ($('directory').value) input.directory = $('directory').value;
     if ($('start-at').value) input.startAt = new Date($('start-at').value).toISOString();

@@ -16,6 +16,12 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - if: runner.os == 'Windows'
+        run: |
+          npx playwright install chromium
+          choco install ffmpeg --no-progress -y
+      - if: runner.os == 'Windows'
+        run: node --test tests/e2e/browser.test.cjs
       - if: runner.os != 'Linux'
         run: npm run test:coverage
       - if: runner.os == 'Linux'

@@ -1,0 +1,10 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>FlowDM</title><link rel="stylesheet" href="popup.css"></head><body>
+<h1>FlowDM</h1>
+<label><input type="checkbox" data-testid="auto-capture"> Tự bắt tải xuống HTTP(S)</label>
+<p>Trình duyệt chỉ hủy tải sau khi FlowDM xác nhận đã nhận. Khi cầu nối lỗi, trình duyệt tiếp tục tải.</p>
+<label for="credential-origin">Trang được cấp quyền đăng nhập</label><select id="credential-origin" data-testid="credential-origin" aria-label="Trang được cấp quyền đăng nhập"></select><label><input type="checkbox" data-testid="credentials"> Cho phép gửi thông tin đăng nhập cho tên miền đã chọn</label>
+<p data-testid="site-origin"></p><p class="privacy">Mặc định không gửi Cookie, Authorization, Referer hoặc User-Agent. Bật quyền theo từng trang nếu tệp yêu cầu đăng nhập. Không chia sẻ thông tin này với trang khác; không lưu vào lịch sử FlowDM.</p>
+<p role="status" data-testid="capture-status">Đang đọc trạng thái…</p>
+<h2>Video / âm thanh trên trang</h2><p>Chỉ tải khi bạn chọn. HLS không DRM được hỗ trợ; DASH chưa được hỗ trợ.</p>
+<div data-testid="media-list"></div><script src="popup.js"></script></body></html>
+
