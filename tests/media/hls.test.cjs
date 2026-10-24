@@ -1,6 +1,8 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const { parsePlaylist } = require('../../src/media/hls.cjs');
+const { parsePlaylist, loadPlaylist } = require('../../src/media/hls.cjs');
+const crypto = require('node:crypto');
+const http = require('node:http');
 const base = 'https://media.example/a/list.m3u8';
 const vod = '#EXTM3U\n#EXT-X-TARGETDURATION:2\n#EXTINF:2,\none.ts\n#EXTINF:2,\n../two.ts\n#EXT-X-ENDLIST';
 test('parses VOD ordered relative segments and chooses highest muxed master', () => {
@@ -33,4 +35,14 @@ test('bounds master variants and resolves duplicate tags at their actual line po
 });
 test('rejects invalid or raised public parser limits', () => {
   for (const limits of [{ maxVariants: 1001 }, { maxVariants: NaN }, { maxSegments: -1 }, { maxSegments: 10001 }, { maxManifestBytes: Infinity }, { maxManifestBytes: 2 ** 21 }]) assert.throws(() => parsePlaylist(vod, base, limits), /limit/);
+});
+test('pins exact selected media manifest bytes including duration and sequence changes', async t => {
+  let selected = vod; const server = http.createServer((req, res) => res.end(req.url === '/master.m3u8' ? '#EXTM3U\n#EXT-X-STREAM-INF:BANDWIDTH=900\nselected.m3u8' : selected));
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve)); t.after(() => new Promise(resolve => server.close(resolve)));
+  const url = `http://127.0.0.1:${server.address().port}/master.m3u8`;
+  const first = await loadPlaylist(url, {}, new AbortController().signal);
+  assert.equal(first.manifestIdentity, crypto.createHash('sha256').update(Buffer.from(vod)).digest('hex'));
+  selected = vod.replace('#EXTINF:2,', '#EXT-X-MEDIA-SEQUENCE:7\n#EXTINF:3,');
+  const second = await loadPlaylist(url, {}, new AbortController().signal);
+  assert.deepEqual(first.resources, second.resources); assert.notEqual(first.manifestIdentity, second.manifestIdentity);
 });

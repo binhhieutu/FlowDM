@@ -1,0 +1,229 @@
+
+> flowdm@0.5.0 test:coverage
+> node scripts/coverage.cjs
+
+✔ bridge accepts only bounded integer connection choices (2.5992ms)
+✔ frames preserve Unicode through partial prefixes, payload and multiple frames (2.1606ms)
+✔ malformed, truncated, oversized and invalid UTF8 frames fail (6.3429ms)
+✔ authenticated private IPC acknowledges and deduplicates concurrent requests (37.8887ms)
+✔ schema, operations, credentials, URLs, fields and request ids are rejected before callback (31.7164ms)
+✔ v2 payload permits explicit direct/HLS metadata and bounded allowlisted headers (16.7406ms)
+✔ dedupe compares entire canonical payload, cloned headers and redacted acknowledgment (14.454ms)
+✔ host bundle validates inputs and creates an executable isolated native host (183.8007ms)
+✔ host handles invalid requests, malformed/truncated frames and message flood without echoing credentials (3.782ms)
+✔ installer CLI preserves legacy interface and rejects unsafe paths (184.3661ms)
+✔ callback errors and deadlines return bounded safe errors (50.2098ms)
+✔ invalid callback results and absent configuration fail safely (19.7863ms)
+✔ native host subprocess uses framed stdout with Unicode and absent desktop error (295.9425ms)
+✔ capture pauses, waits for matching native acknowledgement then cancels (6.3632ms)
+✔ capture resumes on error without cancellation (0.7499ms)
+✔ capture resumes on wrong without cancellation (0.4864ms)
+✔ capture resumes on timeout without cancellation (31.1159ms)
+✔ completed browser download or failed pause never hands off (0.3941ms)
+✔ unsafe, incognito, disabled downloads are left alone (0.38ms)
+✔ duplicate onCreated events cannot hand off twice (0.3935ms)
+✔ browser completing during ack is never canceled (1.8086ms)
+✔ POST downloads never transfer ownership and headers require per-origin consent (0.721ms)
+✔ missing durable task id is not accepted (0.5979ms)
+✔ credential headers are collected only after origin consent and revoked immediately (2.0529ms)
+✔ authenticated browser downloads without consent stay entirely in browser (0.1901ms)
+✔ auto capture uses the filename available after pause (0.4326ms)
+✔ explicit handoff can obtain consented cookies without page reload (0.721ms)
+✔ cookie optional permission denial and revocation during lookup never leak cookies (0.4517ms)
+✔ revoke then re-enable during cookie lookup aborts the old handoff (0.7223ms)
+✔ permission removal during cookie lookup resumes automatic browser download without native send (0.6478ms)
+✔ automatic capture retries a transient onCreated pause error after filename assignment (11.5575ms)
+✔ pause retry stops if browser completes, and a failed first event does not poison its id (0.8564ms)
+✔ consented handoff derives only User-Agent and preserves actually observed Referer (0.5953ms)
+✔ cross-origin page query secrets never become an invented Referer (0.3026ms)
+✔ DASH and YouTube handoffs infer their external type and omit all browser-derived headers even with consent (0.6265ms)
+✔ automatic capture leaves MPD manifests in the browser (0.1966ms)
+✔ content detector reports dynamic media, deduplicates overlay and offers a real click download (9.4382ms)
+✔ media classification detects HLS, direct video/audio and DASH (1.7963ms)
+✔ YouTube page URLs are canonicalized and lookalikes or non-video pages are rejected (0.7463ms)
+✔ media store accepts only canonical explicit YouTube pages (1.5466ms)
+✔ media deduplicates normalized URLs without stripping signed query and expires bounded state (0.4934ms)
+✔ media state snapshots survive worker restart with bounded timestamps (1.4969ms)
+✔ media rejects malformed, credential, browser URLs and unrelated responses (0.2544ms)
+✔ popup shows selectable DASH and persists capture and credential settings (6.2232ms)
+✔ popup honors optional permission denial and reports handoff failure (2.2962ms)
+✔ popup handles unsupported pages, empty detection and connection failure (2.2541ms)
+✔ popup can explicitly choose a detected media origin for credential consent (2.7253ms)
+✔ popup exposes a persistent connection choice for video handoffs (2.1792ms)
+✔ connection preference is trusted, bounded and included in native handoff (12.733ms)
+✔ context menu sends explicit valid URL and ignores blob URLs (2.6223ms)
+✔ settings are persistent and content scripts cannot change capture or credential consent (3.5717ms)
+✔ network and dynamic content media are listed per tab, deduplicated and cleared on navigation (3.2001ms)
+✔ bundle helper writes only requested destination and exact extension origin (27.2625ms)
+✔ background excludes incognito media, accepts explicit DASH and removes tab state (2.6689ms)
+✔ content may add only its own canonical YouTube watch page and a user action can hand it off (2.614ms)
+✔ trusted popup derives only the current public YouTube page when no media element was detected (2.4435ms)
+✔ trusted popup reconciles YouTube rows after SPA navigation and rejects a stale selection (2.4558ms)
+✔ own extension popup tab is trusted while content tab cannot alter settings (1.8023ms)
+✔ permission removal event invalidates pending cookies even after immediate regrant (2.7554ms)
+✔ handoff never invents a Referer from page context (5.7745ms)
+✔ browser ownership ACK requires an accessible non-login response before queueing (153.1368ms)
+✔ setup exports a stable extension, validates inputs and restores prior registration (409.0192ms)
+✔ registration targets are scoped to named per-user native hosts (1.5666ms)
+✔ POSIX registration restores byte-exact contents and removes only its own file (9.4213ms)
+✔ host runtime is verified and Windows copy survives portable extraction cleanup (1250.1238ms)
+✔ write-ahead setup intent preserves previous ownership when registration mutates then throws (102.0012ms)
+✔ recovers pending before/after/disconnect states and preserves unrelated external changes (22.7955ms)
+✔ downloads parallel ranges with exact content, hash and detached snapshots (242.1954ms)
+✔ falls back for ignored ranges and unknown length chunked responses (191.5987ms)
+✔ rejects unsafe inputs and avoids overwriting files in selected directory (263.8223ms)
+✔ detects malformed Content-Range and enforces configured size ceiling (77.1299ms)
+✔ journals without secret headers and restores scheduled tasks safely (33.709ms)
+✔ pauses active transfer, resumes ranges and survives manager restart (618.1967ms)
+✔ refuses changed resume validator and allows retry after server recovers (1105.7755ms)
+✔ restarts from zero without validator and limits actual transfer speed (607.0807ms)
+✔ bounds active download queue and starts scheduled jobs only when due (499.7396ms)
+✔ cancel interrupts limiter waits; close is idempotent; invalid controls fail (25.291ms)
+✔ retries transient probe errors but stops permanent HTTP failure (555.1471ms)
+✔ strips credentials across redirects and bounds redirect loops (124.1017ms)
+✔ rejects truncated, oversized, encoded and changed range responses (596.5782ms)
+✔ restored header-dependent downloads require user to supply headers again (18.2014ms)
+✔ shutdown checkpoints running download and init is idempotent (17.7648ms)
+✔ safely falls back to fresh single stream if server abandons Range after probe (76.8278ms)
+✔ supports empty files and missing or shortened checkpoint files restart safely (2440.6801ms)
+✔ does not split range responses without a strong validator (72.7268ms)
+✔ staging publication is exclusive, complete and cleans temporary entries on failure (10.2241ms)
+✔ policy rejects reserved headers and filenames; journal corruption fails visibly (12.9522ms)
+✔ retries an interrupted validated segment from its committed byte offset (259.0029ms)
+✔ per-host queue cap applies independently from global download cap (826.0211ms)
+✔ disk-full publication failure leaves no partial final name and preserves source (9.2422ms)
+✔ Last-Modified same-second changes restart a complete fresh single stream (613.3802ms)
+✔ recognizes fully published crash checkpoints without network using persisted digest (40.1164ms)
+✔ does not recover an unrelated final file or malformed stored digest as complete (39.3647ms)
+✔ preflights unsupported destination filesystems before any network body transfer (28.0355ms)
+✔ resume recovers a published final appearing after init without contacting offline source (22.8897ms)
+✔ published recovery rejects size mismatches and non-file destinations (5.4418ms)
+✔ migrates version 1 direct queued and paused tasks unchanged into version 4 journal (29.1817ms)
+✔ new downloads wait for initial durable journal and rejected adds cannot start later (178.5ms)
+✔ DASH uses a checkpoint task, journal v4, hashing and atomic publication (101.4284ms)
+✔ external pause/reopen preserves progress and uses the same owned checkpoint, then cleans it on success (145.2688ms)
+✔ cancel removes only the task media checkpoint (51.8814ms)
+✔ an emptied checkpoint cannot silently restart a paused media task (93.3697ms)
+✔ external failures never publish and sensitive external headers are rejected before queueing (57.0654ms)
+✔ HLS auto detection downloads exact TS concatenation through queue and SHA-256 publication (208.8384ms)
+✔ HLS master selects highest bandwidth and fMP4 initialization precedes fragments (169.25ms)
+✔ HLS pause and manager restart reuse the first completed segment (576.1535ms)
+✔ HLS unsafe manifests and segment errors never publish a completed file (393.7333ms)
+✔ HLS strips credential context for cross-origin variants and redirects (131.8085ms)
+✔ validates media type, bounded URL and explicit direct override (45.6737ms)
+✔ HLS refuses HTTP 200 HTML, packed AAC, invalid initialization and fragment boxes (221.7478ms)
+✔ HLS workers honor requested concurrency and append out-of-order TS files deterministically (94.7517ms)
+✔ N=1 has exactly one active worker and fMP4 keeps init before out-of-order fragments (89.5976ms)
+✔ parallel failure aborts peers, cleans scratch, and rejects combined size overflow (97.6552ms)
+✔ parallel aggregate speed cap applies to all workers (778.1402ms)
+✔ abort waits for active parallel workers and removes owned scratch (40.466ms)
+✔ stalled first HLS resource gates scheduling to N and preserves a later root error (37.7327ms)
+✔ HLS pause/reopen reuses durable resources without repeat requests and reconstructs full output (99.061ms)
+✔ HLS changed playlist or tampered/missing cache refuses continuation before network requests (273.4697ms)
+✔ HLS completed out-of-order resource survives earlier resource abort (179.0637ms)
+✔ HLS in-flight partial restarts while completed fragments remain reusable and unthrottled (70.5021ms)
+✔ HLS rejects invalid checkpoint JSON and metadata indexes without using stored paths (193.1153ms)
+✔ HLS fMP4 cached init and media fragments reconstruct in order on reopen (40.3456ms)
+✔ HLS refuses stable resources absent from metadata after an interrupted checkpoint commit (44.1709ms)
+✔ HLS atomically retries transient checkpoint sharing violations without removing old metadata (140.2047ms)
+✔ HLS checkpoint rename retries are bounded and retain the last durable metadata on permanent denial (530.5785ms)
+✔ HLS refuses changed EXTINF or media sequence even with identical resource URLs (40.958ms)
+✔ HLS pure playlist callers pin explicit semantic fields and reject malformed manifest identities (46.3283ms)
+✔ TS validator checks every packet sync and alignment across arbitrary chunks (2.2119ms)
+✔ BMFF validator checks bounded box headers and required initialization or fragment boxes (1.8037ms)
+✔ native checkpoint reconciliation trims append bytes past committed index without refetch (75.0911ms)
+✔ checkpoint refuses missing state, missing files, changed source and unsafe entries (15.4918ms)
+✔ unfinished unvalidated HTTP resource restarts alone while completed native video remains (9.6435ms)
+✔ unvalidated HTTP video partial is retained and continuation is refused (6.5735ms)
+✔ unfinished HTTP audio without completed video is retained and continuation is refused (6.963ms)
+✔ external identity pins format selection and manifest but contains no signed URL (0.8168ms)
+✔ YouTube HLS identity ignores refreshed signatures but pins fragment boundaries and order (1.6002ms)
+✔ YouTube identity preflight bounds manifests and does not forward credential headers (49.07ms)
+✔ checkpoint rejects invalid native journal and aggregate oversized cache (15.7227ms)
+✔ checkpoint refuses hard-linked cached files and metadata (20.5201ms)
+✔ aborting from initial cached-progress notification never starts a transfer child (130.1645ms)
+✔ pinned DASH resumes retained fragments after child exit and a fresh invocation (7793.3185ms)
+✔ invalid YouTube URLs create no scratch workspace (16.5347ms)
+✔ DASH preflight accepts static HTTP-only MPD and rejects DRM, live, XML entities and non-HTTP references (51.3084ms)
+✔ YouTube URLs are canonicalized and arbitrary extractor URLs are rejected (0.775ms)
+✔ extension and download core accept the same canonical YouTube host forms (0.493ms)
+✔ media child environment is a minimal executable environment without inherited application secrets (0.3396ms)
+✔ external downloader only accepts one through sixteen connections (3.0722ms)
+✔ external downloader accepts each supported connection boundary (708.4312ms)
+✔ external DASH uses native fragments and YouTube HTTP uses bounded aria2c connections (329.0293ms)
+✔ YouTube requires aria2c while DASH does not (1.0549ms)
+✔ pinned aria2c accepts FlowDM arguments and bounds direct HTTP concurrency (2706.2089ms)
+✔ DASH relay enforces one shared resource budget across concurrent responses (10.4846ms)
+✔ pinned yt-dlp downloads DASH fragments at the requested native concurrency (4233.0966ms)
+✔ external downloader only publishes finished mux output, reports bytes and never accepts credential headers (75.4173ms)
+✔ external downloader abort kills a slow child and leaves no published partial (261.7913ms)
+✔ external downloader rejects oversized scratch output before publication (93.7356ms)
+✔ DASH tool receives a loopback relay bound to the preflighted manifest bytes (80.8609ms)
+✔ FFmpeg validation rejects non-media output before it can be published (42.6217ms)
+✔ parses VOD ordered relative segments and chooses highest muxed master (4.0678ms)
+✔ fMP4 prepends one initialization map and identifies output format (0.5303ms)
+✔ rejects unsupported or malformed playlists explicitly and enforces limits (1.5063ms)
+✔ bounds master variants and resolves duplicate tags at their actual line positions (43.9163ms)
+✔ rejects invalid or raised public parser limits (0.7481ms)
+✔ pins exact selected media manifest bytes including duration and sequence changes (49.1201ms)
+✔ media tools prefer packaged/source binaries and validate explicit configuration (48.9058ms)
+ℹ tests 165
+ℹ suites 0
+ℹ pass 165
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9839.4867
+✔ desktop downloads exact bytes, pause/resume, persists, rejects invalid URLs and keeps isolation (3239.3311ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3549.7184
+--------------------------|---------|----------|---------|---------|--------------------------------
+File                      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+--------------------------|---------|----------|---------|---------|--------------------------------
+All files                 |   98.22 |    86.36 |   94.84 |   98.22 |
+ extension                |   99.66 |    88.78 |   97.95 |   99.66 |
+  background.js           |   98.71 |    89.02 |      80 |   98.71 | 22
+  capture.js              |     100 |    89.61 |     100 |     100 | ...,49,60-63,74,84,86-87,90-91
+  content.js              |     100 |    52.17 |     100 |     100 | 4,11-18,33
+  media.js                |     100 |    96.42 |     100 |     100 | 13,29,32
+  popup.js                |     100 |    89.47 |     100 |     100 | 4,11,26-27
+ src                      |   81.37 |       75 |   81.25 |   81.37 |
+  main.cjs                |   94.04 |    69.44 |     100 |   94.04 | 45-46,67-69
+  preload.cjs             |   22.22 |    91.66 |   76.92 |   22.22 | 1-13,18
+ src/bridge               |   98.07 |    89.16 |   94.73 |   98.07 |
+  client.cjs              |     100 |       80 |     100 |     100 | 6,8,12-13
+  host.cjs                |     100 |    84.21 |     100 |     100 | 21,28-29
+  index.cjs               |     100 |      100 |     100 |     100 |
+  install.cjs             |     100 |     92.3 |      75 |     100 | 14-16
+  protocol.cjs            |     100 |    94.87 |     100 |     100 | 8,20,35,58
+  server.cjs              |   94.11 |    84.74 |     100 |   94.11 | 30-33
+ src/browser              |     100 |    85.52 |     100 |     100 |
+  admission.cjs           |     100 |    94.73 |     100 |     100 | 13,30
+  registration.cjs        |     100 |    79.41 |     100 |     100 | 22,29,32-33,37,42,46
+  setup.cjs               |     100 |    83.75 |     100 |     100 | ...38,43,67,74,78,83,88,99-100
+ src/core                 |   99.18 |    87.54 |     100 |   99.18 |
+  download-manager.cjs    |   99.52 |    86.14 |     100 |   99.52 | 99-100
+  http-client.cjs         |     100 |    87.87 |     100 |     100 | 10,21,38,40-43,50
+  policy.cjs              |     100 |       92 |     100 |     100 | 7,27-28,38,52
+  storage.cjs             |   95.94 |    90.38 |     100 |   95.94 | 24,56-57
+ src/media                |   98.86 |    85.07 |   91.17 |   98.86 |
+  container-check.cjs     |     100 |    97.82 |     100 |     100 | 34
+  external-checkpoint.cjs |     100 |    87.96 |     100 |     100 | ...,46,51-52,68,87,102,113,124
+  external-metadata.cjs   |     100 |    89.65 |     100 |     100 | 17-20,35
+  external.cjs            |   98.44 |       75 |   82.75 |   98.44 | 128,150-152,160,231
+  hls-checkpoint.cjs      |   97.87 |    92.55 |     100 |   97.87 | 22-23
+  hls-parallel.cjs        |     100 |    94.44 |    87.5 |     100 | 20,36,44,50,70
+  hls.cjs                 |   97.77 |    89.02 |     100 |   97.77 | 61,88
+ src/tools                |     100 |    91.66 |     100 |     100 |
+  media-tools.cjs         |     100 |    91.66 |     100 |     100 | 14,16-17
+ src/ui                   |   96.57 |    78.94 |   86.66 |   96.57 |
+  app.js                  |   97.24 |    82.02 |   81.81 |   97.24 | 11,90-91
+  browser-ui.js           |   94.59 |       68 |     100 |   94.59 | 31-32
+--------------------------|---------|----------|---------|---------|--------------------------------

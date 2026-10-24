@@ -1,0 +1,10 @@
+✔ public YouTube GUI pause and app relaunch continue saved video and fully decode (122777.8079ms)
+ℹ {"at":"2026-10-23T23:58:32.852Z","version":"0.5.0","packaged":false,"url":"https://www.youtube.com/watch?v=aqz-KE-bpKQ","pausedBytes":5012989,"restoredBytes":6491890,"reusedResources":2,"reusedBytes":180856,"bytes":288972332,"sha256":"fc6b9d58d1f91ebfba1e26f3968368ab4dce11d17b749a781e360688d08c44b4","path":"I:\\dich_nguoc\\FlowDM\\downloads\\verification-v5\\YouTube-resume-source-youtube-resume-1792799790274.mp4","duration":634.624,"streams":[{"type":"video","codec":"h264","width":1920,"height":1080},{"type":"audio","codec":"aac"}],"wholeFileDecoded":true}
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 123093.4795

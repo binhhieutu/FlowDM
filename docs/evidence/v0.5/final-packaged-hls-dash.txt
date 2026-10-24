@@ -1,0 +1,11 @@
+✔ HLS and DASH GUI pause, close/relaunch, reuse fragments and decode complete video (15582.503ms)
+ℹ [{"mediaType":"hls","pausedBytes":15416,"restoredBytes":15416,"reusedResources":1,"firstCompletedResource":"/video/segment00.ts","firstResourceRequests":1,"resourceRequests":["/video/segment00.ts","/video/segment01.ts","/video/segment01.ts","/video/segment02.ts"],"bytes":47188,"sha256":"8fd49049fe73583d0e179541f59b57090178a412cd8676250cabbcb6f0bfbc4e","wholeFileDecoded":true},{"mediaType":"dash","pausedBytes":9722,"restoredBytes":9722,"reusedResources":2,"firstCompletedResource":"/dash/init-stream0.m4s","firstResourceRequests":1,"resourceRequests":["/dash/init-stream0.m4s","/dash/chunk-stream0-00001.m4s","/dash/chunk-stream0-00002.m4s","/dash/chunk-stream0-00002.m4s","/dash/chunk-stream0-00003.m4s","/dash/init-stream1.m4s","/dash/chunk-stream1-00001.m4s","/dash/chunk-stream1-00002.m4s","/dash/chunk-stream1-00003.m4s"],"bytes":41899,"sha256":"47486d3f87501c7cc371156ee296cfb3094e28768ef4ac413bc187003923717b","wholeFileDecoded":true}]
+﹣ public YouTube GUI pause and app relaunch continue saved video and fully decode (0.1862ms) # SKIP
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 15925.0809

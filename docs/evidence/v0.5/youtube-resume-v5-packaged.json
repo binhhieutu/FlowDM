@@ -1,0 +1,27 @@
+{
+  "at": "2026-10-24T00:02:28.441Z",
+  "version": "0.5.0",
+  "packaged": true,
+  "url": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+  "pausedBytes": 31247342,
+  "restoredBytes": 32575506,
+  "reusedResources": 12,
+  "reusedBytes": 26444080,
+  "bytes": 288972332,
+  "sha256": "fc6b9d58d1f91ebfba1e26f3968368ab4dce11d17b749a781e360688d08c44b4",
+  "path": "I:\\dich_nguoc\\FlowDM\\downloads\\verification-v5\\YouTube-resume-packaged-youtube-resume-1792800031675.mp4",
+  "duration": 634.624,
+  "streams": [
+    {
+      "type": "video",
+      "codec": "h264",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "type": "audio",
+      "codec": "aac"
+    }
+  ],
+  "wholeFileDecoded": true
+}

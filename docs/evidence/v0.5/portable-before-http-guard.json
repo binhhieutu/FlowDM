@@ -1,0 +1,21 @@
+{
+  "status": "passed",
+  "artifact": "FlowDM 0.5.0.exe",
+  "bytes": 2097152,
+  "sha256": "c6dc868b49983086e04075093526084b2668fd8be50bbecd73f2da434f88e148",
+  "pauseRestartResume": true,
+  "mediaToolsVerified": true,
+  "youtube": {
+    "bytes": 288972332,
+    "sha256": "fc6b9d58d1f91ebfba1e26f3968368ab4dce11d17b749a781e360688d08c44b4",
+    "matchesFullyDecodedSample": true,
+    "resume": {
+      "pauseRestartResume": true,
+      "pausedBytes": 31503457,
+      "restoredBytes": 31503457,
+      "reusedResources": 12,
+      "reusedBytes": 26444080
+    }
+  },
+  "at": "2026-10-24T00:09:40.252Z"
+}

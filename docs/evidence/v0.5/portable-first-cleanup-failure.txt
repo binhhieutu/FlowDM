@@ -1,0 +1,6 @@
+[Error: EBUSY: resource busy or locked, unlink 'C:\Users\hieuPC\AppData\Local\Temp\flowdm-portable-yfmdts\lockfile'] {
+  errno: -4082,
+  code: 'EBUSY',
+  syscall: 'unlink',
+  path: 'C:\\Users\\hieuPC\\AppData\\Local\\Temp\\flowdm-portable-yfmdts\\lockfile'
+}

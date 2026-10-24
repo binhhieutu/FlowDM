@@ -1,0 +1,12 @@
+✔ HLS and DASH GUI pause, close/relaunch, reuse fragments and decode complete video (15876.1747ms)
+ℹ [{"mediaType":"hls","pausedBytes":15416,"restoredBytes":15416,"reusedResources":1,"firstCompletedResource":"/video/segment00.ts","firstResourceRequests":1,"resourceRequests":["/video/segment00.ts","/video/segment01.ts","/video/segment01.ts","/video/segment02.ts"],"bytes":47188,"sha256":"8fd49049fe73583d0e179541f59b57090178a412cd8676250cabbcb6f0bfbc4e","wholeFileDecoded":true},{"mediaType":"dash","pausedBytes":9722,"restoredBytes":9722,"reusedResources":2,"firstCompletedResource":"/dash/init-stream0.m4s","firstResourceRequests":1,"resourceRequests":["/dash/init-stream0.m4s","/dash/chunk-stream0-00001.m4s","/dash/chunk-stream0-00002.m4s","/dash/chunk-stream0-00002.m4s","/dash/chunk-stream0-00003.m4s","/dash/init-stream1.m4s","/dash/chunk-stream1-00001.m4s","/dash/chunk-stream1-00002.m4s","/dash/chunk-stream1-00003.m4s"],"bytes":41899,"sha256":"47486d3f87501c7cc371156ee296cfb3094e28768ef4ac413bc187003923717b","wholeFileDecoded":true}]
+✔ public YouTube GUI pause and app relaunch continue saved video and fully decode (116931.0856ms)
+ℹ {"at":"2026-10-24T00:02:28.441Z","version":"0.5.0","packaged":true,"url":"https://www.youtube.com/watch?v=aqz-KE-bpKQ","pausedBytes":31247342,"restoredBytes":32575506,"reusedResources":12,"reusedBytes":26444080,"bytes":288972332,"sha256":"fc6b9d58d1f91ebfba1e26f3968368ab4dce11d17b749a781e360688d08c44b4","path":"I:\\dich_nguoc\\FlowDM\\downloads\\verification-v5\\YouTube-resume-packaged-youtube-resume-1792800031675.mp4","duration":634.624,"streams":[{"type":"video","codec":"h264","width":1920,"height":1080},{"type":"audio","codec":"aac"}],"wholeFileDecoded":true}
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 133129.9994

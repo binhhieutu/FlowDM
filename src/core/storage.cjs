@@ -5,7 +5,7 @@ const crypto = require('node:crypto');
 const { createReadStream, constants } = require('node:fs');
 
 async function atomicJournal(filename, tasks, version = 2) {
-  if (![2, 3].includes(version)) throw Error('Unsupported download journal version');
+  if (![2, 3, 4].includes(version)) throw Error('Unsupported download journal version');
   const temporary = `${filename}.${crypto.randomUUID()}.tmp`;
   const handle = await fs.open(temporary, 'wx', 0o600);
   try { await handle.writeFile(JSON.stringify({ version, tasks })); await handle.sync(); } finally { await handle.close(); }

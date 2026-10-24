@@ -41,7 +41,7 @@ class DownloadManager extends EventEmitter {
     let saved;
     try { saved = JSON.parse(await fs.readFile(this.journal, 'utf8')); } catch (error) { if (error.code !== 'ENOENT') throw Error(`Cannot read download journal: ${error.message}`); }
     if (saved) {
-      if (![1, 2, 3].includes(saved.version) || !Array.isArray(saved.tasks)) throw Error('Unsupported download journal');
+      if (![1, 2, 3, 4].includes(saved.version) || !Array.isArray(saved.tasks)) throw Error('Unsupported download journal');
       for (const task of saved.tasks) {
         this._validateStored(task);
         const needsPause = task.status === 'downloading' || (task.status === 'queued' && task.requiresHeaders);
@@ -76,15 +76,52 @@ class DownloadManager extends EventEmitter {
   _require(id) { const task = this.tasks.get(id); if (!task) throw Error('Download not found'); return task; }
   _ready() { if (!this.initialized || this.closed) throw Error('Download manager is not running'); }
   _partial(id) { return path.join(this.dataDir, `${id}.part`); }
+  _mediaDirectory(id) {
+    if (!/^[a-f0-9-]{36}$/.test(id)) throw Error('Invalid checkpoint owner');
+    return path.join(this.dataDir, `${id}.media`);
+  }
+  async _prepareCheckpoint(task) {
+    const directory = this._mediaDirectory(task.id);
+    try {
+      const stat = await fs.lstat(directory);
+      if (!stat.isDirectory() || stat.isSymbolicLink()) throw Error('Unsafe media checkpoint directory');
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+      if (task.media?.resumePolicy === 'checkpoint' && task.downloadedBytes > 0) throw Error('Media checkpoint is missing. Cancel and add again to restart.');
+      await fs.mkdir(directory, { mode: 0o700 });
+    }
+    if (task.media?.resumePolicy === 'checkpoint' && task.downloadedBytes > 0) {
+      try {
+        const state = await fs.lstat(path.join(directory, 'checkpoint.json'));
+        if (!state.isFile() || state.isSymbolicLink() || state.nlink !== 1) throw Error('Unsafe media checkpoint metadata');
+      } catch (error) {
+        if (error.code === 'ENOENT') throw Error('Media checkpoint metadata is missing. Cancel and add again to restart.');
+        throw error;
+      }
+    }
+    return directory;
+  }
+  async _clearCheckpoint(task) {
+    if (!['hls', 'dash', 'youtube'].includes(task.mediaType)) return;
+    const directory = this._mediaDirectory(task.id);
+    try {
+      const stat = await fs.lstat(directory);
+      if (!stat.isDirectory() || stat.isSymbolicLink()) throw Error('Unsafe media checkpoint directory');
+      await fs.rm(directory, { recursive: true, force: true });
+    } catch (error) { if (error.code !== 'ENOENT') throw error; }
+  }
   _notify() { this.emit('change', this.list()); }
   _persist() {
     const snapshot = this.list();
-    const write = this.persistence.catch(() => {}).then(() => atomicJournal(this.journal, snapshot, 3));
+    const write = this.persistence.catch(() => {}).then(() => atomicJournal(this.journal, snapshot, 4));
     this.persistence = write; return write;
   }
   _mutate(operation) {
     const result = this.mutations.catch(() => {}).then(operation);
     this.mutations = result; return result;
+  }
+  _persistProgress(runtime) {
+    void this._persist().catch(error => { runtime.persistenceError ||= error; runtime.controller.abort(); });
   }
 
   add(input) {
@@ -135,6 +172,7 @@ class DownloadManager extends EventEmitter {
     if (task.status === 'completed') return clone(task);
     task.status = 'canceled';
     await fs.unlink(this._partial(id)).catch(error => { if (error.code !== 'ENOENT') throw error; });
+    await this._clearCheckpoint(task);
     await this._persist(); this._notify(); return clone(task);
   }
   remove(id) { return this._mutate(() => this._remove(id)); }
@@ -206,6 +244,7 @@ class DownloadManager extends EventEmitter {
       if (prepared.external) await this._transferExternal(task, runtime);
       else if (prepared.playlist) await this._transferHls(task, prepared.playlist, handle, runtime);
       else await this._transfer(task, prepared.headers, handle, runtime);
+      if (runtime.persistenceError) throw runtime.persistenceError;
       if (runtime.controller.signal.aborted || task.status !== 'downloading') return;
       if (task.totalBytes !== null && task.downloadedBytes !== task.totalBytes) throw Error('Incomplete download byte count');
       if (handle) { await handle.sync(); await handle.close(); handle = null; }
@@ -213,6 +252,7 @@ class DownloadManager extends EventEmitter {
       if (runtime.controller.signal.aborted || task.status !== 'downloading') return;
       await this._persist();
       await publish(this._partial(task.id), task.path);
+      await this._clearCheckpoint(task);
       task.totalBytes = task.downloadedBytes; task.status = 'completed'; task.error = null; task.speed = 0;
       await this._persist();
     } catch (error) {
@@ -226,6 +266,7 @@ class DownloadManager extends EventEmitter {
   async _recoverPublished(task) {
     if (['completed', 'canceled'].includes(task.status) || !await recoverPublished(task)) return false;
     await fs.unlink(this._partial(task.id)).catch(error => { if (error.code !== 'ENOENT') throw error; });
+    await this._clearCheckpoint(task);
     task.status = 'completed'; task.totalBytes = task.downloadedBytes; task.error = null; task.speed = 0;
     return true;
   }
@@ -237,21 +278,25 @@ class DownloadManager extends EventEmitter {
       task.path = destination.path; task.filename = destination.filename;
     }
     await preflightPublication(task.path);
+    const checkpointDir = await this._prepareCheckpoint(task);
     await fs.unlink(this._partial(task.id)).catch(error => { if (error.code !== 'ENOENT') throw error; });
-    task.segments = plan(null, 1, false); task.downloadedBytes = 0; task.totalBytes = null;
+    if (task.media?.resumePolicy !== 'checkpoint') task.downloadedBytes = 0;
+    task.segments = [{ index: 0, start: 0, end: null, received: task.downloadedBytes }]; task.totalBytes = null;
     task.sha256 = null; task.validator = null; task.ranges = false; task.finalUrl = playlist.finalUrl;
-    task.media = { format: playlist.extension.slice(1), segmentCount: playlist.segmentCount, completedSegments: 0, resumePolicy: 'restart' };
+    task.media = { ...task.media, format: playlist.extension.slice(1), segmentCount: playlist.segmentCount, resumePolicy: 'checkpoint' };
     const handle = await openPartial(this._partial(task.id), false);
     try { await this._persist(); } catch (error) { await handle.close(); throw error; }
-    return { handle, playlist };
+    return { handle, playlist, checkpointDir };
   }
 
   async _prepareExternal(task) {
     await preflightPublication(task.path);
+    await this._prepareCheckpoint(task);
     await fs.unlink(this._partial(task.id)).catch(error => { if (error.code !== 'ENOENT') throw error; });
-    task.segments = [{ index: 0, start: 0, end: null, received: 0 }];
-    task.downloadedBytes = 0; task.totalBytes = null; task.sha256 = null; task.validator = null; task.ranges = false; task.finalUrl = null;
-    task.media = { format: 'mp4', resumePolicy: 'restart', externalTool: 'yt-dlp', completedSegments: 0 };
+    if (task.media?.resumePolicy !== 'checkpoint') task.downloadedBytes = 0;
+    task.segments = [{ index: 0, start: 0, end: null, received: task.downloadedBytes }];
+    task.totalBytes = null; task.sha256 = null; task.validator = null; task.ranges = false; task.finalUrl = null;
+    task.media = { ...task.media, format: 'mp4', resumePolicy: 'checkpoint', externalTool: 'yt-dlp' };
     await this._persist();
     return { external: true };
   }
@@ -259,30 +304,35 @@ class DownloadManager extends EventEmitter {
   async _transferExternal(task, runtime) {
     const result = await this.externalDownloader({
       url: task.url, mediaType: task.mediaType, headers: this.secrets.get(task.id) || {}, output: this._partial(task.id),
-      signal: runtime.controller.signal, maxBytes: this.maxBytes, speedLimit: task.speedLimit, connections: task.connections,
+      checkpointDir: this._mediaDirectory(task.id), signal: runtime.controller.signal, maxBytes: this.maxBytes, speedLimit: task.speedLimit, connections: task.connections,
       onProgress: progress => {
-        if (runtime.controller.signal.aborted || task.status !== 'downloading') return;
+        if (['completed', 'canceled'].includes(task.status)) return;
         const downloaded = Number.isSafeInteger(progress.downloadedBytes) ? Math.min(progress.downloadedBytes, this.maxBytes) : 0;
         // yt-dlp reports each selected track independently; retain the high-water mark
         // until the final muxed file gives us the authoritative combined byte count.
         const reported = Math.max(task.downloadedBytes, downloaded);
         task.downloadedBytes = reported; task.segments[0].received = reported; runtime.transferred = reported;
         task.totalBytes = Number.isSafeInteger(progress.totalBytes) ? Math.min(progress.totalBytes, this.maxBytes) : null;
-        task.speed = Math.round(runtime.transferred * 1000 / Math.max(1, Date.now() - runtime.began));
+        task.speed = task.status === 'downloading' ? Math.round(runtime.transferred * 1000 / Math.max(1, Date.now() - runtime.began)) : 0;
+        for (const key of ['completedResources', 'reusedResources', 'reusedBytes']) if (Number.isSafeInteger(progress[key]) && progress[key] >= 0) task.media[key] = progress[key];
+        if (Number.isSafeInteger(progress.completedResources)) task.media.completedSegments = progress.completedResources;
+        this._persistProgress(runtime);
         this._notify();
       }
     });
     if (!Number.isSafeInteger(result.bytes) || result.bytes < 1 || result.bytes > this.maxBytes) throw Error('External media output exceeds size limit');
     task.downloadedBytes = result.bytes; task.totalBytes = result.bytes; task.segments[0].received = result.bytes;
-    task.finalUrl = result.finalUrl || null; task.media.completedSegments = 1;
+    task.finalUrl = result.finalUrl || null; task.media = { ...task.media, ...result.metadata, completedSegments: task.media.completedResources || 1 };
     await this._persist();
   }
 
   async _transferHls(task, playlist, handle, runtime) {
-    const result = await transferHlsParallel({ playlist, connections: task.connections, tempRoot: this.dataDir, maxBytes: this.maxBytes, speedLimit: task.speedLimit, signal: runtime.controller.signal,
-      append: async chunk => { let written = 0; while (written < chunk.length) { const value = await handle.write(chunk, written, chunk.length - written, task.downloadedBytes + written); if (!value.bytesWritten) throw Error('Disk write made no progress'); written += value.bytesWritten; } await handle.sync(); },
-      onProgress: progress => { task.downloadedBytes += progress.committedBytes; task.segments[0].received = task.downloadedBytes; task.media.completedSegments++; task.media.networkBytes = progress.networkBytes; task.media.effectiveConnections = Math.min(task.connections, playlist.resources.length); runtime.transferred = progress.networkBytes; task.speed = Math.round(runtime.transferred * 1000 / Math.max(1, Date.now() - runtime.began)); void this._persist(); this._notify(); }
+    let appended = 0;
+    const result = await transferHlsParallel({ playlist, connections: task.connections, tempRoot: this.dataDir, checkpointDir: this._mediaDirectory(task.id), maxBytes: this.maxBytes, speedLimit: task.speedLimit, signal: runtime.controller.signal,
+      append: async chunk => { let written = 0; while (written < chunk.length) { const value = await handle.write(chunk, written, chunk.length - written, appended + written); if (!value.bytesWritten) throw Error('Disk write made no progress'); written += value.bytesWritten; } appended += written; await handle.sync(); },
+      onProgress: progress => { task.downloadedBytes = Math.max(task.downloadedBytes, progress.cumulativeBytes ?? appended); task.segments[0].received = task.downloadedBytes; task.media.completedSegments = progress.completedResources || 0; task.media.reusedResources = progress.reusedResources || 0; task.media.networkBytes = progress.networkBytes; task.media.effectiveConnections = Math.min(task.connections, playlist.resources.length); runtime.transferred = progress.networkBytes; task.speed = task.status === 'downloading' ? Math.round(runtime.transferred * 1000 / Math.max(1, Date.now() - runtime.began)) : 0; this._persistProgress(runtime); this._notify(); }
     });
+    task.downloadedBytes = appended; task.segments[0].received = appended;
     task.totalBytes = task.downloadedBytes; task.media.networkBytes = result.networkBytes; task.media.peakWorkers = result.peakWorkers;
   }
 

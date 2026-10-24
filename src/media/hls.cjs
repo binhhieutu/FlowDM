@@ -1,4 +1,5 @@
 'use strict';
+const crypto = require('node:crypto');
 const { checkedUrl } = require('../core/policy.cjs');
 const { retryRequest, contentLength } = require('../core/http-client.cjs');
 const LIMITS = { maxManifestBytes: 1024 * 1024, maxSegments: 10000, maxVariants: 1000 };
@@ -78,9 +79,10 @@ async function loadPlaylist(url, headers, signal, limits = {}) {
         size += chunk.length; if (size > bounds.maxManifestBytes) throw Error('HLS manifest limit exceeded'); chunks.push(chunk);
       }
     } finally { result.response.destroy(); }
-    const playlist = parsePlaylist(Buffer.concat(chunks).toString('utf8'), result.finalUrl, bounds);
+    const manifest = Buffer.concat(chunks);
+    const playlist = parsePlaylist(manifest.toString('utf8'), result.finalUrl, bounds);
     context = result.context;
-    if (!playlist.variant) return { ...playlist, context, finalUrl: result.finalUrl };
+    if (!playlist.variant) return { ...playlist, context, finalUrl: result.finalUrl, manifestIdentity: crypto.createHash('sha256').update(manifest).digest('hex') };
     url = playlist.variant;
   }
   throw Error('HLS master nesting limit exceeded');

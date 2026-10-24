@@ -51,7 +51,7 @@ function render() {
     copy.append(element('span', 'file-host', host)); info.append(copy);
     const progress = element('div', 'task-progress'); const meta = element('div', 'progress-meta');
     const pct = task.totalBytes ? Math.min(100, task.downloadedBytes / task.totalBytes * 100) : task.status === 'completed' ? 100 : 0;
-    meta.append(element('span', `status ${task.status}`, labels[task.status] || task.status), element('span', '', `${pct.toFixed(0)}%`));
+    meta.append(element('span', `status ${task.status}`, labels[task.status] || task.status), element('span', '', task.totalBytes || task.status === 'completed' ? `${pct.toFixed(0)}%` : '—'));
     const meter = element('progress', 'meter'); meter.max = 100; meter.value = pct; meter.setAttribute('aria-label', `Tiến trình ${task.filename}`);
     let extra = `${bytes(task.downloadedBytes)} / ${bytes(task.totalBytes)}`;
     if (task.status === 'queued' && task.startAt && new Date(task.startAt) > new Date()) extra = new Date(task.startAt).toLocaleString('vi-VN');
@@ -70,7 +70,7 @@ function render() {
     $('detail-name').textContent = task.filename; $('detail-state').textContent = labels[task.status];
     const streamed = ['hls', 'dash', 'youtube'].includes(task.mediaType); $('detail-path').textContent = task.path; $('detail-connections').textContent = streamed ? `${task.connections} kết nối tối đa · ${task.media?.completedSegments || 0}/${task.media?.segmentCount || '?'} đoạn ${task.mediaType.toUpperCase()}` : `${task.segments?.length || task.connections} kết nối`;
     $('detail-hash').textContent = task.sha256 || 'Được tính khi tải hoàn tất';
-    $('detail-error').hidden = !task.error && !streamed; $('detail-error').textContent = task.error || (streamed ? `Video ${task.mediaType.toUpperCase()} được tải lại từ đầu khi tiếp tục để giữ đúng nội dung.` : '');
+    $('detail-error').hidden = !task.error && !streamed; $('detail-error').textContent = task.error || (streamed ? `Giữ lại các đoạn đã tải khi tạm dừng hoặc đóng app. Đã dùng lại ${task.media?.reusedResources || 0} đoạn; đoạn còn dở có thể tải lại riêng.` : '');
     $('segments').replaceChildren(...(task.segments || []).map((segment, index) => {
       const meter = element('progress', 'meter'); meter.max = Math.max(1, segment.end - segment.start + 1); meter.value = segment.received || 0; meter.title = `Kết nối ${index + 1}: ${bytes(segment.received)}`; return meter;
     }));

@@ -1,0 +1,10 @@
+portable-stage: launch first GUI
+portable-stage: close paused HTTP
+portable-stage: relaunch paused HTTP
+Portable smoke failed at relaunch paused HTTP: TypeError: Cannot read properties of undefined (reading 'setDefaultTimeout')
+    at launch (I:\dich_nguoc\FlowDM\scripts\smoke-portable.cjs:44:10)
+    at async I:\dich_nguoc\FlowDM\scripts\smoke-portable.cjs:81:47
+Portable close during cleanup: Portable application process did not shut down
+TypeError: Cannot read properties of undefined (reading 'setDefaultTimeout')
+    at launch (I:\dich_nguoc\FlowDM\scripts\smoke-portable.cjs:44:10)
+    at async I:\dich_nguoc\FlowDM\scripts\smoke-portable.cjs:81:47

@@ -9,6 +9,8 @@ const { spawn, execFile } = require('node:child_process');
 const http = require('node:http');
 const { retryRequest, contentLength } = require('../core/http-client.cjs');
 const { checkedUrl } = require('../core/policy.cjs');
+const checkpoint = require('./external-checkpoint.cjs');
+const { pinHlsMetadata } = require('./external-metadata.cjs');
 
 const MAX_MANIFEST_BYTES = 1024 * 1024;
 const MAX_STDIO_BYTES = 64 * 1024;
@@ -213,6 +215,7 @@ async function validateMediaOutput(filename, ffmpeg, signal) {
     const stop = reason => { stopReason ||= reason; terminate(child); };
     const abort = () => stop('abort');
     signal?.addEventListener('abort', abort, { once: true });
+    if (signal?.aborted) abort();
     timer = setTimeout(() => stop('timeout'), 30000); timer.unref();
     child.stderr.on('data', chunk => { stderr = boundedAppend(stderr, chunk); });
     child.once('error', reject);
@@ -235,7 +238,28 @@ function aria2Arguments(connections, speedLimit) {
   if (speedLimit) options.push(`--max-download-limit=${speedLimit}`, `--max-overall-download-limit=${speedLimit}`);
   return `aria2c:${options.join(' ')}`;
 }
-async function downloadExternal({ url, mediaType, headers = {}, output, signal, maxBytes, connections = DEFAULT_CONNECTIONS, speedLimit = 0, onProgress = () => {}, timeoutMs = 30 * 60 * 1000, tools, toolArgsPrefix = [], validateOutput = validateMediaOutput }) {
+async function extractMetadata(tools, prefix, args, source, signal) {
+  if (signal?.aborted) throw abortError();
+  return new Promise((resolve, reject) => {
+    const child = spawn(tools.ytDlp, [...prefix, ...args, '--dump-single-json', '--skip-download', '--batch-file', '-'], { shell: false, windowsHide: true, detached: process.platform !== 'win32', stdio: ['pipe', 'pipe', 'ignore'], env: mediaToolEnv(tools) });
+    let bytes = 0; const chunks = []; let reason;
+    const stop = error => { reason ||= error; terminate(child); };
+    const abort = () => stop(abortError());
+    signal?.addEventListener('abort', abort, { once: true });
+    if (signal?.aborted) abort();
+    const timer = setTimeout(() => stop(Error('External metadata extraction timed out')), 60000); timer.unref();
+    child.stdin.on('error', () => {}); child.stdin.end(`${source}\n`);
+    child.stdout.on('data', chunk => { bytes += chunk.length; if (bytes > 16 * 1024 * 1024) stop(Error('External metadata size limit exceeded')); else chunks.push(chunk); });
+    child.once('error', reject);
+    child.once('close', code => {
+      clearTimeout(timer); signal?.removeEventListener('abort', abort);
+      if (reason || signal?.aborted) return reject(reason || abortError());
+      if (code !== 0) return reject(Error('External metadata extraction failed'));
+      try { const info = JSON.parse(Buffer.concat(chunks).toString('utf8')); if (!info || typeof info !== 'object' || Array.isArray(info) || info.is_live || info.has_drm || info._has_drm) throw Error('Unsupported external media metadata'); resolve(info); } catch { reject(Error('Invalid or unsupported external media metadata')); }
+    });
+  });
+}
+async function downloadExternal({ url, mediaType, headers = {}, output, signal, maxBytes, connections = DEFAULT_CONNECTIONS, speedLimit = 0, onProgress = () => {}, timeoutMs = 30 * 60 * 1000, tools, toolArgsPrefix = [], validateOutput = validateMediaOutput, checkpointDir }) {
   if (!['dash', 'youtube'].includes(mediaType)) throw Error('External media type must be dash or youtube');
   if (typeof output !== 'string' || !path.isAbsolute(output) || !Number.isSafeInteger(maxBytes) || maxBytes < 1) throw Error('Invalid external media output or size limit');
   if (!Number.isSafeInteger(speedLimit) || speedLimit < 0 || !Number.isSafeInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > MAX_TIMEOUT_MS) throw Error('Invalid external media limits');
@@ -246,22 +270,44 @@ async function downloadExternal({ url, mediaType, headers = {}, output, signal, 
   const actualTools = safeTool(tools || await defaultTools(), mediaType === 'youtube');
   const preflight = mediaType === 'dash' ? await preflightDash(url, headers, signal) : null;
   let relay;
-  const scratch = path.join(path.dirname(output), `.flowdm-external-${crypto.randomUUID()}`);
+  if (checkpointDir !== undefined && (typeof checkpointDir !== 'string' || !path.isAbsolute(checkpointDir))) throw Error('External checkpoint path must be absolute');
+  const scratch = checkpointDir || path.join(path.dirname(output), `.flowdm-external-${crypto.randomUUID()}`);
   const scratchLimit = Math.min(MAX_SCRATCH_BYTES, maxBytes > Math.floor(MAX_SCRATCH_BYTES / 3) ? MAX_SCRATCH_BYTES : maxBytes * 3);
   await fs.mkdir(scratch, { recursive: true, mode: 0o700 });
   try { relay = preflight ? await createDashRelay({ ...preflight, signal, maxBytes }) : null; }
-  catch (error) { await fs.rm(scratch, { recursive: true, force: true }).catch(() => {}); throw error; }
+  catch (error) { if (!checkpointDir) await fs.rm(scratch, { recursive: true, force: true }).catch(() => {}); throw error; }
   const source = relay ? relay.url : youtubeSource;
   const finalSource = preflight?.finalUrl || source;
   const template = path.join(scratch, 'media.%(ext)s');
   const nativeConnections = speedLimit ? Math.min(actualConnections, speedLimit) : actualConnections;
   const nativeRate = speedLimit ? Math.max(1, Math.floor(speedLimit / nativeConnections)) : 0;
   const youtubeFormat = 'bv*[vcodec^=avc1][height<=1080][protocol=m3u8_native]+ba[acodec^=mp4a][ext=m4a]/bv*[vcodec^=avc1][height<=1080][ext=mp4]+ba[acodec^=mp4a][ext=m4a]/b[ext=mp4]';
+  const format = mediaType === 'youtube' ? youtubeFormat : 'bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]';
+  const sourceHash = checkpoint.hash(mediaType === 'youtube' ? youtubeSource : checkedUrl(url).href);
+  let resumeState = null; let metadata; let pinnedIdentity; let reused = { downloadedBytes: 0, completedResources: 0 };
+  try {
+    if (checkpointDir) {
+      resumeState = await checkpoint.readState(scratch, sourceHash, scratchLimit);
+      const metadataArgs = ['--ignore-config', '--no-plugin-dirs', '--no-remote-components', '--no-playlist', '--no-cache-dir', '--js-runtimes', `node:${actualTools.jsRuntime}`, '--format', format];
+      metadata = await extractMetadata(actualTools, toolArgsPrefix, metadataArgs, source, signal);
+      if (mediaType === 'youtube') metadata.flowdm_hls_identity = await pinHlsMetadata(metadata, signal);
+      pinnedIdentity = checkpoint.identity(metadata, preflight?.manifest);
+      if (resumeState && resumeState.identity !== pinnedIdentity) throw Error('External media identity changed; retained fragments cannot be mixed');
+      // Do not re-extract the source between validation and transfer. Only this
+      // in-memory metadata carries ephemeral signed URLs into the native tool.
+      delete metadata.requested_downloads;
+      await checkpoint.reconcileNative(scratch, scratchLimit);
+      await checkpoint.discardUnsafeHttpPartials(scratch);
+      reused = await checkpoint.resumableProgress(scratch);
+      await checkpoint.snapshot(scratch, { sourceHash, identity: pinnedIdentity, ...reused }, scratchLimit);
+      onProgress({ ...reused, totalBytes: null, reusedResources: reused.completedResources, reusedBytes: reused.downloadedBytes });
+    }
+  } catch (error) { await relay?.close().catch(() => {}); throw error; }
   const args = [
-    ...toolArgsPrefix, '--ignore-config', '--no-plugin-dirs', '--no-remote-components', '--no-playlist', '--no-overwrites', '--no-part', '--no-cache-dir', '--no-mtime', '--no-simulate',
-    '--newline', '--progress', '--progress-template', 'download:flowdm-progress:%(progress.downloaded_bytes)s:%(progress.total_bytes_estimate)s',
+    ...toolArgsPrefix, '--ignore-config', '--no-plugin-dirs', '--no-remote-components', '--no-playlist', '--no-overwrites', ...(checkpointDir ? ['--part', '--continue', '--keep-fragments', '--abort-on-unavailable-fragments'] : ['--no-part']), '--no-cache-dir', '--no-mtime', '--no-simulate',
+    '--newline', '--progress', '--progress-template', 'download:flowdm-progress:%(progress.downloaded_bytes)s:%(progress.total_bytes_estimate)s:%(progress.fragment_index)s',
     '--print', 'after_move:flowdm-file:%(filepath)s', '--ffmpeg-location', actualTools.ffmpeg, '--js-runtimes', `node:${actualTools.jsRuntime}`,
-    '--merge-output-format', 'mp4', '--format', mediaType === 'youtube' ? youtubeFormat : 'bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]', '--max-filesize', String(maxBytes), '-o', template
+    '--merge-output-format', 'mp4', '--format', format, '--max-filesize', String(maxBytes), '-o', template
   ];
   if (mediaType === 'youtube') {
     args.push('--match-filter', "live_status != 'is_live' & live_status != 'is_upcoming' & live_status != 'post_live'", '--downloader', `http:${actualTools.aria2c}`, '--downloader-args', aria2Arguments(actualConnections, speedLimit), '--downloader', 'dash,m3u8:native', '--concurrent-fragments', String(nativeConnections));
@@ -271,30 +317,38 @@ async function downloadExternal({ url, mediaType, headers = {}, output, signal, 
     if (speedLimit) args.push('--limit-rate', String(nativeRate));
   }
   if (mediaType === 'youtube' && speedLimit) args.push('--limit-rate', String(nativeRate));
-  args.push('--batch-file', '-');
+  args.push(checkpointDir ? '--load-info-json' : '--batch-file', '-');
   let child; let stopReason = null; let resultPath; let stderr = Buffer.alloc(0); let stdout = Buffer.alloc(0); let stdoutTail = '';
-  let timer; let sizeTimer; let scratchError = null; let checkingScratch = false;
+  let timer; let sizeTimer; let scratchError = null; let checkingScratch = false; let polling = Promise.resolve();
   try {
     await new Promise((resolve, reject) => {
+      if (signal?.aborted) return reject(abortError());
       child = spawn(actualTools.ytDlp, args, { shell: false, windowsHide: true, detached: process.platform !== 'win32', stdio: ['pipe', 'pipe', 'pipe'], env: mediaToolEnv(actualTools) });
       child.stdin?.on('error', () => {});
-      child.stdin?.end(`${source}\n`);
+      child.stdin?.end(checkpointDir ? JSON.stringify(metadata) : `${source}\n`);
       const stop = reason => { stopReason ||= reason; terminate(child); };
       const abort = () => stop('abort');
       signal?.addEventListener('abort', abort, { once: true });
+      if (signal?.aborted) abort();
       timer = setTimeout(() => stop('timeout'), timeoutMs); timer.unref();
       sizeTimer = setInterval(() => {
         if (checkingScratch) return;
         checkingScratch = true;
-        void scratchBytes(scratch, scratchLimit).catch(error => { if (error.code !== 'ENOENT') { scratchError ||= error; stop('size'); } }).finally(() => { checkingScratch = false; });
+        polling = (async () => {
+          await scratchBytes(scratch, scratchLimit);
+          if (checkpointDir) {
+            const progress = await checkpoint.resumableProgress(scratch);
+            onProgress({ ...progress, totalBytes: null, reusedResources: reused.completedResources, reusedBytes: reused.downloadedBytes });
+          }
+        })().catch(error => { if (error.code !== 'ENOENT' && !(error instanceof SyntaxError)) { scratchError ||= error; stop('size'); } }).finally(() => { checkingScratch = false; });
       }, 100); sizeTimer.unref();
       child.stdout.on('data', chunk => {
         stdout = boundedAppend(stdout, chunk);
         const lines = `${stdoutTail}${chunk.toString('utf8')}`.split(/\r?\n/); stdoutTail = lines.pop().slice(-MAX_STDIO_BYTES);
         for (const line of lines) {
           const file = /^flowdm-file:(.+)$/.exec(line); if (file) resultPath = file[1];
-          const progress = /^flowdm-progress:(\d+|NA):(?:\d+|NA)$/.exec(line);
-          if (progress) onProgress({ downloadedBytes: progress[1] === 'NA' ? 0 : Number(progress[1]), totalBytes: null });
+          const progress = /^flowdm-progress:(\d+|NA):(?:\d+|NA)(?::(\d+|NA))?$/.exec(line);
+          if (progress) onProgress({ downloadedBytes: progress[1] === 'NA' ? 0 : Number(progress[1]), totalBytes: null, ...(checkpointDir ? { completedResources: progress[2] && progress[2] !== 'NA' ? Number(progress[2]) : reused.completedResources, reusedResources: reused.completedResources, reusedBytes: reused.downloadedBytes } : {}) });
         }
       });
       child.stderr.on('data', chunk => { stderr = boundedAppend(stderr, chunk); });
@@ -313,12 +367,19 @@ async function downloadExternal({ url, mediaType, headers = {}, output, signal, 
     await validateOutput(produced, actualTools.ffmpeg, signal);
     const bytes = await copyVerifiedFile(produced, output, maxBytes, signal);
     onProgress({ downloadedBytes: bytes, totalBytes: bytes });
-    return { bytes, finalUrl: finalSource, metadata: { mediaType, tool: 'yt-dlp' } };
+    return { bytes, finalUrl: finalSource, metadata: { mediaType, tool: 'yt-dlp', ...(checkpointDir ? { resumable: true, reusedResources: reused.completedResources, reusedBytes: reused.downloadedBytes } : {}) } };
   } finally {
     if (timer) clearTimeout(timer);
     if (sizeTimer) clearInterval(sizeTimer);
+    await polling;
     await relay?.close().catch(() => {});
-    await fs.rm(scratch, { recursive: true, force: true }).catch(() => {});
+    if (checkpointDir && pinnedIdentity) {
+      await checkpoint.reconcileNative(scratch, scratchLimit);
+      const savedProgress = await checkpoint.resumableProgress(scratch);
+      await checkpoint.snapshot(scratch, { sourceHash, identity: pinnedIdentity, ...savedProgress }, scratchLimit);
+      onProgress({ ...savedProgress, totalBytes: null, reusedResources: reused.completedResources, reusedBytes: reused.downloadedBytes });
+    }
+    if (!checkpointDir) await fs.rm(scratch, { recursive: true, force: true }).catch(() => {});
   }
 }
 module.exports = { canonicalYouTubeUrl, preflightDash, downloadExternal, rejectCredentialHeaders, createDashRelay, validateMediaOutput, mediaToolEnv, aria2Arguments };

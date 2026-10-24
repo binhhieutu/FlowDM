@@ -1,0 +1,11 @@
+portable-stage: launch first GUI
+portable-stage: close paused HTTP
+portable-stage: relaunch paused HTTP
+portable-stage: HTTP resumed and verified
+portable-stage: add YouTube
+portable-stage: wait saved YouTube fragments
+portable-stage: close paused YouTube
+portable-stage: relaunch paused YouTube
+portable-stage: finish resumed YouTube
+{"status":"passed","artifact":"FlowDM 0.5.0.exe","bytes":2097152,"sha256":"af16c0b9756b4ebc89c4852b7f684ef723d018b805ce6d0fbbd2181fe447c025","pauseRestartResume":true,"mediaToolsVerified":true,"youtube":{"bytes":288972332,"sha256":"fc6b9d58d1f91ebfba1e26f3968368ab4dce11d17b749a781e360688d08c44b4","matchesFullyDecodedSample":true,"resume":{"pauseRestartResume":true,"pausedBytes":31658408,"restoredBytes":31658408,"reusedResources":12,"reusedBytes":26444080}},"at":"2026-10-24T00:13:21.931Z"}
+portable-stage: close verified portable

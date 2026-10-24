@@ -43,7 +43,7 @@ test('HLS master selects highest bandwidth and fMP4 initialization precedes frag
   const done = await wait(manager, (await manager.add({ url })).id);
   assert.equal(done.status, 'completed', done.error); assert.equal(done.filename, 'list.mp4'); assert.deepEqual(await fs.readFile(done.path), Buffer.concat([init, fragmentA, fragmentB]));
 });
-test('HLS pause and manager restart resume safely restart from first segment', async t => {
+test('HLS pause and manager restart reuse the first completed segment', async t => {
   let first = 0;
   const { manager, url, config } = await setup(t, (req, res) => {
     if (req.url === '/list.m3u8') return res.end(playlist);
@@ -55,7 +55,7 @@ test('HLS pause and manager restart resume safely restart from first segment', a
   await manager.pause(task.id); assert.equal(manager.list()[0].status, 'paused'); await manager.close();
   const restored = await new DownloadManager(config).init();
   await restored.resume(task.id); const done = await wait(restored, task.id);
-  assert.equal(done.status, 'completed', done.error); assert.ok(first >= 2); assert.deepEqual(await fs.readFile(done.path), Buffer.concat([a, b, c]));
+  assert.equal(done.status, 'completed', done.error); assert.equal(first, 1); assert.deepEqual(await fs.readFile(done.path), Buffer.concat([a, b, c]));
   await restored.close();
 });
 test('HLS unsafe manifests and segment errors never publish a completed file', async t => {
