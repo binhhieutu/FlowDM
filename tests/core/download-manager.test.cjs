@@ -95,6 +95,26 @@ test('journals without secret headers and restores scheduled tasks safely', asyn
 
 module.exports = { fixture, serve, bytes, status };
 
+test('resumes sparse parallel progress when later ranges have not received any bytes', async t => {
+  const { manager, url } = await fixture(t, (req, res) => {
+    const match = /^bytes=(\d+)-(\d+)$/.exec(req.headers.range || '');
+    const start = +match[1], end = +match[2];
+    res.writeHead(206, { ETag: '"sparse"', 'Content-Length': end - start + 1, 'Content-Range': `bytes ${start}-${end}/${bytes.length}` });
+    if (end === 0) return res.end(bytes.subarray(0, 1));
+    let at = start;
+    if (start === 0) { res.write(bytes.subarray(0, 4096)); at = 4096; }
+    const timer = setTimeout(() => res.end(bytes.subarray(at, end + 1)), 250);
+    res.once('close', () => clearTimeout(timer));
+  });
+  const task = await manager.add({ url, connections: 4 });
+  while (!manager.list()[0].downloadedBytes) await new Promise(resolve => setTimeout(resolve, 5));
+  const paused = await manager.pause(task.id);
+  assert.ok(paused.segments.slice(1).every(segment => segment.received === 0));
+  await manager.resume(task.id);
+  const done = await status(manager, task.id, ['completed', 'failed']);
+  assert.equal(done.status, 'completed', done.error); assert.deepEqual(await fs.readFile(done.path), bytes);
+});
+
 test('pauses active transfer, resumes ranges and survives manager restart', async t => {
   const { manager, root, url } = await fixture(t);
   const task = await manager.add({ url, speedLimit: bytes.length * 2, connections: 1 });
@@ -136,13 +156,17 @@ test('refuses changed resume validator and allows retry after server recovers', 
   assert.equal((await status(manager, task.id, ['completed', 'failed'])).status, 'completed');
 });
 
-test('restarts from zero without validator and limits actual transfer speed', async t => {
+test('preserves partial without validator and rate limits a separately requested fresh transfer', async t => {
   const { manager, url } = await fixture(t, (req, res) => { res.writeHead(200, { 'Content-Length': bytes.length }); res.end(bytes); });
   const task = await manager.add({ url, connections: 1, speedLimit: bytes.length * 2 });
   while (!manager.list()[0].downloadedBytes) await new Promise(resolve => setTimeout(resolve, 10));
   await manager.pause(task.id);
-  const started = Date.now(); await manager.resume(task.id);
-  const done = await status(manager, task.id, ['completed', 'failed']);
+  const saved = manager.list()[0].downloadedBytes;
+  await manager.resume(task.id);
+  const refused = await status(manager, task.id, ['failed']);
+  assert.match(refused.error, /validator|resume/i); assert.equal(refused.downloadedBytes, saved);
+  const started = Date.now(); const fresh = await manager.add({ url, connections: 1, speedLimit: bytes.length * 2 });
+  const done = await status(manager, fresh.id, ['completed', 'failed']);
   assert.equal(done.status, 'completed', done.error);
   assert.ok(Date.now() - started >= 400);
   assert.deepEqual(await fs.readFile(done.path), bytes);
@@ -236,19 +260,19 @@ test('shutdown checkpoints running download and init is idempotent', async t => 
   assert.equal(saved.tasks[0].status, 'paused');
 });
 
-test('safely falls back to fresh single stream if server abandons Range after probe', async t => {
+test('refuses a server abandoning Range after probe without restarting the download', async t => {
   const { manager, url } = await fixture(t, (req, res) => {
     if (req.headers.range === 'bytes=0-0') return serve(req, res);
     res.writeHead(200, { ETag: '"fixture-v1"', 'Content-Length': bytes.length }); res.end(bytes);
   });
   const task = await manager.add({ url });
   const done = await status(manager, task.id, ['completed', 'failed']);
-  assert.equal(done.status, 'completed', done.error);
-  assert.equal(done.segments.length, 1);
-  assert.deepEqual(await fs.readFile(done.path), bytes);
+  assert.equal(done.status, 'failed'); assert.match(done.error, /RANGE_IGNORED/);
+  assert.equal(done.downloadedBytes, 0);
+  await assert.rejects(fs.stat(done.path), { code: 'ENOENT' });
 });
 
-test('supports empty files and missing or shortened checkpoint files restart safely', async t => {
+test('supports empty files and refuses missing or shortened checkpoints without restarting', async t => {
   const empty = await fixture(t, (_req, res) => { res.writeHead(200, { 'Content-Length': 0 }); res.end(); });
   const zero = await empty.manager.add({ url: empty.url });
   const done = await status(empty.manager, zero.id, ['completed', 'failed']);
@@ -262,7 +286,10 @@ test('supports empty files and missing or shortened checkpoint files restart saf
     const partial = path.join(item.root, 'data', `${task.id}.part`);
     if (missing) await fs.unlink(partial); else await fs.truncate(partial, 0);
     await item.manager.resume(task.id);
-    assert.equal((await status(item.manager, task.id, ['completed', 'failed'])).status, 'completed');
+    const failed = await status(item.manager, task.id, ['completed', 'failed']);
+    assert.equal(failed.status, 'failed'); assert.match(failed.error, /checkpoint/i); assert.ok(failed.downloadedBytes > 0);
+    if (missing) await assert.rejects(fs.stat(partial), { code: 'ENOENT' });
+    else assert.equal((await fs.stat(partial)).size, 0);
   }
 });
 
@@ -361,7 +388,7 @@ test('disk-full publication failure leaves no partial final name and preserves s
   assert.deepEqual((await fs.readdir(root)).sort(), ['downloads.json', 'source.part']);
 });
 
-test('Last-Modified same-second changes restart a complete fresh single stream', async t => {
+test('Last-Modified same-second changes refuse continuation and retain original bytes', async t => {
   let current = Buffer.alloc(bytes.length, 'A');
   const { manager, url } = await fixture(t, (req, res) => {
     const match = /bytes=(\d+)-(\d*)/.exec(req.headers.range || '');
@@ -375,8 +402,9 @@ test('Last-Modified same-second changes restart a complete fresh single stream',
   await manager.pause(task.id); current = Buffer.alloc(bytes.length, 'B');
   await manager.resume(task.id);
   const done = await status(manager, task.id, ['completed', 'failed']);
-  assert.equal(done.status, 'completed', done.error);
-  assert.ok((await fs.readFile(done.path)).equals(current), 'Last-Modified must not combine old and changed response bytes');
+  assert.equal(done.status, 'failed'); assert.match(done.error, /ETag|validator/i);
+  const retained = await fs.readFile(path.join(manager.dataDir, `${task.id}.part`));
+  assert.ok(retained.length > 0 && retained.every(byte => byte === 65), 'Original A bytes must be retained, not replaced by B');
   assert.equal(done.ranges, false);
 });
 

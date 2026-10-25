@@ -1,0 +1,10 @@
+✔ real video GUI refreshes expired HTTP HLS DASH links and resumes after relaunch without repeating committed data (27004.1928ms)
+ℹ [{"kind":"direct","id":"f72ce787-c56b-42ef-b5de-6ff6d9ecbe4d","pausedBytes":3328,"bytes":41899,"sha256":"87cbfbd36af5cc2c6d1e4fced4ec705f28d221ea2b5081ca7ae578278dba8e38","reusedResources":0,"changedSourceRefused":true,"relaunchAfterRefresh":true,"wholeFileDecoded":true},{"kind":"video","id":"4a58a21a-9cac-4586-b692-c8ce563481ad","pausedBytes":15416,"bytes":47188,"sha256":"8fd49049fe73583d0e179541f59b57090178a412cd8676250cabbcb6f0bfbc4e","reusedResources":1,"changedSourceRefused":true,"relaunchAfterRefresh":true,"wholeFileDecoded":true},{"kind":"dash","id":"dbf0ea6d-560f-45df-a86d-57d2138f6645","pausedBytes":9722,"bytes":41899,"sha256":"47486d3f87501c7cc371156ee296cfb3094e28768ef4ac413bc187003923717b","reusedResources":2,"changedSourceRefused":true,"relaunchAfterRefresh":true,"wholeFileDecoded":true}]
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 27337.3492

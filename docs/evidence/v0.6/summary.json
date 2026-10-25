@@ -1,0 +1,58 @@
+{
+  "version": "0.6.0",
+  "coverage": {
+    "lines": {
+      "total": 2684,
+      "covered": 2625,
+      "skipped": 0,
+      "pct": 97.8
+    },
+    "statements": {
+      "total": 2684,
+      "covered": 2625,
+      "skipped": 0,
+      "pct": 97.8
+    },
+    "functions": {
+      "total": 269,
+      "covered": 255,
+      "skipped": 0,
+      "pct": 94.79
+    },
+    "branches": {
+      "total": 2451,
+      "covered": 2121,
+      "skipped": 0,
+      "pct": 86.53
+    },
+    "branchesTrue": {
+      "total": 0,
+      "covered": 0,
+      "skipped": 0,
+      "pct": 100
+    }
+  },
+  "audit": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "dependencies": {
+      "prod": 1,
+      "dev": 322,
+      "optional": 23,
+      "peer": 13,
+      "peerOptional": 0,
+      "total": 322
+    }
+  },
+  "artifact": {
+    "file": "I:\\dich_nguoc\\FlowDM\\dist\\FlowDM 0.6.0.exe",
+    "bytes": 263158645,
+    "sha256": "09fe7a2b0547a70858bda69df2009ce4bfcf1d3226d7a28ca0ba03fd156e538d"
+  }
+}

@@ -1,0 +1,12 @@
+✔ real Chromium extension auto capture, video/HLS, cookie consent and host-down fallback (21337.9344ms)
+ℹ Loaded real extension hmddekcnadhpciibhknljaddbbhldepm
+ℹ Native messaging launches the generated host successfully
+ℹ Auto capture completed exact bytes and original browser download was canceled after ACK
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 21702.0519

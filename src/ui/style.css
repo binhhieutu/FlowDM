@@ -3,3 +3,5 @@
 .header-actions{display:flex;align-items:center;gap:10px}.header-actions>.secondary{font-size:12px}.setup-steps{padding-left:21px;color:#5b7186;font-size:12px;line-height:1.9}.setup-steps li{margin-bottom:9px}.path-hint{font:10px ui-monospace,monospace;overflow-wrap:anywhere;color:#6b8296}#browser-kind,#browser-extension-id{width:100%}#browser-message{min-height:34px;background:#eef5f8;padding:10px;border-radius:6px}
 
 #media-type{width:100%;font-size:12px}
+
+.task-actions{flex-wrap:wrap}

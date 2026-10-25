@@ -259,7 +259,60 @@ async function extractMetadata(tools, prefix, args, source, signal) {
     });
   });
 }
-async function downloadExternal({ url, mediaType, headers = {}, output, signal, maxBytes, connections = DEFAULT_CONNECTIONS, speedLimit = 0, onProgress = () => {}, timeoutMs = 30 * 60 * 1000, tools, toolArgsPrefix = [], validateOutput = validateMediaOutput, checkpointDir }) {
+function selectedFormat(mediaType) {
+  return mediaType === 'youtube' ? 'bv*[vcodec^=avc1][height<=1080][protocol=m3u8_native]+ba[acodec^=mp4a][ext=m4a]/bv*[vcodec^=avc1][height<=1080][ext=mp4]+ba[acodec^=mp4a][ext=m4a]/b[ext=mp4]' : 'bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]';
+}
+function sourceBinding({ url, mediaType, checkpointSourceUrl, checkpointSourceHash }) {
+  const candidate = mediaType === 'youtube' ? canonicalYouTubeUrl(url) : checkedUrl(url).href;
+  const prior = checkpointSourceUrl === undefined ? candidate : mediaType === 'youtube' ? canonicalYouTubeUrl(checkpointSourceUrl) : checkedUrl(checkpointSourceUrl).href;
+  if (checkpointSourceHash !== undefined && !/^[a-f0-9]{64}$/.test(checkpointSourceHash)) throw Error('Invalid external checkpoint source hash');
+  const sourceHash = checkpointSourceHash || checkpoint.hash(prior);
+  if (mediaType === 'youtube' && sourceHash !== checkpoint.hash(candidate)) throw Error('Replacement must identify the same canonical YouTube video');
+  return sourceHash;
+}
+function checkpointLimit(maxBytes) {
+  if (!Number.isSafeInteger(maxBytes) || maxBytes < 1) throw Error('Invalid external media size limit');
+  return Math.min(MAX_SCRATCH_BYTES, maxBytes > Math.floor(MAX_SCRATCH_BYTES / 3) ? MAX_SCRATCH_BYTES : maxBytes * 3);
+}
+function manifestBaseHash(url) {
+  const base = checkedUrl(url); base.search = ''; base.hash = '';
+  return checkpoint.hash(base.href);
+}
+function validateDashBase(saved, finalUrl) {
+  const expected = saved.manifestBaseHash;
+  if (!expected || expected !== manifestBaseHash(finalUrl)) throw Error('DASH resource base location changed; retained fragments were preserved');
+}
+async function selectedMetadata(actualTools, toolArgsPrefix, mediaType, source, signal) {
+  const args = ['--ignore-config', '--no-plugin-dirs', '--no-remote-components', '--no-playlist', '--no-cache-dir', '--js-runtimes', `node:${actualTools.jsRuntime}`, '--format', selectedFormat(mediaType)];
+  const metadata = await extractMetadata(actualTools, toolArgsPrefix, args, source, signal);
+  if (mediaType === 'youtube') metadata.flowdm_hls_identity = await pinHlsMetadata(metadata, signal);
+  return metadata;
+}
+// Refresh is read-only: the manager commits the URL plus stable hash together in
+// its journal, while subsequent transfer repeats identity verification using the
+// same extracted metadata it supplies to yt-dlp. No cache rebinding is needed.
+async function validateExternalReplacement({ url, mediaType, checkpointDir, maxBytes, checkpointSourceUrl, checkpointSourceHash, headers = {}, signal, tools, toolArgsPrefix = [] }) {
+  if (!['dash', 'youtube'].includes(mediaType)) throw Error('External media type must be dash or youtube');
+  if (typeof checkpointDir !== 'string' || !path.isAbsolute(checkpointDir)) throw Error('External checkpoint path must be absolute');
+  if (signal?.aborted) throw abortError();
+  rejectCredentialHeaders(headers);
+  const limit = checkpointLimit(maxBytes);
+  const sourceHash = sourceBinding({ url, mediaType, checkpointSourceUrl, checkpointSourceHash });
+  const saved = await checkpoint.readState(checkpointDir, sourceHash, limit, { create: false });
+  if (!saved) throw Error('External checkpoint state is missing');
+  const actualTools = safeTool(tools || await defaultTools(), mediaType === 'youtube');
+  const preflight = mediaType === 'dash' ? await preflightDash(url, headers, signal) : null;
+  if (preflight) validateDashBase(saved, preflight.finalUrl);
+  let relay;
+  try {
+    relay = preflight ? await createDashRelay({ ...preflight, signal, maxBytes }) : null;
+    const metadata = await selectedMetadata(actualTools, toolArgsPrefix, mediaType, relay?.url || canonicalYouTubeUrl(url), signal);
+    if (saved.identity !== checkpoint.identity(metadata, preflight?.manifest)) throw Error('External media identity changed; retained fragments cannot be mixed');
+    if (signal?.aborted) throw abortError();
+    return { compatible: true, checkpointSourceHash: sourceHash };
+  } finally { await relay?.close(); }
+}
+async function downloadExternal({ url, mediaType, headers = {}, output, signal, maxBytes, connections = DEFAULT_CONNECTIONS, speedLimit = 0, onProgress = () => {}, timeoutMs = 30 * 60 * 1000, tools, toolArgsPrefix = [], validateOutput = validateMediaOutput, checkpointDir, checkpointSourceHash }) {
   if (!['dash', 'youtube'].includes(mediaType)) throw Error('External media type must be dash or youtube');
   if (typeof output !== 'string' || !path.isAbsolute(output) || !Number.isSafeInteger(maxBytes) || maxBytes < 1) throw Error('Invalid external media output or size limit');
   if (!Number.isSafeInteger(speedLimit) || speedLimit < 0 || !Number.isSafeInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > MAX_TIMEOUT_MS) throw Error('Invalid external media limits');
@@ -267,12 +320,13 @@ async function downloadExternal({ url, mediaType, headers = {}, output, signal, 
   if (signal?.aborted) throw abortError();
   rejectCredentialHeaders(headers);
   const youtubeSource = mediaType === 'youtube' ? canonicalYouTubeUrl(url) : null;
+  const sourceHash = sourceBinding({ url, mediaType, checkpointSourceHash });
   const actualTools = safeTool(tools || await defaultTools(), mediaType === 'youtube');
   const preflight = mediaType === 'dash' ? await preflightDash(url, headers, signal) : null;
   let relay;
   if (checkpointDir !== undefined && (typeof checkpointDir !== 'string' || !path.isAbsolute(checkpointDir))) throw Error('External checkpoint path must be absolute');
   const scratch = checkpointDir || path.join(path.dirname(output), `.flowdm-external-${crypto.randomUUID()}`);
-  const scratchLimit = Math.min(MAX_SCRATCH_BYTES, maxBytes > Math.floor(MAX_SCRATCH_BYTES / 3) ? MAX_SCRATCH_BYTES : maxBytes * 3);
+  const scratchLimit = checkpointLimit(maxBytes);
   await fs.mkdir(scratch, { recursive: true, mode: 0o700 });
   try { relay = preflight ? await createDashRelay({ ...preflight, signal, maxBytes }) : null; }
   catch (error) { if (!checkpointDir) await fs.rm(scratch, { recursive: true, force: true }).catch(() => {}); throw error; }
@@ -281,16 +335,14 @@ async function downloadExternal({ url, mediaType, headers = {}, output, signal, 
   const template = path.join(scratch, 'media.%(ext)s');
   const nativeConnections = speedLimit ? Math.min(actualConnections, speedLimit) : actualConnections;
   const nativeRate = speedLimit ? Math.max(1, Math.floor(speedLimit / nativeConnections)) : 0;
-  const youtubeFormat = 'bv*[vcodec^=avc1][height<=1080][protocol=m3u8_native]+ba[acodec^=mp4a][ext=m4a]/bv*[vcodec^=avc1][height<=1080][ext=mp4]+ba[acodec^=mp4a][ext=m4a]/b[ext=mp4]';
-  const format = mediaType === 'youtube' ? youtubeFormat : 'bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]';
-  const sourceHash = checkpoint.hash(mediaType === 'youtube' ? youtubeSource : checkedUrl(url).href);
+  const format = selectedFormat(mediaType);
   let resumeState = null; let metadata; let pinnedIdentity; let reused = { downloadedBytes: 0, completedResources: 0 };
   try {
     if (checkpointDir) {
       resumeState = await checkpoint.readState(scratch, sourceHash, scratchLimit);
-      const metadataArgs = ['--ignore-config', '--no-plugin-dirs', '--no-remote-components', '--no-playlist', '--no-cache-dir', '--js-runtimes', `node:${actualTools.jsRuntime}`, '--format', format];
-      metadata = await extractMetadata(actualTools, toolArgsPrefix, metadataArgs, source, signal);
-      if (mediaType === 'youtube') metadata.flowdm_hls_identity = await pinHlsMetadata(metadata, signal);
+      if (preflight && resumeState && !resumeState.manifestBaseHash && (resumeState.files.length || resumeState.downloadedBytes > 0 || resumeState.completedResources > 0)) throw Error('DASH checkpoint resource base is missing; retained fragments were preserved. Start a new task to download safely.');
+      if (resumeState?.manifestBaseHash && preflight) validateDashBase(resumeState, preflight.finalUrl);
+      metadata = await selectedMetadata(actualTools, toolArgsPrefix, mediaType, source, signal);
       pinnedIdentity = checkpoint.identity(metadata, preflight?.manifest);
       if (resumeState && resumeState.identity !== pinnedIdentity) throw Error('External media identity changed; retained fragments cannot be mixed');
       // Do not re-extract the source between validation and transfer. Only this
@@ -299,7 +351,7 @@ async function downloadExternal({ url, mediaType, headers = {}, output, signal, 
       await checkpoint.reconcileNative(scratch, scratchLimit);
       await checkpoint.discardUnsafeHttpPartials(scratch);
       reused = await checkpoint.resumableProgress(scratch);
-      await checkpoint.snapshot(scratch, { sourceHash, identity: pinnedIdentity, ...reused }, scratchLimit);
+      await checkpoint.snapshot(scratch, { sourceHash, identity: pinnedIdentity, ...(preflight ? { manifestBaseHash: manifestBaseHash(preflight.finalUrl) } : {}), ...reused }, scratchLimit);
       onProgress({ ...reused, totalBytes: null, reusedResources: reused.completedResources, reusedBytes: reused.downloadedBytes });
     }
   } catch (error) { await relay?.close().catch(() => {}); throw error; }
@@ -376,10 +428,10 @@ async function downloadExternal({ url, mediaType, headers = {}, output, signal, 
     if (checkpointDir && pinnedIdentity) {
       await checkpoint.reconcileNative(scratch, scratchLimit);
       const savedProgress = await checkpoint.resumableProgress(scratch);
-      await checkpoint.snapshot(scratch, { sourceHash, identity: pinnedIdentity, ...savedProgress }, scratchLimit);
+      await checkpoint.snapshot(scratch, { sourceHash, identity: pinnedIdentity, ...(preflight ? { manifestBaseHash: manifestBaseHash(preflight.finalUrl) } : {}), ...savedProgress }, scratchLimit);
       onProgress({ ...savedProgress, totalBytes: null, reusedResources: reused.completedResources, reusedBytes: reused.downloadedBytes });
     }
     if (!checkpointDir) await fs.rm(scratch, { recursive: true, force: true }).catch(() => {});
   }
 }
-module.exports = { canonicalYouTubeUrl, preflightDash, downloadExternal, rejectCredentialHeaders, createDashRelay, validateMediaOutput, mediaToolEnv, aria2Arguments };
+module.exports = { canonicalYouTubeUrl, preflightDash, downloadExternal, rejectCredentialHeaders, createDashRelay, validateMediaOutput, mediaToolEnv, aria2Arguments, validateExternalReplacement };

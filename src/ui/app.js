@@ -1,7 +1,7 @@
 'use strict';
 const $ = id => document.getElementById(id);
 const labels = { queued: 'Chờ tải', downloading: 'Đang tải', paused: 'Tạm dừng', completed: 'Hoàn tất', failed: 'Thất bại', canceled: 'Đã hủy' };
-let tasks = []; let filter = 'all'; let selected = null; let defaultDirectory = ''; let toastTimer;
+let tasks = []; let filter = 'all'; let selected = null; let defaultDirectory = ''; let toastTimer; let refreshingId = null;
 const bytes = number => {
   if (number === null || number === undefined) return 'Chưa rõ';
   if (number < 1024) return `${Math.max(0, number).toFixed(0)} B`;
@@ -59,6 +59,11 @@ function render() {
     const buttons = element('div', 'task-actions');
     if (['downloading', 'queued'].includes(task.status)) buttons.append(taskButton(task, 'pause', 'Tạm dừng'));
     if (['paused', 'failed'].includes(task.status)) buttons.append(taskButton(task, 'resume', task.status === 'failed' ? 'Thử lại' : 'Tiếp tục'));
+    if (['paused', 'failed'].includes(task.status)) {
+      const update = element('button', '', 'Cập nhật liên kết'); update.type = 'button';
+      update.addEventListener('click', event => { event.stopPropagation(); refreshingId = task.id; $('refresh-url').value = ''; $('refresh-error').hidden = true; $('refresh-dialog').showModal(); $('refresh-url').focus(); });
+      buttons.append(update);
+    }
     if (task.status === 'completed') buttons.append(taskButton(task, 'reveal', 'Mở vị trí'));
     if (['downloading', 'queued', 'paused'].includes(task.status)) buttons.append(taskButton(task, 'cancel', 'Hủy', 'danger'));
     else buttons.append(taskButton(task, 'remove', 'Xóa khỏi danh sách', 'remove'));
@@ -77,6 +82,17 @@ function render() {
   }
 }
 function showAdd() { $('form-error').hidden = true; $('directory').value = defaultDirectory; $('add-dialog').showModal(); $('url').focus(); }
+for (const id of ['refresh-close', 'refresh-cancel']) $(id).addEventListener('click', () => $('refresh-dialog').close());
+$('refresh-form').addEventListener('submit', async event => {
+  event.preventDefault(); if ($('refresh-submit').disabled) return;
+  $('refresh-error').hidden = true; $('refresh-submit').disabled = true;
+  try {
+    const result = await window.flow.refreshSource(refreshingId, $('refresh-url').value.trim());
+    if (!result.ok) throw Error(result.error);
+    $('refresh-dialog').close(); toast('Đã cập nhật liên kết và giữ tiến độ. Nhấn Tiếp tục để tải.'); await refresh();
+  } catch (error) { $('refresh-error').textContent = error.message; $('refresh-error').hidden = false; }
+  finally { $('refresh-submit').disabled = false; }
+});
 $('add-button').addEventListener('click', showAdd); $('empty-add').addEventListener('click', showAdd);
 for (const id of ['close-dialog', 'cancel-dialog']) $(id).addEventListener('click', () => $('add-dialog').close());
 $('choose-directory').addEventListener('click', async () => { const result = await window.flow.chooseDirectory(); if (result.ok && result.data) $('directory').value = result.data; else if (!result.ok) toast(result.error); });

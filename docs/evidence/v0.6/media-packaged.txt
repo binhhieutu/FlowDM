@@ -1,0 +1,14 @@
+✔ HLS and DASH GUI pause, close/relaunch, reuse fragments and decode complete video (19471.4708ms)
+ℹ [{"mediaType":"hls","pausedBytes":15416,"restoredBytes":15416,"reusedResources":1,"firstCompletedResource":"/video/segment00.ts","firstResourceRequests":1,"resourceRequests":["/video/segment00.ts","/video/segment01.ts","/video/segment01.ts","/video/segment02.ts"],"bytes":47188,"sha256":"8fd49049fe73583d0e179541f59b57090178a412cd8676250cabbcb6f0bfbc4e","wholeFileDecoded":true},{"mediaType":"dash","pausedBytes":9722,"restoredBytes":9722,"reusedResources":2,"firstCompletedResource":"/dash/init-stream0.m4s","firstResourceRequests":1,"resourceRequests":["/dash/init-stream0.m4s","/dash/chunk-stream0-00001.m4s","/dash/chunk-stream0-00002.m4s","/dash/chunk-stream0-00002.m4s","/dash/chunk-stream0-00003.m4s","/dash/init-stream1.m4s","/dash/chunk-stream1-00001.m4s","/dash/chunk-stream1-00002.m4s","/dash/chunk-stream1-00003.m4s"],"bytes":41899,"sha256":"47486d3f87501c7cc371156ee296cfb3094e28768ef4ac413bc187003923717b","wholeFileDecoded":true}]
+﹣ public YouTube GUI pause and app relaunch continue saved video and fully decode (0.2078ms) # SKIP
+✔ real video GUI refreshes expired HTTP HLS DASH links and resumes after relaunch without repeating committed data (36638.5366ms)
+ℹ [{"kind":"direct","id":"43ca06dd-e70f-4f2f-ae66-c47da73ea6f3","pausedBytes":3328,"bytes":41899,"sha256":"87cbfbd36af5cc2c6d1e4fced4ec705f28d221ea2b5081ca7ae578278dba8e38","reusedResources":0,"changedSourceRefused":true,"relaunchAfterRefresh":true,"wholeFileDecoded":true},{"kind":"video","id":"e9b1bf28-de95-4799-938a-58132b8577d8","pausedBytes":15416,"bytes":47188,"sha256":"8fd49049fe73583d0e179541f59b57090178a412cd8676250cabbcb6f0bfbc4e","reusedResources":1,"changedSourceRefused":true,"relaunchAfterRefresh":true,"wholeFileDecoded":true},{"kind":"dash","id":"32173eee-d858-4742-ba5d-8083dbca58b5","pausedBytes":9722,"bytes":41899,"sha256":"47486d3f87501c7cc371156ee296cfb3094e28768ef4ac413bc187003923717b","reusedResources":2,"changedSourceRefused":true,"relaunchAfterRefresh":true,"wholeFileDecoded":true}]
+﹣ public YouTube refresh validates the same video and resumes retained fragments after app relaunch (0.3791ms) # SKIP
+ℹ tests 4
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 2
+ℹ todo 0
+ℹ duration_ms 37082.7578

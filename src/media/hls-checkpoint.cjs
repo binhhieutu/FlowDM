@@ -33,11 +33,9 @@ async function inspectResource(filename, playlist, index, maxBytes) {
   try { for await (const chunk of handle.createReadStream()) { hash.update(chunk); validator.push(chunk); } } finally { await handle.close(); }
   validator.finish(); return { bytes: stat.size, sha256: hash.digest('hex') };
 }
-async function openCheckpoint(directory, playlist, maxBytes) {
-  await fs.mkdir(directory, { recursive: true, mode: 0o700 }); const stat = await fs.lstat(directory);
-  if (!stat.isDirectory() || stat.isSymbolicLink()) throw checkpointError('invalid directory');
+function playlistIdentity(playlist) {
   if (playlist.manifestIdentity !== undefined && !/^[a-f0-9]{64}$/.test(playlist.manifestIdentity)) throw checkpointError('invalid manifest identity');
-  const identity = crypto.createHash('sha256').update(JSON.stringify({
+  return crypto.createHash('sha256').update(JSON.stringify({
     extension: playlist.extension, resources: playlist.resources,
     manifestIdentity: playlist.manifestIdentity || null,
     semantic: playlist.manifestIdentity ? null : {
@@ -45,6 +43,11 @@ async function openCheckpoint(directory, playlist, maxBytes) {
       durations: playlist.durations ?? null, initialization: playlist.initialization ?? null
     }
   })).digest('hex');
+}
+async function openCheckpoint(directory, playlist, maxBytes) {
+  await fs.mkdir(directory, { recursive: true, mode: 0o700 }); const stat = await fs.lstat(directory);
+  if (!stat.isDirectory() || stat.isSymbolicLink()) throw checkpointError('invalid directory');
+  const identity = playlistIdentity(playlist);
   const filename = path.join(directory, 'checkpoint.json'); const names = await fs.readdir(directory);
   let state = { version: 1, identity, count: playlist.resources.length, resources: [] };
   if (names.includes('checkpoint.json')) {
@@ -91,4 +94,4 @@ async function openCheckpoint(directory, playlist, maxBytes) {
     }
   };
 }
-module.exports = { openCheckpoint };
+module.exports = { openCheckpoint, playlistIdentity };

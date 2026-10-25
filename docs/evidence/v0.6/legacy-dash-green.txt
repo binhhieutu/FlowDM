@@ -1,0 +1,27 @@
+✔ YouTube refresh validates canonical identity without changing cache or deleting HTTP bytes (144.3443ms)
+✔ refresh rejects different canonical video and metadata drift while preserving every file (125.491ms)
+✔ refresh does not create a missing checkpoint directory (21.3157ms)
+✔ DASH refresh refuses unchanged relative manifest moved to another resource base (54.2817ms)
+✔ legacy DASH checkpoint without a recorded resource base refuses source refresh (18.484ms)
+✔ legacy DASH continuation refuses retained files before extraction and preserves cache across redirect (41.2797ms)
+✔ empty legacy DASH state may establish its first resource base (73.3512ms)
+✔ native checkpoint reconciliation trims append bytes past committed index without refetch (33.4975ms)
+✔ checkpoint refuses missing state, missing files, changed source and unsafe entries (9.4656ms)
+✔ unfinished unvalidated HTTP resource restarts alone while completed native video remains (4.3684ms)
+✔ unvalidated HTTP video partial is retained and continuation is refused (4.4147ms)
+✔ unfinished HTTP audio without completed video is retained and continuation is refused (2.3896ms)
+✔ external identity pins format selection and manifest but contains no signed URL (0.5241ms)
+✔ YouTube HLS identity ignores refreshed signatures but pins fragment boundaries and order (1.1158ms)
+✔ YouTube identity preflight bounds manifests and does not forward credential headers (25.7999ms)
+✔ checkpoint rejects invalid native journal and aggregate oversized cache (6.3905ms)
+✔ checkpoint refuses hard-linked cached files and metadata (7.782ms)
+✔ aborting from initial cached-progress notification never starts a transfer child (64.5993ms)
+✔ pinned DASH resumes retained fragments after child exit and a fresh invocation (10556.9078ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10791.0037

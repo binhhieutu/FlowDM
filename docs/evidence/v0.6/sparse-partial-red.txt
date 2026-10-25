@@ -1,0 +1,45 @@
+✖ resumes sparse parallel progress when later ranges have not received any bytes (87.5123ms)
+  AssertionError [ERR_ASSERTION]: HTTP resume checkpoint is unsafe or truncated; retained bytes were preserved
+  + actual - expected
+
+  + 'failed'
+  - 'completed'
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\download-manager.test.cjs:115:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'failed',
+    expected: 'completed',
+    operator: 'strictEqual'
+  }
+
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 165.9672
+
+✖ failing tests:
+
+test at tests\core\download-manager.test.cjs:98:1
+✖ resumes sparse parallel progress when later ranges have not received any bytes (87.5123ms)
+  AssertionError [ERR_ASSERTION]: HTTP resume checkpoint is unsafe or truncated; retained bytes were preserved
+  + actual - expected
+
+  + 'failed'
+  - 'completed'
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\download-manager.test.cjs:115:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'failed',
+    expected: 'completed',
+    operator: 'strictEqual'
+  }

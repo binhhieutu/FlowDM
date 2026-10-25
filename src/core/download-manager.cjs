@@ -11,6 +11,8 @@ const { loadPlaylist, getResource } = require('../media/hls.cjs');
 const { createValidator } = require('../media/container-check.cjs');
 const { transferHlsParallel } = require('../media/hls-parallel.cjs');
 const { downloadExternal } = require('../media/external.cjs');
+const { assessHttpResume } = require('./http-resume.cjs');
+const { prepareSourceReplacement } = require('./source-refresh.cjs');
 
 const clone = value => structuredClone(value);
 const STATES = ['queued', 'downloading', 'paused', 'completed', 'failed', 'canceled'];
@@ -146,6 +148,25 @@ class DownloadManager extends EventEmitter {
   }
 
   pause(id) { return this._mutate(() => this._pause(id)); }
+  refreshSource(id, input) {
+    return this._mutate(async () => {
+      this._ready(); const task = this._require(id);
+      if (!['paused', 'failed'].includes(task.status) || this.running.has(id)) throw Error('Pause the download before updating its source');
+      const previousHeaders = this.secrets.get(id);
+      const prepared = await prepareSourceReplacement({ task: clone(task), input, previousHeaders, checkpointDir: this._mediaDirectory(id), maxBytes: this.maxBytes, signal: AbortSignal.timeout(30000), externalValidator: require('../media/external.cjs').validateExternalReplacement });
+      this._ready();
+      const updated = { ...task, url: prepared.url, status: 'paused', error: null, speed: 0, requiresHeaders: Object.keys(prepared.headers).length > 0 };
+      if (prepared.checkpointSourceHash) updated.media = { ...task.media, checkpointSourceHash: prepared.checkpointSourceHash };
+      this.tasks.set(id, updated); this.secrets.set(id, prepared.headers);
+      try { await this._persist(); }
+      catch (error) {
+        this.tasks.set(id, task);
+        if (previousHeaders === undefined) this.secrets.delete(id); else this.secrets.set(id, previousHeaders);
+        await this._persist().catch(() => {}); throw error;
+      }
+      this._notify(); return clone(updated);
+    });
+  }
   async _pause(id) {
     this._ready(); const task = this._require(id);
     if (['completed', 'canceled', 'paused'].includes(task.status)) return clone(task);
@@ -213,14 +234,17 @@ class DownloadManager extends EventEmitter {
     await preflightPublication(task.path);
     const headers = this.secrets.get(task.id) || {};
     const metadata = await probe(task.url, headers, runtime.controller.signal, this.maxBytes);
-    let resume = task.downloadedBytes > 0 && task.validator?.type === 'etag' && metadata.validator?.type === 'etag' && task.ranges && metadata.ranges;
-    if (resume && (task.validator.type !== metadata.validator.type || task.validator.value !== metadata.validator.value || task.totalBytes !== metadata.total)) throw Error('Remote file changed. Cancel and add the download again to restart safely.');
+    const resume = task.downloadedBytes > 0;
+    if (resume) {
+      const assessment = assessHttpResume({ saved: task, probed: metadata });
+      if (!assessment.allowed) throw Error(assessment.reason);
+    }
     if (resume) {
       try {
         const stat = await fs.lstat(this._partial(task.id));
-        const required = Math.max(...task.segments.map(segment => segment.start + segment.received));
-        if (stat.size < required) resume = false;
-      } catch (error) { if (error.code === 'ENOENT') resume = false; else throw error; }
+        const required = Math.max(0, ...task.segments.filter(segment => segment.received > 0).map(segment => segment.start + segment.received));
+        if (!stat.isFile() || stat.isSymbolicLink() || stat.nlink !== 1 || stat.size < required || stat.size > task.totalBytes) throw Error('HTTP resume checkpoint has an unsafe size or is truncated; retained bytes were preserved');
+      } catch (error) { if (error.code === 'ENOENT') throw Error('HTTP resume checkpoint is missing; progress was preserved'); else throw error; }
     }
     const ranges = metadata.ranges && metadata.validator?.type === 'etag';
     if (!resume) {
@@ -230,7 +254,7 @@ class DownloadManager extends EventEmitter {
     }
     task.sha256 = null;
     task.totalBytes = metadata.total; task.finalUrl = metadata.finalUrl;
-    task.validator = metadata.validator; task.ranges = ranges;
+    task.validator = metadata.validator; task.ranges = ranges; task.contentEncoding = metadata.contentEncoding;
     const handle = await openPartial(this._partial(task.id), resume);
     try { await this._persist(); } catch (error) { await handle.close(); throw error; }
     return { handle, headers };
@@ -305,6 +329,7 @@ class DownloadManager extends EventEmitter {
     const result = await this.externalDownloader({
       url: task.url, mediaType: task.mediaType, headers: this.secrets.get(task.id) || {}, output: this._partial(task.id),
       checkpointDir: this._mediaDirectory(task.id), signal: runtime.controller.signal, maxBytes: this.maxBytes, speedLimit: task.speedLimit, connections: task.connections,
+      checkpointSourceHash: task.media?.checkpointSourceHash,
       onProgress: progress => {
         if (['completed', 'canceled'].includes(task.status)) return;
         const downloaded = Number.isSafeInteger(progress.downloadedBytes) ? Math.min(progress.downloadedBytes, this.maxBytes) : 0;
@@ -337,15 +362,9 @@ class DownloadManager extends EventEmitter {
   }
 
   async _transfer(task, headers, handle, runtime) {
-    for (let attempt = 0; attempt < 2; attempt++) {
-      const results = await Promise.allSettled(task.segments.map(segment => this._segment(task, segment, headers, handle, runtime).catch(error => { runtime.controller.abort(); throw error; })));
-      const failure = results.find(result => result.status === 'rejected' && result.reason.name !== 'AbortError') || results.find(result => result.status === 'rejected');
-      if (!failure) return;
-      if (failure.reason.code !== 'RANGE_IGNORED' || attempt || task.status !== 'downloading') throw failure.reason;
-      runtime.controller = new AbortController();
-      task.ranges = false; task.segments = plan(task.totalBytes, 1, false); task.downloadedBytes = 0;
-      await handle.truncate(0); await handle.sync(); await this._persist();
-    }
+    const results = await Promise.allSettled(task.segments.map(segment => this._segment(task, segment, headers, handle, runtime).catch(error => { runtime.controller.abort(); throw error; })));
+    const failure = results.find(result => result.status === 'rejected' && result.reason.name !== 'AbortError') || results.find(result => result.status === 'rejected');
+    if (failure) throw failure.reason;
   }
 
   _safeError(error) {
@@ -373,9 +392,10 @@ class DownloadManager extends EventEmitter {
     const start = segment.start + segment.received;
     const requestHeaders = { ...headers };
     if (task.ranges) requestHeaders.range = `bytes=${start}-${segment.end}`;
-    if (segment.received && task.validator) requestHeaders['if-range'] = task.validator.value;
-    const { response } = await retryRequest(task.url, requestHeaders, runtime.controller.signal);
+    if (task.ranges && task.validator) requestHeaders['if-range'] = task.validator.value;
+    const { response, finalUrl } = await retryRequest(task.url, requestHeaders, runtime.controller.signal);
     try {
+      if (task.finalUrl && new URL(finalUrl).origin !== new URL(task.finalUrl).origin) throw Error('Remote response origin changed; retained bytes were preserved');
       this._checkResponse(task, segment, response, start);
       for await (const chunk of response) {
         if (runtime.controller.signal.aborted) throw Object.assign(Error('Aborted'), { name: 'AbortError' });

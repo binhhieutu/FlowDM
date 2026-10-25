@@ -69,6 +69,10 @@ function installHandlers() {
     }
     return manager[input.action](input.id);
   });
+  handle('refreshSource', input => {
+    if (!input || typeof input !== 'object' || Array.isArray(input) || typeof input.id !== 'string' || typeof input.url !== 'string' || Object.keys(input).some(key => !['id', 'url'].includes(key))) throw Error('Thông tin cập nhật liên kết không hợp lệ.');
+    return manager.refreshSource(input.id, { url: input.url }).catch(error => { throw Error(manager._safeError(error)); });
+  });
   handle('chooseDirectory', async () => {
     const result = await dialog.showOpenDialog(win, { title: 'Chọn thư mục lưu', defaultPath: downloadDir, properties: ['openDirectory', 'createDirectory'] });
     return result.canceled ? null : result.filePaths[0];

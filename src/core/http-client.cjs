@@ -3,6 +3,7 @@ const http = require('node:http');
 const https = require('node:https');
 const { setTimeout: delay } = require('node:timers/promises');
 const { checkedUrl } = require('./policy.cjs');
+const { isStrongEtag, identityEncoding } = require('./http-resume.cjs');
 
 async function request(url, headers, signal, redirects = 0) {
   const parsed = checkedUrl(url);
@@ -46,6 +47,7 @@ function rangeInfo(response) {
 function contentLength(response) {
   const raw = response.headers['content-length'];
   if (raw === undefined) return null;
+  if (typeof raw !== 'string' || !/^\d+$/.test(raw)) throw Error('Invalid Content-Length');
   const length = Number(raw);
   if (!Number.isSafeInteger(length) || length < 0) throw Error('Invalid Content-Length');
   return length;
@@ -55,14 +57,26 @@ async function probe(url, headers, signal, maxBytes) {
   const { response } = result;
   try {
     if (![200, 206].includes(response.statusCode)) throw Error(`HTTP ${response.statusCode}`);
-    if (response.headers['content-encoding'] && response.headers['content-encoding'] !== 'identity') throw Error('Encoded responses are unsupported for byte-safe downloads');
+    if (!identityEncoding(response.headers['content-encoding'])) throw Error('Encoded responses are unsupported for byte-safe downloads');
     const ranges = response.statusCode === 206;
+    if (!ranges && response.headers['content-range'] !== undefined) throw Error('Unexpected Content-Range on HTTP 200');
     const info = ranges ? rangeInfo(response) : null;
     if (info && (info.start !== 0 || info.end !== 0)) throw Error('Invalid probe Content-Range');
+    if (ranges) {
+      const length = contentLength(response);
+      if (length !== null && length !== 1) throw Error('Invalid probe Content-Length');
+      let received = 0;
+      for await (const chunk of response) {
+        received += chunk.length;
+        if (received > 1) throw Error('Invalid probe response length');
+      }
+      if (received !== 1) throw Error('Truncated probe response');
+    }
     const total = info ? info.total : contentLength(response);
     if (total !== null && total > maxBytes) throw Error('Download exceeds size limit');
     const etag = response.headers.etag;
-    return { finalUrl: result.finalUrl, ranges, total, validator: etag && !etag.startsWith('W/') ? { type: 'etag', value: etag } : response.headers['last-modified'] ? { type: 'modified', value: response.headers['last-modified'] } : null };
+    const candidate = { type: 'etag', value: etag };
+    return { finalUrl: result.finalUrl, ranges, total, validator: isStrongEtag(candidate) ? candidate : response.headers['last-modified'] ? { type: 'modified', value: response.headers['last-modified'] } : null, contentEncoding: 'identity' };
   } finally { response.destroy(); }
 }
 module.exports = { retryRequest, probe, rangeInfo, contentLength };

@@ -52,4 +52,4 @@ function inputOptions(input, defaultDirectory) {
   const mediaFilename = mediaType === 'hls' ? `${path.parse(filename).name}.ts` : ['dash', 'youtube'].includes(mediaType) ? `${path.parse(filename).name || 'video'}.mp4` : filename;
   return { url, mediaType, filename: mediaFilename, directory, connections: integer(input.connections ?? 4, 1, 16, 'Connections'), speedLimit: integer(input.speedLimit ?? 0, 0, Number.MAX_SAFE_INTEGER, 'Speed limit'), startAt, headers };
 }
-module.exports = { checkedUrl, inputOptions, integer };
+module.exports = { checkedUrl, checkedHeaders, inputOptions, integer };

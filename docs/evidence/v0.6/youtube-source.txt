@@ -1,0 +1,10 @@
+✔ public YouTube refresh validates the same video and resumes retained fragments after app relaunch (126879.3631ms)
+ℹ {"at":"2026-10-25T12:06:36.682Z","variant":"source","version":"0.6.0","id":"63bff2a0-bba4-4a3d-8d4a-deac17a51a1a","pausedBytes":32821878,"restoredBytes":32821878,"reusedResources":12,"reusedBytes":26444080,"bytes":288972332,"sha256":"fc6b9d58d1f91ebfba1e26f3968368ab4dce11d17b749a781e360688d08c44b4","refreshAccepted":true,"relaunchAfterRefresh":true,"wholeFileDecoded":true,"output":"I:\\dich_nguoc\\FlowDM\\downloads\\verification-v6\\YouTube-refresh-source-1792929996509.mp4"}
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 127238.6083

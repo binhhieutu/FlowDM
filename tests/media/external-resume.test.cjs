@@ -5,7 +5,7 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const os = require('node:os');
 const http = require('node:http');
-const { downloadExternal } = require('../../src/media/external.cjs');
+const { downloadExternal, validateExternalReplacement } = require('../../src/media/external.cjs');
 const cache = require('../../src/media/external-checkpoint.cjs');
 const { hlsIdentity, pinHlsMetadata } = require('../../src/media/external-metadata.cjs');
 
@@ -169,7 +169,10 @@ test('pinned DASH resumes retained fragments after child exit and a fresh invoca
   const checkpoint = JSON.parse(await fs.readFile(path.join(input.checkpointDir, 'checkpoint.json'), 'utf8'));
   assert.ok(checkpoint.files.length > 0);
   assert.ok(progress.at(-1).downloadedBytes > 0);
+  const cacheBeforeRefresh = await fs.readFile(path.join(input.checkpointDir, 'checkpoint.json'));
   changed = true;
+  await assert.rejects(validateExternalReplacement({ ...input, url: `${input.url}?token=new`, checkpointSourceUrl: input.url }), /identity|changed/i);
+  assert.deepEqual(await fs.readFile(path.join(input.checkpointDir, 'checkpoint.json')), cacheBeforeRefresh);
   await assert.rejects(downloadExternal(input), /identity|changed/i);
   assert.deepEqual(requests, before);
   changed = false;
@@ -180,7 +183,11 @@ test('pinned DASH resumes retained fragments after child exit and a fresh invoca
   await fs.writeFile(filename, damaged);
   await assert.rejects(downloadExternal(input), /integrity|corrupt/i);
   await fs.writeFile(filename, bytes);
-  const result = await downloadExternal(input);
+  const replacementUrl = `${input.url}?token=new`;
+  const replacement = await validateExternalReplacement({ ...input, url: replacementUrl, checkpointSourceUrl: input.url });
+  assert.deepEqual(await fs.readFile(path.join(input.checkpointDir, 'checkpoint.json')), cacheBeforeRefresh);
+  assert.deepEqual(requests, before, 'preflight never requests already committed media resources');
+  const result = await downloadExternal({ ...input, url: replacementUrl, checkpointSourceHash: replacement.checkpointSourceHash });
   assert.equal(requests['init.mp4'], before['init.mp4']);
   assert.equal(requests['fragment00.m4s'], before['fragment00.m4s']);
   assert.ok(result.metadata.reusedResources >= 2);

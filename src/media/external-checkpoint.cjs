@@ -31,9 +31,9 @@ async function entries(directory) {
   return files.filter(file => file.name !== STATE && file.name !== `${STATE}.tmp`);
 }
 
-async function readState(directory, sourceHash, limit) {
+async function readState(directory, sourceHash, limit, { create = true } = {}) {
   if (!path.isAbsolute(directory)) throw Error('External checkpoint path must be absolute');
-  await fs.mkdir(directory, { recursive: true, mode: 0o700 });
+  if (create) await fs.mkdir(directory, { recursive: true, mode: 0o700 });
   const files = await entries(directory);
   let data;
   try {

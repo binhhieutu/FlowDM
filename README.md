@@ -1,14 +1,16 @@
-# FlowDM 0.5
+# FlowDM 0.6
 
-Kiểm chứng bản 0.5 và các giới hạn nền tảng: [VERIFICATION_V5.md](docs/VERIFICATION_V5.md).
+Kiểm chứng bản 0.6 và các giới hạn: [VERIFICATION_V6.md](docs/VERIFICATION_V6.md). Lịch sử checkpoint 0.5: [VERIFICATION_V5.md](docs/VERIFICATION_V5.md).
 
 Ứng dụng tải HTTP/HTTPS desktop với tiện ích Chromium tự bắt tải xuống và chọn tải video HLS VOD, DASH tĩnh giới hạn và YouTube công khai. Mã nguồn và nhận diện riêng; không dùng mã hay tài sản IDM và không tuyên bố đủ mọi tính năng IDM.
 
 ## Dùng trên Windows
 
-Mở `dist/FlowDM 0.5.0.exe` hoặc `dist/win-unpacked/FlowDM.exe`. Bản Windows đóng gói không cần cài Node.js; kèm yt-dlp 2026.10.21, FFmpeg 8.1 và aria2 1.37.0 đã ghim hash cùng giấy phép trong private artifact. Nhấn **Thêm liên kết** để chọn URL, thư mục, tên tệp và số kết nối tối đa 1/2/4/8/16 cho mỗi lượt tải. Có tạm dừng/tiếp tục, hủy/thử lại, tìm kiếm/lọc, hẹn giờ, giới hạn tốc độ và SHA-256 sau tải. Không tự mở hay chạy tệp tải về; không ghi đè tệp có sẵn.
+Mở `dist/FlowDM 0.6.0.exe` hoặc `dist/win-unpacked/FlowDM.exe`. Bản Windows đóng gói không cần cài Node.js; kèm yt-dlp 2026.10.21, FFmpeg 8.1 và aria2 1.37.0 đã ghim hash cùng giấy phép trong private artifact. Nhấn **Thêm liên kết** để chọn URL, thư mục, tên tệp và số kết nối tối đa 1/2/4/8/16 cho mỗi lượt tải. Có tạm dừng/tiếp tục, hủy/thử lại, tìm kiếm/lọc, hẹn giờ, giới hạn tốc độ và SHA-256 sau tải. Không tự mở hay chạy tệp tải về; không ghi đè tệp có sẵn.
 
-Tải tệp trực tiếp nhiều kết nối và resume giữ byte cần server hỗ trợ Range và validator an toàn. Khi không thể xác minh cùng phiên bản, ứng dụng tải lại an toàn hoặc báo lỗi thay vì trộn dữ liệu. HLS dùng tối đa số worker đã chọn, giữ một cửa sổ trượt hữu hạn và ghép các đoạn đúng thứ tự qua tệp tạm trên đĩa; không giữ toàn bộ video trong RAM. DASH dùng tải fragment native của yt-dlp với cùng giới hạn kết nối. HLS/DASH/YouTube mới dùng checkpoint để giữ các đoạn đã hoàn tất qua tạm dừng, đóng bình thường và mở lại ứng dụng. Khi tiếp tục, HLS dựng lại tệp ghép từ các đoạn đã kiểm tra trên đĩa; DASH/YouTube dùng trạng thái fragment native đã đối chiếu. Chỉ đoạn đang dở có thể phải tải lại. Hủy xóa dữ liệu tạm; xóa lịch sử không xóa tệp đã hoàn tất.
+Tải tệp trực tiếp nhiều kết nối và resume giữ byte cần server hỗ trợ Range và strong ETag phù hợp. Khi phần dở không thể xác minh cùng phiên bản hoặc cache mất/hỏng/dư bytes, ứng dụng giữ tiến độ và báo lỗi; không tự tải lại toàn bộ. HLS dùng tối đa số worker đã chọn, giữ một cửa sổ trượt hữu hạn và ghép các đoạn đúng thứ tự qua tệp tạm trên đĩa; không giữ toàn bộ video trong RAM. DASH dùng tải fragment native của yt-dlp với cùng giới hạn kết nối. HLS/DASH/YouTube dùng checkpoint để giữ các đoạn đã hoàn tất qua tạm dừng, đóng bình thường và mở lại ứng dụng. Khi tiếp tục, HLS dựng lại tệp ghép từ các đoạn đã kiểm tra trên đĩa; DASH/YouTube dùng trạng thái fragment native đã đối chiếu. Chỉ đoạn đang dở có thể phải tải lại. Hủy xóa dữ liệu tạm; xóa lịch sử không xóa tệp đã hoàn tất.
+
+Nếu link hết hạn: **Tạm dừng → Cập nhật liên kết → dán link mới → Kiểm tra và cập nhật → Tiếp tục**. Tác vụ giữ ID, vị trí lưu và tiến độ qua mở lại app. Link mới phải cùng origin; HTTP cần strong ETag/kích thước/range phù hợp, HLS cần đúng manifest và resource identity, DASH cần đúng MPD và final origin/path, YouTube cần cùng video/format. Link CDN khác origin, manifest thay đổi hoặc credentials đã mất sẽ bị từ chối. Checkpoint DASH 0.5 thiếu thông tin resource base vẫn giữ bytes nhưng không thể resume/refresh an toàn trong 0.6; tạo tác vụ mới nếu không đủ bằng chứng. HTTP fallback của yt-dlp thiếu validator vẫn giữ guard từ chối nối, chưa có byte-resume cho mọi định dạng.
 
 Giới hạn tốc độ tính theo từng lượt tải, đơn vị KiB/s. Lịch hẹn dùng giờ máy; máy và FlowDM phải đang hoạt động. Không có dịch vụ nền tự đánh thức máy.
 
