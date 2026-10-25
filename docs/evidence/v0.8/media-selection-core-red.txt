@@ -1,0 +1,84 @@
+✖ inspects media without queuing and pins a selected audio container through relaunch (13.5115ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\media-selection.test.cjs:8:132)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual'
+  }
+
+✖ selected subtitles choose one MKV output and never persist extracted URLs (9.3683ms)
+  TypeError [Error]: f.manager.inspectMedia is not a function
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\media-selection.test.cjs:9:145)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+✖ uninspected, mismatched, malicious or unavailable selections cannot create tasks (9.5094ms)
+  TypeError [Error]: f.manager.inspectMedia is not a function
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\media-selection.test.cjs:10:152)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+✖ playlist preview binds chosen IDs, caps input and isolates per-entry download failure (8.1322ms)
+  TypeError [Error]: f.manager.inspectMedia is not a function
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\media-selection.test.cjs:11:157)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+ℹ tests 4
+ℹ suites 0
+ℹ pass 0
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 299.7754
+
+✖ failing tests:
+
+test at tests\core\media-selection.test.cjs:8:1
+✖ inspects media without queuing and pins a selected audio container through relaunch (13.5115ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\media-selection.test.cjs:8:132)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual'
+  }
+
+test at tests\core\media-selection.test.cjs:9:1
+✖ selected subtitles choose one MKV output and never persist extracted URLs (9.3683ms)
+  TypeError [Error]: f.manager.inspectMedia is not a function
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\media-selection.test.cjs:9:145)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+test at tests\core\media-selection.test.cjs:10:1
+✖ uninspected, mismatched, malicious or unavailable selections cannot create tasks (9.5094ms)
+  TypeError [Error]: f.manager.inspectMedia is not a function
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\media-selection.test.cjs:10:152)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+test at tests\core\media-selection.test.cjs:11:1
+✖ playlist preview binds chosen IDs, caps input and isolates per-entry download failure (8.1322ms)
+  TypeError [Error]: f.manager.inspectMedia is not a function
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\media-selection.test.cjs:11:157)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)

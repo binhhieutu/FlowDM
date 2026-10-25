@@ -1,0 +1,22 @@
+✔ catalog exposes codecs and 4K without raw URLs or credentials (2.049ms)
+✔ selection pins exact IDs and codec compatible containers (0.9776ms)
+✔ selection rejects absent or incompatible format combinations (0.7378ms)
+✔ selection rejects selector syntax, unknown keys and excessive subtitles (1.3221ms)
+✔ playlist canonicalizes public YouTube IDs, drops credentials and nested entries, dedupes and caps 100 (1.0643ms)
+✔ normalization is bounded, deterministic and drops malformed or DRM formats (0.4639ms)
+✔ subtitles force a single embedded MKV and are refused for audio only (0.7522ms)
+✔ exact format IDs refuse every yt-dlp selector alias and ambiguous leading characters (1.4113ms)
+✔ explicit selection pins identity without changing legacy identity (2.1226ms)
+✔ DASH inspection exposes safe 4K DTO and exact selected download (245.5608ms)
+✔ audio-only selection preserves exact audio ID and output validation mode (143.2191ms)
+✔ selected container drift is refused before transfer (88.1457ms)
+✔ pinned DASH inspection and selected video/audio plus audio-only fully decode (7997.9462ms)
+✔ extractor cannot substitute another actual format while retaining the requested ID in its catalog (83.8022ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8582.4663

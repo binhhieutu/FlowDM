@@ -1,0 +1,10 @@
+✔ public YouTube GUI selects video, audio-only and available embedded subtitles with real full decoding (39235.4633ms)
+ℹ {"mode":"subtitles","filename":"public-selected-subtitle-1792969101144.mkv","path":"I:\\dich_nguoc\\FlowDM\\downloads\\verification-v8\\public-selected-subtitle-1792969101144.mkv","bytes":33854529,"sha256":"f9556e1e740f298562b76b4ba0f8ce12ceb20c33624fb3e287c9554ed9bb44c7","selection":{"mode":"video","videoFormatId":"230","audioFormatId":"140","subtitleIds":["manual:en"]},"streams":[{"type":"video","codec":"h264","width":640,"height":272},{"type":"audio","codec":"aac"},{"type":"subtitle","codec":"subrip"}],"duration":888.093,"wholeFileDecoded":true}
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 39669.9868

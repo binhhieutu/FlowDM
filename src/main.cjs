@@ -55,7 +55,7 @@ function installHandlers() {
   handle('list', () => manager.list());
   handle('add', input => {
     if (!input || typeof input !== 'object' || Array.isArray(input)) throw new Error('Thông tin tải không hợp lệ.');
-    const allowed = ['url', 'filename', 'connections', 'directory', 'startAt', 'speedLimit', 'mediaType'];
+    const allowed = ['url', 'filename', 'connections', 'directory', 'startAt', 'speedLimit', 'mediaType', 'selection', 'catalogId'];
     if (Object.keys(input).some(key => !allowed.includes(key))) throw new Error('Tham số không được hỗ trợ.');
     return manager.add(input);
   });
@@ -77,6 +77,11 @@ function installHandlers() {
     if (!input || typeof input !== 'object' || Array.isArray(input) || typeof input.id !== 'string' || Object.keys(input).some(key => !['id', 'connections'].includes(key))) throw Error('Thông tin số kết nối không hợp lệ.');
     return manager.setConnections(input.id, input.connections).catch(error => { throw Error(manager._safeError(error)); });
   });
+  handle('inspectMedia', input => {
+    if (!input || typeof input !== 'object' || Array.isArray(input) || Object.keys(input).some(key => !['url', 'mediaType'].includes(key))) throw Error('Thông tin kiểm tra media không hợp lệ.');
+    return manager.inspectMedia(input).catch(error => { throw Error(manager._safeError(error)); });
+  });
+  handle('addPlaylist', input => manager.addPlaylist(input));
   handle('chooseDirectory', async () => {
     const result = await dialog.showOpenDialog(win, { title: 'Chọn thư mục lưu', defaultPath: downloadDir, properties: ['openDirectory', 'createDirectory'] });
     return result.canceled ? null : result.filePaths[0];

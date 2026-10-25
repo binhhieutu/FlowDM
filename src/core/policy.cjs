@@ -1,6 +1,7 @@
 'use strict';
 const path = require('node:path');
 const http = require('node:http');
+const { validateSelection } = require('../media/catalog.cjs');
 
 function checkedUrl(value) {
   if (typeof value !== 'string' || value.length > 32768) throw Error('URL must be a string of at most 32768 characters');
@@ -50,6 +51,8 @@ function inputOptions(input, defaultDirectory) {
   const headers = checkedHeaders(input.headers);
   if (['dash', 'youtube'].includes(mediaType) && Object.keys(headers).length) throw Error('External media downloads do not accept browser headers');
   const mediaFilename = mediaType === 'hls' ? `${path.parse(filename).name}.ts` : ['dash', 'youtube'].includes(mediaType) ? `${path.parse(filename).name || 'video'}.mp4` : filename;
-  return { url, mediaType, filename: mediaFilename, directory, connections: integer(input.connections ?? 4, 1, 16, 'Connections'), speedLimit: integer(input.speedLimit ?? 0, 0, Number.MAX_SAFE_INTEGER, 'Speed limit'), startAt, headers };
+  if (input.selection !== undefined && !['dash', 'youtube'].includes(mediaType)) throw Error('Format selection requires YouTube or DASH');
+  const selection = input.selection === undefined ? undefined : validateSelection(input.selection);
+  return { url, mediaType, filename: mediaFilename, directory, connections: integer(input.connections ?? 4, 1, 16, 'Connections'), speedLimit: integer(input.speedLimit ?? 0, 0, Number.MAX_SAFE_INTEGER, 'Speed limit'), startAt, headers, selection };
 }
 module.exports = { checkedUrl, checkedHeaders, inputOptions, integer };

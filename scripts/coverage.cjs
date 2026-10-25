@@ -18,6 +18,7 @@ function run(args, env = process.env) {
 const files = ['core', 'media', 'bridge', 'browser', 'tools'].flatMap(group => fs.readdirSync(path.join(root, 'tests', group)).filter(file => file.endsWith('.test.cjs')).map(file => `tests/${group}/${file}`));
 run([c8, `--temp-directory=${unit}`, '--include=src/**', '--include=extension/**', '--all', '--reporter=json-summary', process.execPath, '--test', ...files]);
 run(['--test', '--test-concurrency=1', 'tests/e2e/desktop.test.cjs'], { ...process.env, FLOWDM_COVERAGE_DIR: desktop });
+run(['--test', '--test-concurrency=1', 'tests/e2e/media-selection.test.cjs'], { ...process.env, FLOWDM_COVERAGE_DIR: desktop });
 for (const directory of [unit, desktop]) for (const file of fs.readdirSync(directory)) {
   if (file.startsWith('coverage-') && file.endsWith('.json')) fs.copyFileSync(path.join(directory, file), path.join(merged, file));
 }

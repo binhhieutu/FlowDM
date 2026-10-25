@@ -76,11 +76,12 @@ function render() {
     $('detail-name').textContent = task.filename; $('detail-state').textContent = labels[task.status];
     const streamed = ['hls', 'dash', 'youtube'].includes(task.mediaType); $('detail-path').textContent = task.path; $('detail-connections').textContent = streamed ? `${task.connections} kết nối tối đa · ${task.media?.completedSegments || 0}/${task.media?.segmentCount || '?'} đoạn ${task.mediaType.toUpperCase()}` : `${task.activeConnections || 0}/${task.connections} kết nối · ${task.segments.length} vùng`;
     if (connectionTask !== task.id) { connectionTask = task.id; connectionDraft = null; $('connection-change-error').hidden = true; }
-    $('connection-controls').hidden = streamed || !['queued', 'downloading', 'paused', 'failed'].includes(task.status);
+    $('connection-controls').hidden = !['queued', 'downloading', 'paused', 'failed'].includes(task.status);
     const count = String(connectionDraft ?? task.connections);
     if (![...$('live-connections').options].some(option => option.value === count)) $('live-connections').add(new Option(`${count} kết nối`, count));
-    $('live-connections').value = count; $('live-connections').disabled = changingConnections; $('apply-connections').disabled = changingConnections;
-    $('connection-hint').textContent = task.ranges ? 'Giữ tiến độ khi đổi số kết nối; tự chia phần còn thiếu.' : 'Số kết nối thực tế phụ thuộc máy chủ; có thể chỉ dùng một kết nối.';
+    const unavailable = streamed && task.status === 'downloading' && task.media?.canResize === false;
+    $('live-connections').value = count; $('live-connections').disabled = changingConnections; $('apply-connections').disabled = changingConnections || unavailable;
+    $('connection-hint').textContent = streamed ? task.mediaType === 'hls' ? 'Đổi số kết nối tại ranh giới đoạn, giữ lại các đoạn đã tải.' : unavailable ? 'Đang chuẩn bị hoặc định dạng hiện tại chưa hỗ trợ đổi kết nối an toàn; tác vụ vẫn tiếp tục.' : 'Đổi kết nối bằng tiếp tục từ checkpoint; giữ các đoạn hoàn tất.' : task.ranges ? 'Giữ tiến độ khi đổi số kết nối; tự chia phần còn thiếu.' : 'Số kết nối thực tế phụ thuộc máy chủ; có thể chỉ dùng một kết nối.';
     $('detail-hash').textContent = task.sha256 || 'Được tính khi tải hoàn tất';
     $('detail-error').hidden = !task.error && !streamed; $('detail-error').textContent = task.error || (streamed ? `Giữ lại các đoạn đã tải khi tạm dừng hoặc đóng app. Đã dùng lại ${task.media?.reusedResources || 0} đoạn; đoạn còn dở có thể tải lại riêng.` : '');
     $('segments').replaceChildren(...(task.segments || []).map((segment, index) => {
@@ -88,7 +89,7 @@ function render() {
     }));
   }
 }
-function showAdd() { $('form-error').hidden = true; $('directory').value = defaultDirectory; $('add-dialog').showModal(); $('url').focus(); }
+function showAdd() { window.mediaChoice?.reset(); $('form-error').hidden = true; $('directory').value = defaultDirectory; $('add-dialog').showModal(); $('url').focus(); }
 $('live-connections').addEventListener('change', () => { connectionDraft = Number($('live-connections').value); });
 $('apply-connections').addEventListener('click', async () => {
   if (changingConnections) return;
@@ -126,19 +127,28 @@ for (const [id, op, states] of [['pause-all', 'pause', ['downloading', 'queued']
   await refresh();
 });
 $('add-form').addEventListener('submit', async event => {
-  event.preventDefault(); $('form-error').hidden = true; $('submit-download').disabled = true;
+  event.preventDefault(); if ($('add-form').dataset.busy === 'true') return;
+  $('add-form').dataset.busy = 'true'; $('form-error').hidden = true; $('submit-download').disabled = true;
   try {
     const input = { url: $('url').value.trim(), connections: Number($('connections').value), speedLimit: Number($('speed-limit').value) * 1024 };
     if ($('media-type').value !== 'auto') input.mediaType = $('media-type').value;
     if ($('filename').value.trim()) input.filename = $('filename').value.trim();
     if ($('directory').value) input.directory = $('directory').value;
     if ($('start-at').value) input.startAt = new Date($('start-at').value).toISOString();
-    const result = await window.flow.add(input);
+    const media = window.mediaChoice?.optionsForUrl(input.url) || {};
+    let result;
+    if (media.playlist) {
+      const batch = await window.flow.addPlaylist({ catalogId: media.catalogId, entryIds: media.entryIds, connections: input.connections, speedLimit: input.speedLimit, ...(input.directory ? { directory: input.directory } : {}) });
+      if (!batch.ok) throw Error(batch.error);
+      if (!batch.data.created.length) throw Error(batch.data.errors[0]?.error || 'Không tạo được tác vụ playlist.');
+      toast(`Đã thêm ${batch.data.created.length} video${batch.data.errors.length ? `; ${batch.data.errors.length} mục lỗi` : ''}.`);
+      result = { ok: true, data: batch.data.created[0] };
+    } else result = await window.flow.add({ ...input, ...media });
     if (!result.ok) throw new Error(result.error);
     selected = result.data.id; filter = 'all'; document.querySelector('[data-filter="all"]').click();
     $('add-dialog').close(); $('url').value = ''; $('filename').value = ''; $('start-at').value = ''; await refresh();
   } catch (error) { $('form-error').textContent = error.message; $('form-error').hidden = false; }
-  finally { $('submit-download').disabled = false; }
+  finally { delete $('add-form').dataset.busy; $('submit-download').disabled = false; }
 });
 window.flow.onChange(next => { tasks = next; if (!selected && tasks.length) selected = tasks[0].id; render(); });
 (async () => { const info = await window.flow.info(); if (info.ok) { defaultDirectory = info.data.downloadDir; $('app-version').textContent = `v${info.data.version} · ${info.data.platform}`; $('bridge-status').textContent = info.data.bridgeAvailable ? 'Sẵn sàng nhận liên kết từ trình duyệt' : 'Tích hợp trình duyệt chưa sẵn sàng'; if (info.data.mediaTools && !info.data.mediaTools.ready) $('media-type-hint').textContent = `HLS/DASH/YouTube chưa sẵn sàng: ${info.data.mediaTools.error || 'thiếu công cụ media'}`; } await refresh(); })().catch(error => toast(error.message));

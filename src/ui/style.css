@@ -7,3 +7,5 @@
 .task-actions{flex-wrap:wrap}
 
 .connection-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:16px}.connection-controls label{margin:0;font-size:11px}.connection-controls select,.connection-controls button{font-size:11px}.connection-controls .hint{flex-basis:100%;margin:0}
+
+#add-dialog{max-height:92vh;overflow-y:auto}.media-catalog{margin:14px 0;padding:14px;background:#f5f9fc;border:1px solid #dbe6ef;border-radius:9px}.media-catalog>strong{font-size:12px;overflow-wrap:anywhere}.media-catalog select{width:100%;font-size:11px}.media-options{max-height:140px;overflow:auto}.media-options label{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:400;margin:8px 0;overflow-wrap:anywhere}.media-options input{flex:0 0 auto}.playlist-options{max-height:230px}

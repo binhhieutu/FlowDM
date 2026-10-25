@@ -72,10 +72,10 @@ async function snapshot(directory, value, limit) {
   return data;
 }
 
-function identity(info, manifest) {
+function identity(info, manifest, selection) {
   const formats = info.requested_formats || [info];
   const selected = formats.map(format => Object.fromEntries(['format_id', 'ext', 'protocol', 'vcodec', 'acodec', 'width', 'height', 'fps', 'asr', 'audio_channels', 'filesize', 'fragment_count'].map(key => [key, format[key] ?? null])));
-  return hash(JSON.stringify({ id: manifest ? null : info.id, duration: info.duration ?? null, formats: selected, manifest: manifest ? hash(manifest) : null, hls: info.flowdm_hls_identity ?? null }));
+  return hash(JSON.stringify({ id: manifest ? null : info.id, duration: info.duration ?? null, formats: selected, manifest: manifest ? hash(manifest) : null, hls: info.flowdm_hls_identity ?? null, ...(selection ? { selection } : {}) }));
 }
 
 async function resumableProgress(directory) {

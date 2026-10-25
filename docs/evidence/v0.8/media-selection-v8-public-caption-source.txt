@@ -1,0 +1,13 @@
+✔ actual DASH catalog GUI selects 4K video and audio-only, validates formats and fully decodes outputs (12211.56ms)
+ℹ [{"mode":"video","filename":"selected-4k.mp4","sha256":"46a232f7e8e67ab5857be01c093e73c1362abd3e69226f978e3d2ecba29381e1","streams":[{"type":"video","codec":"h264","width":3840,"height":2160},{"type":"audio","codec":"aac"}],"duration":2,"wholeFileDecoded":true},{"mode":"audio","filename":"selected-audio.m4a","sha256":"116e902b1ccc0a71a8948f3dc9eefdebe83940af5d23d14aebc89f061c40e7e0","streams":[{"type":"audio","codec":"aac"}],"duration":2,"wholeFileDecoded":true}]
+✔ public YouTube GUI selects video, audio-only and available embedded subtitles with real full decoding (51594.5667ms)
+ℹ {"mode":"subtitles","filename":"public-selected-subtitle-1792968066487.mkv","path":"I:\\dich_nguoc\\FlowDM\\downloads\\verification-v8\\public-selected-subtitle-1792968066487.mkv","bytes":33854529,"sha256":"d32de71c1b07326a3b6e58192a2ce78098ce2fbc5fa755e5957385dc24c216e7","selection":{"mode":"video","videoFormatId":"230","audioFormatId":"140","subtitleIds":["manual:en"]},"streams":[{"type":"video","codec":"h264","width":640,"height":272},{"type":"audio","codec":"aac"},{"type":"subtitle","codec":"subrip"}],"duration":888.093,"wholeFileDecoded":true}
+﹣ public YouTube playlist GUI previews bounded canonical entries and select-all toggles without batch downloading (0.1029ms) # SKIP
+ℹ tests 3
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 63810.5541

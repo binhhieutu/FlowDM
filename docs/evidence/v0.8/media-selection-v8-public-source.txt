@@ -1,0 +1,15 @@
+✔ actual DASH catalog GUI selects 4K video and audio-only, validates formats and fully decodes outputs (16250.5275ms)
+ℹ [{"mode":"video","filename":"selected-4k.mp4","sha256":"46a232f7e8e67ab5857be01c093e73c1362abd3e69226f978e3d2ecba29381e1","streams":[{"type":"video","codec":"h264","width":3840,"height":2160},{"type":"audio","codec":"aac"}],"duration":2,"wholeFileDecoded":true},{"mode":"audio","filename":"selected-audio.m4a","sha256":"116e902b1ccc0a71a8948f3dc9eefdebe83940af5d23d14aebc89f061c40e7e0","streams":[{"type":"audio","codec":"aac"}],"duration":2,"wholeFileDecoded":true}]
+✔ public YouTube GUI selects video, audio-only and available embedded subtitles with real full decoding (138196.8587ms)
+ℹ {"mode":"video","filename":"public-selected-video-1792967914105.mp4","path":"I:\\dich_nguoc\\FlowDM\\downloads\\verification-v8\\public-selected-video-1792967914105.mp4","bytes":268514873,"sha256":"d6355e1b7785b8647f1fc09583b0c417a9b22381231b72440e3fbe9c8759fa46","selection":{"mode":"video","videoFormatId":"312","audioFormatId":"140","subtitleIds":[]},"streams":[{"type":"video","codec":"h264","width":1920,"height":1080},{"type":"audio","codec":"aac"}],"duration":634.62458,"wholeFileDecoded":true}
+ℹ {"mode":"audio","filename":"public-selected-audio-1792968028137.m4a","path":"I:\\dich_nguoc\\FlowDM\\downloads\\verification-v8\\public-selected-audio-1792968028137.m4a","bytes":10264233,"sha256":"a4a58b2407e8bfaf96cb70c4edb4d6928cdd699498f9b29679445b94b2aa5302","selection":{"mode":"audio","audioFormatId":"140","subtitleIds":[]},"streams":[{"type":"audio","codec":"aac"}],"duration":634.62458,"wholeFileDecoded":true}
+ℹ {"status":"unavailable","url":"https://www.youtube.com/watch?v=aqz-KE-bpKQ","reason":"Public source returned no supported VTT/SRT caption tracks"}
+﹣ public YouTube playlist GUI previews bounded canonical entries and select-all toggles without batch downloading (0.1334ms) # SKIP
+ℹ tests 3
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 154452.1039

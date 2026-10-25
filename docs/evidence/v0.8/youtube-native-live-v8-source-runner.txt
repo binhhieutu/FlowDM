@@ -1,0 +1,10 @@
+✔ public YouTube GUI changes native connections 1→4→1 and reuses exact selection after relaunch (534770.7735ms)
+ℹ {"at":"2026-10-25T23:04:42.410Z","version":"0.8.0","packaged":false,"url":"https://www.youtube.com/watch?v=eRsGyueVLvQ","transitions":[1,4,1],"selection":{"mode":"video","videoFormatId":"230","audioFormatId":"140","subtitleIds":[]},"video":{"id":"230","codec":"h264","width":640,"height":272},"audio":{"id":"140","codec":"aac"},"initialResources":2,"reuseAtFour":{"resources":3,"bytes":295912},"reuseAtOne":{"resources":5,"bytes":295912},"pausedBytes":678368,"restoredBytes":751952,"restoredConnections":1,"reusedResources":6,"reusedBytes":621904,"bytes":34076192,"sha256":"e946cdb5a062fedb143dc8cf0411fbb841b2661bc24521090949d7455418b6d5","duration":888.093605,"wholeFileDecoded":true,"cdnRequestCountsAvailable":false,"output":"I:\\dich_nguoc\\FlowDM\\downloads\\verification-v8\\YouTube-native-live-source-1792969482399.mp4"}
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 535122.2185

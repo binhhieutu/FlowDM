@@ -1,0 +1,12 @@
+✔ public YouTube GUI selects video, audio-only and available embedded subtitles with real full decoding (147989.0469ms)
+ℹ {"mode":"video","filename":"public-selected-video-1792969100958.mp4","path":"I:\\dich_nguoc\\FlowDM\\downloads\\verification-v8\\public-selected-video-1792969100958.mp4","bytes":268514873,"sha256":"d6355e1b7785b8647f1fc09583b0c417a9b22381231b72440e3fbe9c8759fa46","selection":{"mode":"video","videoFormatId":"312","audioFormatId":"140","subtitleIds":[]},"streams":[{"type":"video","codec":"h264","width":1920,"height":1080},{"type":"audio","codec":"aac"}],"duration":634.62458,"wholeFileDecoded":true}
+ℹ {"mode":"audio","filename":"public-selected-audio-1792969222395.m4a","path":"I:\\dich_nguoc\\FlowDM\\downloads\\verification-v8\\public-selected-audio-1792969222395.m4a","bytes":10264233,"sha256":"a4a58b2407e8bfaf96cb70c4edb4d6928cdd699498f9b29679445b94b2aa5302","selection":{"mode":"audio","audioFormatId":"140","subtitleIds":[]},"streams":[{"type":"audio","codec":"aac"}],"duration":634.62458,"wholeFileDecoded":true}
+ℹ {"status":"unavailable","url":"https://www.youtube.com/watch?v=aqz-KE-bpKQ","reason":"Public source returned no supported VTT/SRT caption tracks"}
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 148428.6394

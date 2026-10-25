@@ -1,0 +1,4 @@
+public playlist preview GUI validates bounded entries and selection without batch downloading: PASS
+Actual public URL: https://www.youtube.com/playlist?list=PLjEaoINr3zgFX8ZsChQVQsuDSjEqdWMAD
+Only filtered playlist test ran; video/audio/4K were not rerun.
+Duration: 3448.541 ms; exit: 0

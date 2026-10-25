@@ -40,7 +40,7 @@ async function prepareSourceReplacement({ task, input, previousHeaders, checkpoi
   if (['dash', 'youtube'].includes(mediaType)) {
     if (Object.keys(headers).length) throw Error('External media downloads do not accept browser headers');
     if (task.media?.resumePolicy === 'checkpoint') {
-      extra = await externalValidator({ url, mediaType, checkpointDir, maxBytes, signal, checkpointSourceUrl: task.url, checkpointSourceHash: task.media.checkpointSourceHash });
+      extra = await externalValidator({ url, mediaType, checkpointDir, maxBytes, signal, checkpointSourceUrl: task.url, checkpointSourceHash: task.media.checkpointSourceHash, selection: task.selection, expectedExtension: task.media.selectionExtension });
     }
   } else if (mediaType === 'hls') {
     const playlist = await loadPlaylist(url, headers, signal);

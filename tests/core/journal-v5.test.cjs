@@ -13,9 +13,9 @@ async function legacy(t, version = 4) {
   t.after(async () => { if (next) await next.close(); await fs.rm(root, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 }); });
   return { root, filename, state, raw, make() { next = new DownloadManager(options); return next; } };
 }
-test('journal v4 migration preserves an exact private backup before writing v5', async t => {
+test('journal v4 migration preserves an exact private backup before writing v6', async t => {
   const f = await legacy(t); const manager = await f.make().init();
-  assert.equal(JSON.parse(await fs.readFile(f.filename, 'utf8')).version, 5);
+  assert.equal(JSON.parse(await fs.readFile(f.filename, 'utf8')).version, 6);
   const backups = (await fs.readdir(f.root)).filter(name => /^downloads\.v4\..*\.backup\.json$/.test(name)); assert.equal(backups.length, 1);
   assert.equal(await fs.readFile(path.join(f.root, backups[0]), 'utf8'), f.raw); assert.equal(manager.list()[0].id, f.state.tasks[0].id);
 });

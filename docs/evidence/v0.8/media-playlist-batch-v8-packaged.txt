@@ -1,0 +1,10 @@
+✔ public playlist batch submit GUI creates one selected job and preserves it across app restart (5761.9707ms)
+ℹ {"at":"2026-10-25T23:06:28.356Z","url":"https://www.youtube.com/playlist?list=PLjEaoINr3zgFX8ZsChQVQsuDSjEqdWMAD","scope":"one job submitted, paused, app restarted, then canceled; no full batch download","version":"0.8.0","status":"passed","previewEntries":17,"selectedEntryIds":["nIoXOplUvAw"],"createdJobs":1,"canonicalUrl":"https://www.youtube.com/watch?v=nIoXOplUvAw","connections":2,"pausedBytes":0,"restoredBytes":0,"pauseRestartResumeStatePreserved":true,"canceled":true,"ownedCacheRemoved":true,"fullVideoDownloaded":false}
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6106.4765

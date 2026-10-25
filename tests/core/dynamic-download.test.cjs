@@ -61,13 +61,13 @@ test('idle HTTP workers split the slow unfinished range and preserve exact file 
   await complete(f, added.id); assert.ok(f.requests.length > 4, `Expected slow-tail redistribution, got ${f.requests.length} requests`); assert.ok(f.peak <= 4);
 });
 
-test('invalid live connection inputs and non-HTTP requests cannot mutate the download', async t => {
+test('invalid counts cannot mutate downloads; queued media accepts a connection cap', async t => {
   const f = await fixture(t); const task = await f.manager.add({ url: f.url, startAt: Date.now() + 60000 });
   assert.equal(typeof f.manager.setConnections, 'function');
   for (const count of [0, 17, -1, 1.5, '4', null]) await assert.rejects(f.manager.setConnections(task.id, count));
   assert.equal(snapshot(f, task.id).connections, 4);
   const media = await f.manager.add({ url: f.url, mediaType: 'hls', startAt: Date.now() + 60000 });
-  await assert.rejects(f.manager.setConnections(media.id, 8), /HTTP|direct/i);
+  assert.equal((await f.manager.setConnections(media.id, 8)).connections, 8);
   await f.manager.cancel(task.id); await assert.rejects(f.manager.setConnections(task.id, 8));
 });
 

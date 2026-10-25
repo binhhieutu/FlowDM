@@ -11,6 +11,9 @@ const { retryRequest, contentLength } = require('../core/http-client.cjs');
 const { checkedUrl } = require('../core/policy.cjs');
 const checkpoint = require('./external-checkpoint.cjs');
 const { pinHlsMetadata } = require('./external-metadata.cjs');
+const { normalizeCatalog, validateSelection, selectionFormat } = require('./catalog.cjs');
+const { embedSubtitles } = require('./external-selection.cjs');
+const { externalResizeControl } = require('./external-control.cjs');
 
 const MAX_MANIFEST_BYTES = 1024 * 1024;
 const MAX_STDIO_BYTES = 64 * 1024;
@@ -207,10 +210,10 @@ async function copyVerifiedFile(source, destination, maxBytes, signal) {
     if (failed) await fs.unlink(destination).catch(() => {});
   }
 }
-async function validateMediaOutput(filename, ffmpeg, signal) {
+async function validateMediaOutput(filename, ffmpeg, signal, selection) {
   if (signal?.aborted) throw abortError();
   await new Promise((resolve, reject) => {
-    const child = spawn(ffmpeg, ['-v', 'error', '-xerror', '-i', filename, '-map', '0:v:0', '-map', '0:a:0', '-t', '1', '-f', 'null', '-'], { shell: false, windowsHide: true, stdio: ['ignore', 'ignore', 'pipe'], env: mediaToolEnv({ ytDlp: ffmpeg, ffmpeg, jsRuntime: process.execPath }) });
+    const child = spawn(ffmpeg, ['-v', 'error', '-xerror', '-i', filename, ...(selection?.mode === 'audio' ? ['-map', '0:a:0'] : ['-map', '0:v:0', '-map', '0:a:0']), '-t', '1', '-f', 'null', '-'], { shell: false, windowsHide: true, stdio: ['ignore', 'ignore', 'pipe'], env: mediaToolEnv({ ytDlp: ffmpeg, ffmpeg, jsRuntime: process.execPath }) });
     let timer; let stopReason = null; let stderr = Buffer.alloc(0);
     const stop = reason => { stopReason ||= reason; terminate(child); };
     const abort = () => stop('abort');
@@ -223,7 +226,7 @@ async function validateMediaOutput(filename, ffmpeg, signal) {
       clearTimeout(timer); signal?.removeEventListener('abort', abort);
       if (stopReason === 'abort' || signal?.aborted) return reject(abortError());
       if (stopReason === 'timeout') return reject(Error('FFmpeg media validation timed out'));
-      if (code !== 0) return reject(Object.assign(Error('External media output is not a valid MP4 with video and audio'), { code: 'INVALID_EXTERNAL_MEDIA' }));
+      if (code !== 0) return reject(Object.assign(Error(selection ? 'External media output does not contain the selected valid tracks' : 'External media output is not a valid MP4 with video and audio'), { code: 'INVALID_EXTERNAL_MEDIA' }));
       resolve();
     });
   });
@@ -282,20 +285,51 @@ function validateDashBase(saved, finalUrl) {
   const expected = saved.manifestBaseHash;
   if (!expected || expected !== manifestBaseHash(finalUrl)) throw Error('DASH resource base location changed; retained fragments were preserved');
 }
-async function selectedMetadata(actualTools, toolArgsPrefix, mediaType, source, signal) {
-  const args = ['--ignore-config', '--no-plugin-dirs', '--no-remote-components', '--no-playlist', '--no-cache-dir', '--js-runtimes', `node:${actualTools.jsRuntime}`, '--format', selectedFormat(mediaType)];
+function canonicalInspectionUrl(value) {
+  const url = checkedUrl(value);
+  if (['youtube.com','www.youtube.com','m.youtube.com'].includes(url.hostname.toLowerCase()) && url.pathname === '/playlist') {
+    const id = url.searchParams.get('list');
+    if (!/^[A-Za-z0-9_-]{10,128}$/.test(id || '')) throw Error('A canonical public YouTube playlist URL is required');
+    return { source: 'https://www.youtube.com/playlist?list=' + id, playlist: true };
+  }
+  return { source: canonicalYouTubeUrl(value), playlist: false };
+}
+async function inspectMedia({ url, mediaType, signal, tools, toolArgsPrefix = [] }) {
+  if (!['dash', 'youtube'].includes(mediaType)) throw Error('External media type must be dash or youtube');
+  if (signal?.aborted) throw abortError();
+  const actualTools = safeTool(tools || await defaultTools());
+  const canonical = mediaType === 'youtube' ? canonicalInspectionUrl(url) : null;
+  const preflight = mediaType === 'dash' ? await preflightDash(url, {}, signal) : null;
+  let relay;
+  try {
+    relay = preflight ? await createDashRelay({ ...preflight, signal, maxBytes: MAX_MANIFEST_BYTES }) : null;
+    const args = ['--ignore-config', '--no-plugin-dirs', '--no-remote-components', '--no-cache-dir', '--js-runtimes', 'node:' + actualTools.jsRuntime, ...(canonical?.playlist ? ['--flat-playlist', '--playlist-end', '100', '--yes-playlist'] : ['--no-playlist'])];
+    const metadata = await extractMetadata(actualTools, toolArgsPrefix, args, relay?.url || canonical.source, signal);
+    return normalizeCatalog(metadata, { sourceUrl: mediaType === 'youtube' ? canonical.source : checkedUrl(url).href, mediaType });
+  } finally { await relay?.close(); }
+}
+async function selectedMetadata(actualTools, toolArgsPrefix, mediaType, source, signal, selection, expectedExtension) {
+  const args = ['--ignore-config', '--no-plugin-dirs', '--no-remote-components', '--no-playlist', '--no-cache-dir', '--js-runtimes', `node:${actualTools.jsRuntime}`, '--format', selection ? [selection.videoFormatId, selection.audioFormatId].filter(Boolean).join('+') : selectedFormat(mediaType)];
   const metadata = await extractMetadata(actualTools, toolArgsPrefix, args, source, signal);
+  if (selection) {
+    const picked = selectionFormat(selection, normalizeCatalog(metadata, { mediaType }));
+    const expected = [picked.selection.videoFormatId, picked.selection.audioFormatId].filter(Boolean).sort();
+    const actual = (Array.isArray(metadata.requested_formats) ? metadata.requested_formats : [metadata]).map(format => format.format_id).sort();
+    if (actual.length !== expected.length || actual.some((id, index) => id !== expected[index])) throw Error('Selected format IDs do not match the extracted tracks');
+    if (expectedExtension !== undefined && picked.extension !== expectedExtension) throw Error('Selected media container extension changed');
+  }
   if (mediaType === 'youtube') metadata.flowdm_hls_identity = await pinHlsMetadata(metadata, signal);
   return metadata;
 }
 // Refresh is read-only: the manager commits the URL plus stable hash together in
 // its journal, while subsequent transfer repeats identity verification using the
 // same extracted metadata it supplies to yt-dlp. No cache rebinding is needed.
-async function validateExternalReplacement({ url, mediaType, checkpointDir, maxBytes, checkpointSourceUrl, checkpointSourceHash, headers = {}, signal, tools, toolArgsPrefix = [] }) {
+async function validateExternalReplacement({ url, mediaType, checkpointDir, maxBytes, checkpointSourceUrl, checkpointSourceHash, headers = {}, signal, tools, toolArgsPrefix = [], selection, expectedExtension }) {
   if (!['dash', 'youtube'].includes(mediaType)) throw Error('External media type must be dash or youtube');
   if (typeof checkpointDir !== 'string' || !path.isAbsolute(checkpointDir)) throw Error('External checkpoint path must be absolute');
   if (signal?.aborted) throw abortError();
   rejectCredentialHeaders(headers);
+  if (selection !== undefined) selection = validateSelection(selection);
   const limit = checkpointLimit(maxBytes);
   const sourceHash = sourceBinding({ url, mediaType, checkpointSourceUrl, checkpointSourceHash });
   const saved = await checkpoint.readState(checkpointDir, sourceHash, limit, { create: false });
@@ -306,19 +340,21 @@ async function validateExternalReplacement({ url, mediaType, checkpointDir, maxB
   let relay;
   try {
     relay = preflight ? await createDashRelay({ ...preflight, signal, maxBytes }) : null;
-    const metadata = await selectedMetadata(actualTools, toolArgsPrefix, mediaType, relay?.url || canonicalYouTubeUrl(url), signal);
-    if (saved.identity !== checkpoint.identity(metadata, preflight?.manifest)) throw Error('External media identity changed; retained fragments cannot be mixed');
+    const metadata = await selectedMetadata(actualTools, toolArgsPrefix, mediaType, relay?.url || canonicalYouTubeUrl(url), signal, selection, expectedExtension);
+    if (selection && expectedExtension !== undefined && selectionFormat(selection, normalizeCatalog(metadata, { mediaType })).extension !== expectedExtension) throw Error('Selected media container extension changed');
+    if (saved.identity !== checkpoint.identity(metadata, preflight?.manifest, selection)) throw Error('External media identity changed; retained fragments cannot be mixed');
     if (signal?.aborted) throw abortError();
     return { compatible: true, checkpointSourceHash: sourceHash };
   } finally { await relay?.close(); }
 }
-async function downloadExternal({ url, mediaType, headers = {}, output, signal, maxBytes, connections = DEFAULT_CONNECTIONS, speedLimit = 0, onProgress = () => {}, timeoutMs = 30 * 60 * 1000, tools, toolArgsPrefix = [], validateOutput = validateMediaOutput, checkpointDir, checkpointSourceHash }) {
+async function downloadExternalOperation({ url, mediaType, headers = {}, output, signal, maxBytes, connections = DEFAULT_CONNECTIONS, speedLimit = 0, onProgress = () => {}, timeoutMs = 30 * 60 * 1000, tools, toolArgsPrefix = [], validateOutput = validateMediaOutput, checkpointDir, checkpointSourceHash, selection, expectedExtension, onControlReady = () => {} }) {
   if (!['dash', 'youtube'].includes(mediaType)) throw Error('External media type must be dash or youtube');
   if (typeof output !== 'string' || !path.isAbsolute(output) || !Number.isSafeInteger(maxBytes) || maxBytes < 1) throw Error('Invalid external media output or size limit');
   if (!Number.isSafeInteger(speedLimit) || speedLimit < 0 || !Number.isSafeInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > MAX_TIMEOUT_MS) throw Error('Invalid external media limits');
   const actualConnections = validatedConnections(connections);
   if (signal?.aborted) throw abortError();
   rejectCredentialHeaders(headers);
+  if (selection !== undefined) selection = validateSelection(selection);
   const youtubeSource = mediaType === 'youtube' ? canonicalYouTubeUrl(url) : null;
   const sourceHash = sourceBinding({ url, mediaType, checkpointSourceHash });
   const actualTools = safeTool(tools || await defaultTools(), mediaType === 'youtube');
@@ -335,15 +371,16 @@ async function downloadExternal({ url, mediaType, headers = {}, output, signal, 
   const template = path.join(scratch, 'media.%(ext)s');
   const nativeConnections = speedLimit ? Math.min(actualConnections, speedLimit) : actualConnections;
   const nativeRate = speedLimit ? Math.max(1, Math.floor(speedLimit / nativeConnections)) : 0;
-  const format = selectedFormat(mediaType);
+  let format = selectedFormat(mediaType); let extension = 'mp4';
   let resumeState = null; let metadata; let pinnedIdentity; let reused = { downloadedBytes: 0, completedResources: 0 };
   try {
+    if (selection && !checkpointDir) metadata = await selectedMetadata(actualTools, toolArgsPrefix, mediaType, source, signal, selection, expectedExtension);
     if (checkpointDir) {
       resumeState = await checkpoint.readState(scratch, sourceHash, scratchLimit);
       if (preflight && resumeState && !resumeState.manifestBaseHash && (resumeState.files.length || resumeState.downloadedBytes > 0 || resumeState.completedResources > 0)) throw Error('DASH checkpoint resource base is missing; retained fragments were preserved. Start a new task to download safely.');
       if (resumeState?.manifestBaseHash && preflight) validateDashBase(resumeState, preflight.finalUrl);
-      metadata = await selectedMetadata(actualTools, toolArgsPrefix, mediaType, source, signal);
-      pinnedIdentity = checkpoint.identity(metadata, preflight?.manifest);
+      metadata = await selectedMetadata(actualTools, toolArgsPrefix, mediaType, source, signal, selection, expectedExtension);
+      pinnedIdentity = checkpoint.identity(metadata, preflight?.manifest, selection);
       if (resumeState && resumeState.identity !== pinnedIdentity) throw Error('External media identity changed; retained fragments cannot be mixed');
       // Do not re-extract the source between validation and transfer. Only this
       // in-memory metadata carries ephemeral signed URLs into the native tool.
@@ -354,13 +391,19 @@ async function downloadExternal({ url, mediaType, headers = {}, output, signal, 
       await checkpoint.snapshot(scratch, { sourceHash, identity: pinnedIdentity, ...(preflight ? { manifestBaseHash: manifestBaseHash(preflight.finalUrl) } : {}), ...reused }, scratchLimit);
       onProgress({ ...reused, totalBytes: null, reusedResources: reused.completedResources, reusedBytes: reused.downloadedBytes });
     }
-  } catch (error) { await relay?.close().catch(() => {}); throw error; }
+    if (selection) {
+      const picked = selectionFormat(selection, normalizeCatalog(metadata, { sourceUrl: url, mediaType }));
+      selection = picked.selection; format = picked.format; extension = picked.extension;
+      if (expectedExtension !== undefined && expectedExtension !== extension) throw Error('Selected media container extension changed');
+    }
+  } catch (error) { await relay?.close().catch(() => {}); if (!checkpointDir) await fs.rm(scratch,{recursive:true,force:true}).catch(()=>{}); throw error; }
   const args = [
     ...toolArgsPrefix, '--ignore-config', '--no-plugin-dirs', '--no-remote-components', '--no-playlist', '--no-overwrites', ...(checkpointDir ? ['--part', '--continue', '--keep-fragments', '--abort-on-unavailable-fragments'] : ['--no-part']), '--no-cache-dir', '--no-mtime', '--no-simulate',
     '--newline', '--progress', '--progress-template', 'download:flowdm-progress:%(progress.downloaded_bytes)s:%(progress.total_bytes_estimate)s:%(progress.fragment_index)s',
     '--print', 'after_move:flowdm-file:%(filepath)s', '--ffmpeg-location', actualTools.ffmpeg, '--js-runtimes', `node:${actualTools.jsRuntime}`,
-    '--merge-output-format', 'mp4', '--format', format, '--max-filesize', String(maxBytes), '-o', template
+    '--merge-output-format', ['mp4', 'webm', 'mkv'].includes(extension) ? extension : 'mp4', '--format', format, '--max-filesize', String(maxBytes), '-o', template
   ];
+  if (selection) args.push('--remux-video', extension);
   if (mediaType === 'youtube') {
     args.push('--match-filter', "live_status != 'is_live' & live_status != 'is_upcoming' & live_status != 'post_live'", '--downloader', `http:${actualTools.aria2c}`, '--downloader-args', aria2Arguments(actualConnections, speedLimit), '--downloader', 'dash,m3u8:native', '--concurrent-fragments', String(nativeConnections));
   } else {
@@ -369,15 +412,16 @@ async function downloadExternal({ url, mediaType, headers = {}, output, signal, 
     if (speedLimit) args.push('--limit-rate', String(nativeRate));
   }
   if (mediaType === 'youtube' && speedLimit) args.push('--limit-rate', String(nativeRate));
-  args.push(checkpointDir ? '--load-info-json' : '--batch-file', '-');
+  args.push(metadata ? '--load-info-json' : '--batch-file', '-');
   let child; let stopReason = null; let resultPath; let stderr = Buffer.alloc(0); let stdout = Buffer.alloc(0); let stdoutTail = '';
   let timer; let sizeTimer; let scratchError = null; let checkingScratch = false; let polling = Promise.resolve();
   try {
+    onControlReady(externalResizeControl(metadata, checkpointDir));
     await new Promise((resolve, reject) => {
       if (signal?.aborted) return reject(abortError());
       child = spawn(actualTools.ytDlp, args, { shell: false, windowsHide: true, detached: process.platform !== 'win32', stdio: ['pipe', 'pipe', 'pipe'], env: mediaToolEnv(actualTools) });
       child.stdin?.on('error', () => {});
-      child.stdin?.end(checkpointDir ? JSON.stringify(metadata) : `${source}\n`);
+      child.stdin?.end(metadata ? JSON.stringify(metadata) : `${source}\n`);
       const stop = reason => { stopReason ||= reason; terminate(child); };
       const abort = () => stop('abort');
       signal?.addEventListener('abort', abort, { once: true });
@@ -415,12 +459,14 @@ async function downloadExternal({ url, mediaType, headers = {}, output, signal, 
       });
     });
     await scratchBytes(scratch, scratchLimit);
-    const produced = processOutputPath(scratch, resultPath || '');
-    await validateOutput(produced, actualTools.ffmpeg, signal);
+    let produced = processOutputPath(scratch, resultPath || '');
+    if (selection?.subtitleIds.length) produced = await embedSubtitles({ metadata, selection, produced, scratch, tools: actualTools, signal, maxBytes, env: mediaToolEnv(actualTools) });
+    await validateOutput(produced, actualTools.ffmpeg, signal, selection);
     const bytes = await copyVerifiedFile(produced, output, maxBytes, signal);
     onProgress({ downloadedBytes: bytes, totalBytes: bytes });
     return { bytes, finalUrl: finalSource, metadata: { mediaType, tool: 'yt-dlp', ...(checkpointDir ? { resumable: true, reusedResources: reused.completedResources, reusedBytes: reused.downloadedBytes } : {}) } };
   } finally {
+    onControlReady(null);
     if (timer) clearTimeout(timer);
     if (sizeTimer) clearInterval(sizeTimer);
     await polling;
@@ -434,4 +480,32 @@ async function downloadExternal({ url, mediaType, headers = {}, output, signal, 
     if (!checkpointDir) await fs.rm(scratch, { recursive: true, force: true }).catch(() => {});
   }
 }
-module.exports = { canonicalYouTubeUrl, preflightDash, downloadExternal, rejectCredentialHeaders, createDashRelay, validateMediaOutput, mediaToolEnv, aria2Arguments, validateExternalReplacement };
+async function downloadExternal(options) {
+  const timeoutMs = options.timeoutMs ?? 30 * 60 * 1000;
+  if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > MAX_TIMEOUT_MS) throw Error('Invalid external media limits');
+  const controller = new AbortController();
+  let timedOut = false;
+  const abort = () => controller.abort();
+  options.signal?.addEventListener('abort', abort, { once: true });
+  if (options.signal?.aborted) abort();
+  // One deadline covers preflight/extraction, transfer, subtitle HTTP/remux,
+  // validation and the private output copy. Cleanup still waits for child exit
+  // and checkpoints retained resources before returning the timeout.
+  const timer = setTimeout(() => { if (!controller.signal.aborted) { timedOut = true; controller.abort(); } }, timeoutMs);
+  timer.unref();
+  try {
+    const result = await downloadExternalOperation({ ...options, timeoutMs, signal: controller.signal });
+    if (controller.signal.aborted) {
+      await fs.unlink(options.output).catch(error => { if (error.code !== 'ENOENT') throw error; });
+      throw abortError();
+    }
+    return result;
+  } catch (error) {
+    if (timedOut) throw Object.assign(Error('External media operation timed out'), { code: 'EXTERNAL_MEDIA_TIMEOUT' });
+    throw error;
+  } finally {
+    clearTimeout(timer);
+    options.signal?.removeEventListener('abort', abort);
+  }
+}
+module.exports = { inspectMedia, canonicalInspectionUrl, canonicalYouTubeUrl, preflightDash, downloadExternal, rejectCredentialHeaders, createDashRelay, validateMediaOutput, mediaToolEnv, aria2Arguments, validateExternalReplacement };

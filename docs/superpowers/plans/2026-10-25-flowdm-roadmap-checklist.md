@@ -4,7 +4,7 @@
 
 **Ngày:** 2026-10-25. **Trạng thái:** kế hoạch; chưa triển khai các mục chưa đánh dấu.
 
-**Tiến độ 2026-10-25:** Task 1–2 hoàn tất ở 0.6.0, Task 3 hoàn tất ở 0.7.0; Task 4–10 chưa triển khai. Xem [VERIFICATION_V7.md](../../VERIFICATION_V7.md) và [review Task 3](../../dynamic-ranges-v7-review.md). Xem [VERIFICATION_V6.md](../../VERIFICATION_V6.md) và [review](../../source-refresh-v6-review.md). External HTTP fallback thiếu validator vẫn bị từ chối; legacy DASH thiếu base hash được giữ nguyên nhưng không resume an toàn.
+**Tiến độ 2026-10-26:** Task 1–2 hoàn tất ở 0.6.0, Task 3 hoàn tất ở 0.7.0. Task 4 và đổi N khi tải media đã qua kiểm thử nguồn và review trong phạm vi 0.8; final coverage/audit đã đạt; build/artifact cuối đang chờ. Task 5–10 chưa triển khai. Xem [VERIFICATION_V8.md](../../VERIFICATION_V8.md) và [review 0.8](../../media-selection-v8-review.md). Xem [VERIFICATION_V7.md](../../VERIFICATION_V7.md) và [review Task 3](../../dynamic-ranges-v7-review.md). Xem [VERIFICATION_V6.md](../../VERIFICATION_V6.md) và [review](../../source-refresh-v6-review.md). External HTTP fallback thiếu validator vẫn bị từ chối; legacy DASH thiếu base hash được giữ nguyên nhưng không resume an toàn.
 
 **Goal:** Hoàn thiện những khả năng tải xuống còn thiếu theo hướng sử dụng tương tự IDM, giữ được dữ liệu tải dở và kiểm chứng thực tế trên Windows/Linux/macOS.
 
@@ -99,11 +99,23 @@ Các task tùy chọn 7–8 không chặn bản phát hành A/B. Không mở t�
 
 **Interface mới:** `inspectMedia({ url, signal }) -> Promise<{ sourceId, formats, subtitles, entries }>`; format DTO chứa ID/codec/container/resolution/estimate, không trả raw CDN URL. `selection={videoFormatId,audioFormatId,subtitleIds,mode}` được validate và pin vào identity trước khi tạo job; `mode` chỉ `video` hoặc `audio`.
 
-- [ ] RED: test H264/VP9/AV1, 720p/1080p/4K, audio-only, thiếu audio, format biến mất, phụ đề thủ công/tự động và playlist trùng entry. Không đổi format âm thầm khi resume.
-- [ ] Chạy `node --test tests/media/catalog.test.cjs`; xác nhận FAIL.
-- [ ] Implement inspect/select và mux container tương thích; UI hiển thị codec/container/dung lượng ước lượng. Playlist hiện danh sách chọn trước khi tạo batch, giới hạn 100 mục/lần; một entry lỗi không hủy các job khác.
-- [ ] GREEN: test trên và `node --test tests/e2e/media-selection.test.cjs`; tải thật nguồn công khai cho video+audio, audio-only và phụ đề; dùng FFmpeg kiểm tra track/duration/full decode. Fixture kiểm chứng 4K nếu nguồn thật không có 4K; ghi rõ khác biệt.
-- [ ] Review rồi commit `feat: select media formats subtitles and playlist entries`.
+- [x] RED: test H264/VP9/AV1, 720p/1080p/4K, audio-only, thiếu audio, format biến mất, phụ đề thủ công/tự động và playlist trùng entry. Không đổi format âm thầm khi resume.
+- [x] Chạy `node --test tests/media/catalog.test.cjs`; xác nhận FAIL.
+- [x] Implement inspect/select và mux container tương thích; UI hiển thị codec/container/dung lượng ước lượng. Playlist hiện danh sách chọn trước khi tạo batch, giới hạn 100 mục/lần; một entry lỗi không hủy các job khác.
+- [x] GREEN: test trên và `node --test tests/e2e/media-selection.test.cjs`; tải thật nguồn công khai cho video+audio, audio-only và phụ đề; dùng FFmpeg kiểm tra track/duration/full decode. Fixture kiểm chứng 4K nếu nguồn thật không có 4K; ghi rõ khác biệt.
+- [x] Review code/security: đóng 3 P2 về selector alias/actual format ID, deadline phụ đề và nhầm demuxer phụ đề; không còn P1/P2 trong phạm vi. Reviewer chạy độc lập 4/4 hồi quy.
+- [x] Review và commit `feat: select media formats and resize native media connections` sau coverage/build/kiểm thử artifact cuối.
+
+**Bằng chứng nguồn:** GUI chọn DASH H.264 3840×2160 do dự án tạo + audio-only; YouTube Big Buck Bunny 1080p + audio-only; Sintel manual English vào MKV, FFmpeg decode toàn file. Playlist công khai preview17 mục, từ chối ID ngoài catalog; bản packaged submit đúng1jobN2, pause/relaunch giữ job rồi cancel/cleanup. Chưa tải toàn bộ batch công khai. Container MP4/WebM/MKV theo codec, phụ đề vào MKV; tối đa 8 track phụ đề và 100 mục playlist. Schema 6 backup trước migration, đọc v1–v6.
+
+### Milestone bổ sung — đổi số kết nối media khi đang tải
+
+- [x] HLS đổi worker trực tiếp; giảm N chờ số request đang chạy xuống mức mới, giữ cap và thứ tự ghép.
+- [x] DASH/YouTube native fragment đủ điều kiện: pause → chờ child kết thúc/checkpoint → lưu N → resume cùng task/selection; HTTP fallback hoặc pha không an toàn từ chối đổi khi đang chạy.
+- [x] GUI nguồn HLS/DASH 1→4→1 → pause/đóng/mở/resume: peak request 4, phần đã commit không GET lại, SHA khớp baseline và full decode.
+- [x] YouTube công khai native nguồn 1→4→1 → pause/đóng/mở/resume: giữ 6 resource/621904 byte, full decode 888.094 giây. Không có CDN request counts nên không suy thành bằng chứng không GET lại trên CDN.
+- [x] Final coverage 241/241 unit/integration + desktop 1/1 + local media-selection 1/1: lines 96.75%, branches 86.16%, functions 94.78%; audit 0. Hai nhánh public optional skip trong lượt coverage.
+- [ ] Build, ASAR/tool hash và đúng Windows artifact 0.8 cuối; packaged media-selection/live-N chưa xác nhận ở checkpoint tài liệu này.
 
 ## Task 5 — Gắn lại phiên trình duyệt và Firefox
 
@@ -188,4 +200,4 @@ Tách thành các deliverable nhỏ để không chặn toàn roadmap:
 
 ## Điểm bắt đầu thực thi
 
-Task 1–2 đã qua RED/GREEN, review và kiểm thử thực tế trong 0.6.0; dùng chung một commit vì cùng hợp đồng HTTP identity/preflight (ruling tại PROGRESS.md). Task 3 đã qua RED/GREEN, review và kiểm thử GUI/HTTP Internet thật ở 0.7.0. Journal nâng schema 5 với backup trước migration; đọc được v1–v5. HTTP range pool dừng nhóm writer trước khi chia, tối thiểu 256 KiB mỗi nửa, tối đa 1.024 vùng. Task 4 là mục tiếp theo khi được yêu cầu; Task 4–10 chưa triển khai.
+Task 1–2 đã qua RED/GREEN, review và kiểm thử thực tế trong 0.6.0; dùng chung một commit vì cùng hợp đồng HTTP identity/preflight (ruling tại PROGRESS.md). Task 3 đã qua RED/GREEN, review và kiểm thử GUI/HTTP Internet thật ở 0.7.0. Journal nâng schema 5 với backup trước migration; đọc được v1–v5. HTTP range pool dừng nhóm writer trước khi chia, tối thiểu 256 KiB mỗi nửa, tối đa 1.024 vùng. Task 4 và milestone đổi N media đã qua nguồn/review; final gate/artifact 0.8 còn chờ. Task 5–10 chưa triển khai. State mới dùng schema 6, đọc v1–v6 và backup trước migration.

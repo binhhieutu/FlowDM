@@ -1,0 +1,50 @@
+{
+  "at": "2026-10-25T22:58:15.153Z",
+  "url": "https://www.youtube.com/watch?v=eRsGyueVLvQ",
+  "rows": [
+    {
+      "mode": "subtitles",
+      "filename": "public-selected-subtitle-1792969101144.mkv",
+      "path": "I:\\dich_nguoc\\FlowDM\\downloads\\verification-v8\\public-selected-subtitle-1792969101144.mkv",
+      "bytes": 33854529,
+      "sha256": "f9556e1e740f298562b76b4ba0f8ce12ceb20c33624fb3e287c9554ed9bb44c7",
+      "selection": {
+        "mode": "video",
+        "videoFormatId": "230",
+        "audioFormatId": "140",
+        "subtitleIds": [
+          "manual:en"
+        ]
+      },
+      "streams": [
+        {
+          "type": "video",
+          "codec": "h264",
+          "width": 640,
+          "height": 272
+        },
+        {
+          "type": "audio",
+          "codec": "aac"
+        },
+        {
+          "type": "subtitle",
+          "codec": "subrip"
+        }
+      ],
+      "duration": 888.093,
+      "wholeFileDecoded": true
+    }
+  ],
+  "subtitles": {
+    "status": "passed",
+    "url": "https://www.youtube.com/watch?v=eRsGyueVLvQ",
+    "trackId": "manual:en"
+  },
+  "status": "passed",
+  "version": "0.8.0",
+  "packaged": true,
+  "artifact": "I:/dich_nguoc/FlowDM/dist/win-unpacked/FlowDM.exe",
+  "versionVerifiedFrom": "dist/win-unpacked/resources/app.asar/package.json",
+  "asarSha256": "db57dbe3619be906cd231166a21be6aaf3cc85e1c6d996d32a2482312c3f15b9"
+}

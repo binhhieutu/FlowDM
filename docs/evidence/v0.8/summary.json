@@ -1,0 +1,153 @@
+{
+  "version": "0.8.0",
+  "artifact": {
+    "name": "FlowDM 0.8.0.exe",
+    "bytes": 263172342,
+    "sha256": "d2451f6627dd418a1a8b346f72e44a4355a12cf98d1e9d6ff4dc94f8887de796"
+  },
+  "unitIntegration": {
+    "passed": 241,
+    "failed": 0
+  },
+  "coverage": {
+    "lines": {
+      "total": 3361,
+      "covered": 3252,
+      "skipped": 0,
+      "pct": 96.75
+    },
+    "statements": {
+      "total": 3361,
+      "covered": 3252,
+      "skipped": 0,
+      "pct": 96.75
+    },
+    "functions": {
+      "total": 345,
+      "covered": 327,
+      "skipped": 0,
+      "pct": 94.78
+    },
+    "branches": {
+      "total": 3130,
+      "covered": 2697,
+      "skipped": 0,
+      "pct": 86.16
+    },
+    "branchesTrue": {
+      "total": 0,
+      "covered": 0,
+      "skipped": 0,
+      "pct": 100
+    }
+  },
+  "auditVulnerabilities": 0,
+  "platforms": {
+    "windows": {
+      "buildExitCode": 0,
+      "portableSmokeExitCode": 0
+    },
+    "linux": {
+      "directoryBuildExitCode": 0,
+      "nativeTested": false,
+      "archiveBuilt": false
+    },
+    "macOS": {
+      "built": false,
+      "nativeTested": false
+    }
+  },
+  "packageVerification": [
+    {
+      "platform": "win-unpacked",
+      "filesVerified": 47,
+      "asarSha256": "db57dbe3619be906cd231166a21be6aaf3cc85e1c6d996d32a2482312c3f15b9"
+    },
+    {
+      "platform": "linux-unpacked",
+      "filesVerified": 47,
+      "asarSha256": "db57dbe3619be906cd231166a21be6aaf3cc85e1c6d996d32a2482312c3f15b9"
+    }
+  ],
+  "packagedGuiPending": false,
+  "packagedLocalGui": {
+    "exitCode": 0,
+    "passed": 4,
+    "failed": 0,
+    "optionalSkipped": 5,
+    "flows": [
+      "HTTP liveN and slow-tail redistribution",
+      "HLS/DASH liveN and relaunch",
+      "DASH 4K/audio-only selection",
+      "HTTP/HLS/DASH source refresh and relaunch"
+    ]
+  },
+  "packagedPublicSelection": {
+    "bbbExitCode": 0,
+    "captionExitCode": 0,
+    "bbbVideoBytes": 268514873,
+    "bbbAudioBytes": 10264233,
+    "bbbMatchesSourceHash": true,
+    "captionBytes": 33854529,
+    "wholeFileDecoded": true
+  },
+  "packagedPublicNative": {
+    "exitCode": 0,
+    "at": "2026-10-25T23:12:32.056Z",
+    "version": "0.8.0",
+    "packaged": true,
+    "url": "https://www.youtube.com/watch?v=eRsGyueVLvQ",
+    "transitions": [
+      1,
+      4,
+      1
+    ],
+    "selection": {
+      "mode": "video",
+      "videoFormatId": "230",
+      "audioFormatId": "140",
+      "subtitleIds": []
+    },
+    "video": {
+      "id": "230",
+      "codec": "h264",
+      "width": 640,
+      "height": 272
+    },
+    "audio": {
+      "id": "140",
+      "codec": "aac"
+    },
+    "initialResources": 2,
+    "reuseAtFour": {
+      "resources": 3,
+      "bytes": 295912
+    },
+    "reuseAtOne": {
+      "resources": 5,
+      "bytes": 295912
+    },
+    "pausedBytes": 678368,
+    "restoredBytes": 751952,
+    "restoredConnections": 1,
+    "reusedResources": 6,
+    "reusedBytes": 621904,
+    "bytes": 34076192,
+    "sha256": "e946cdb5a062fedb143dc8cf0411fbb841b2661bc24521090949d7455418b6d5",
+    "duration": 888.093605,
+    "wholeFileDecoded": true,
+    "matchesPreviouslyDecodedSample": true,
+    "cdnRequestCountsAvailable": false,
+    "output": "I:\\dich_nguoc\\FlowDM\\downloads\\verification-v8\\YouTube-native-live-packaged-1792969952044.mp4"
+  },
+  "sourcePublicNativeExitCode": 0,
+  "packagedPlaylistSubmit": {
+    "exitCode": 0,
+    "createdJobs": 1,
+    "pausedAtBytes": 0,
+    "pauseRestartStatePreserved": true,
+    "canceledAndCacheRemoved": true,
+    "fullVideoDownloaded": false
+  },
+  "completedAt": "2026-10-25T23:13:16.889Z"
+}

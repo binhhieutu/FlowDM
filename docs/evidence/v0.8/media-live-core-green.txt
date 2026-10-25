@@ -1,0 +1,15 @@
+✔ HLS manager changes live1 to4 to1 and retains completed resources through relaunch (1644.7224ms)
+✔ closing app interrupts a pending HLS decrease rather than waiting for held resources (68.4974ms)
+✔ inspects media without queuing and pins a selected audio container through relaunch (47.5547ms)
+✔ selected subtitles choose one MKV output and never persist extracted URLs (33.2268ms)
+✔ uninspected, mismatched, malicious or unavailable selections cannot create tasks (7.6952ms)
+✔ playlist preview binds chosen IDs, caps input and isolates per-entry download failure (37.5728ms)
+✔ closing the manager aborts and settles media inspection before shutdown (30.1514ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2795.6463

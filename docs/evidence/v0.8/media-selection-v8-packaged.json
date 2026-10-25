@@ -1,0 +1,57 @@
+{
+  "at": "2026-10-25T22:58:57.950Z",
+  "actualGenerated4K": true,
+  "invalidFormatRefused": true,
+  "rows": [
+    {
+      "mode": "video",
+      "filename": "selected-4k.mp4",
+      "sha256": "46a232f7e8e67ab5857be01c093e73c1362abd3e69226f978e3d2ecba29381e1",
+      "streams": [
+        {
+          "type": "video",
+          "codec": "h264",
+          "width": 3840,
+          "height": 2160
+        },
+        {
+          "type": "audio",
+          "codec": "aac"
+        }
+      ],
+      "duration": 2,
+      "wholeFileDecoded": true
+    },
+    {
+      "mode": "audio",
+      "filename": "selected-audio.m4a",
+      "sha256": "116e902b1ccc0a71a8948f3dc9eefdebe83940af5d23d14aebc89f061c40e7e0",
+      "streams": [
+        {
+          "type": "audio",
+          "codec": "aac"
+        }
+      ],
+      "duration": 2,
+      "wholeFileDecoded": true
+    }
+  ],
+  "requests": [
+    "manifest.mpd",
+    "manifest.mpd",
+    "manifest.mpd",
+    "chunk-stream0-00001.m4s",
+    "init-stream0.m4s",
+    "chunk-stream0-00002.m4s",
+    "chunk-stream1-00002.m4s",
+    "init-stream1.m4s",
+    "chunk-stream1-00001.m4s",
+    "chunk-stream1-00003.m4s",
+    "manifest.mpd",
+    "manifest.mpd",
+    "chunk-stream1-00002.m4s",
+    "chunk-stream1-00001.m4s",
+    "init-stream1.m4s",
+    "chunk-stream1-00003.m4s"
+  ]
+}

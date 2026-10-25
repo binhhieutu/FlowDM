@@ -1,0 +1,25 @@
+✖ HLS manager changes live1 to4 to1 and retains completed resources through relaunch (176.1694ms)
+  Error: Live connection changes are supported for direct HTTP downloads
+      at I:\dich_nguoc\FlowDM\src\core\download-manager.cjs:182:64
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\media-live-connections.test.cjs:5:234)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3)
+
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 258.9156
+
+✖ failing tests:
+
+test at tests\core\media-live-connections.test.cjs:5:1
+✖ HLS manager changes live1 to4 to1 and retains completed resources through relaunch (176.1694ms)
+  Error: Live connection changes are supported for direct HTTP downloads
+      at I:\dich_nguoc\FlowDM\src\core\download-manager.cjs:182:64
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\media-live-connections.test.cjs:5:234)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3)
