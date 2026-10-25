@@ -22,7 +22,7 @@ async function wait(manager, id) {
   throw Error(JSON.stringify(manager.list()));
 }
 
-test('DASH uses a checkpoint task, journal v4, hashing and atomic publication', async t => {
+test('DASH uses a checkpoint task, journal v5, hashing and atomic publication', async t => {
   const { manager, root } = await setup(t, async ({ output, onProgress }) => {
     onProgress({ downloadedBytes: 3, totalBytes: null });
     await fs.writeFile(output, 'dash-mux'); onProgress({ downloadedBytes: 8, totalBytes: 8 });
@@ -33,7 +33,7 @@ test('DASH uses a checkpoint task, journal v4, hashing and atomic publication', 
   assert.equal(done.status, 'completed', done.error); assert.equal(done.mediaType, 'dash'); assert.equal(done.filename, 'video.mp4');
   assert.deepEqual(done.segments, [{ index: 0, start: 0, end: null, received: 8 }]); assert.equal(await fs.readFile(done.path, 'utf8'), 'dash-mux');
   const journal = JSON.parse(await fs.readFile(path.join(root, 'data', 'downloads.json'), 'utf8'));
-  assert.equal(journal.version, 4); assert.equal(journal.tasks[0].media.resumePolicy, 'checkpoint');
+  assert.equal(journal.version, 5); assert.equal(journal.tasks[0].media.resumePolicy, 'checkpoint');
 });
 
 test('external pause/reopen preserves progress and uses the same owned checkpoint, then cleans it on success', async t => {

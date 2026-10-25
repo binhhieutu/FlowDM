@@ -1,0 +1,20 @@
+{
+  "at": "2026-10-25T12:37:32.786Z",
+  "packaged": true,
+  "version": "0.7.0",
+  "url": "https://media.w3.org/2010/05/sintel/trailer.mp4",
+  "transitions": [
+    1,
+    4,
+    1
+  ],
+  "strongValidator": true,
+  "pausedBytes": 349345,
+  "restoredBytes": 349345,
+  "restoredConnections": 1,
+  "bytes": 4372373,
+  "sha256": "b670602fa00934ca27c4351bb0efe7ea7a07fae57284e44226025eeed7c51254",
+  "independentContinuousCopyMatches": true,
+  "wholeFileDecoded": true,
+  "output": "I:\\dich_nguoc\\FlowDM\\downloads\\verification-v7\\HTTP-live-packaged-1792931852783.mp4"
+}

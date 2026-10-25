@@ -5,3 +5,5 @@
 #media-type{width:100%;font-size:12px}
 
 .task-actions{flex-wrap:wrap}
+
+.connection-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:16px}.connection-controls label{margin:0;font-size:11px}.connection-controls select,.connection-controls button{font-size:11px}.connection-controls .hint{flex-basis:100%;margin:0}

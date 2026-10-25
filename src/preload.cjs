@@ -4,6 +4,7 @@ contextBridge.exposeInMainWorld('flow', {
   list: () => ipcRenderer.invoke('flow:list'),
   add: input => ipcRenderer.invoke('flow:add', input),
   refreshSource: (id, url) => ipcRenderer.invoke('flow:refreshSource', { id, url }),
+  setConnections: (id, connections) => ipcRenderer.invoke('flow:setConnections', { id, connections }),
   action: (id, action) => ipcRenderer.invoke('flow:action', { id, action }),
   chooseDirectory: () => ipcRenderer.invoke('flow:chooseDirectory'),
   openFolder: () => ipcRenderer.invoke('flow:openFolder'),

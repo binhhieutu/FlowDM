@@ -1,0 +1,16 @@
+✔ changes live HTTP connections 1 to 4 to 1, preserves committed ranges across pause and relaunch (2073.5175ms)
+✔ idle HTTP workers split the slow unfinished range and preserve exact file coverage (744.2979ms)
+✔ invalid live connection inputs and non-HTTP requests cannot mutate the download (21.581ms)
+✔ live resizing retains the aggregate speed budget rather than resetting it per worker (2199.5436ms)
+✔ pause during a pending ownership journal waits and never starts replacement requests (752.7122ms)
+✔ a failed ownership journal restores the old plan and never starts uncommitted ranges (743.603ms)
+✔ connection changes interrupt retry backoff without failing or losing the file (311.4225ms)
+✔ a server without ranges keeps its one uninterrupted stream when the configured cap changes (1893.9266ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8821.9056

@@ -1,0 +1,27 @@
+✖ v5 preserves a completed unknown-length single-stream download (19.5975ms)
+  Error: Invalid journal segment coverage
+      at DownloadManager._validateStored (I:\dich_nguoc\FlowDM\src\core\download-manager.cjs:77:145)
+      at DownloadManager.init (I:\dich_nguoc\FlowDM\src\core\download-manager.cjs:48:44)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\journal-v5.test.cjs:34:77)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3)
+
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 93.8871
+
+✖ failing tests:
+
+test at tests\core\journal-v5.test.cjs:32:1
+✖ v5 preserves a completed unknown-length single-stream download (19.5975ms)
+  Error: Invalid journal segment coverage
+      at DownloadManager._validateStored (I:\dich_nguoc\FlowDM\src\core\download-manager.cjs:77:145)
+      at DownloadManager.init (I:\dich_nguoc\FlowDM\src\core\download-manager.cjs:48:44)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\journal-v5.test.cjs:34:77)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3)

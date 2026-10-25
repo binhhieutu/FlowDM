@@ -5,11 +5,17 @@ const crypto = require('node:crypto');
 const { createReadStream, constants } = require('node:fs');
 
 async function atomicJournal(filename, tasks, version = 2) {
-  if (![2, 3, 4].includes(version)) throw Error('Unsupported download journal version');
+  if (![2, 3, 4, 5].includes(version)) throw Error('Unsupported download journal version');
   const temporary = `${filename}.${crypto.randomUUID()}.tmp`;
   const handle = await fs.open(temporary, 'wx', 0o600);
   try { await handle.writeFile(JSON.stringify({ version, tasks })); await handle.sync(); } finally { await handle.close(); }
   try { await fs.rename(temporary, filename); } catch (error) { await fs.unlink(temporary).catch(() => {}); throw error; }
+}
+async function backupJournal(filename, version) {
+  const backup = path.join(path.dirname(filename), `downloads.v${version}.${crypto.randomUUID()}.backup.json`);
+  const handle = await fs.open(backup, 'wx', 0o600);
+  try { await handle.writeFile(await fs.readFile(filename)); await handle.sync(); } finally { await handle.close(); }
+  return backup;
 }
 async function uniqueDestination(directory, filename, reserved) {
   await fs.mkdir(directory, { recursive: true });
@@ -71,4 +77,4 @@ async function publish(partial, destination) {
     await fs.unlink(partial);
   } finally { await fs.unlink(staging).catch(error => { if (error.code !== 'ENOENT') throw error; }); }
 }
-module.exports = { atomicJournal, uniqueDestination, openPartial, hashFile, publish, recoverPublished, preflightPublication };
+module.exports = { atomicJournal, backupJournal, uniqueDestination, openPartial, hashFile, publish, recoverPublished, preflightPublication };

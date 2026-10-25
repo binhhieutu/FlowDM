@@ -1,0 +1,109 @@
+✖ journal v4 migration preserves an exact private backup before writing v5 (24.4184ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  4 !== 5
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\journal-v5.test.cjs:18:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 4,
+    expected: 5,
+    operator: 'strictEqual'
+  }
+
+✖ backup failure blocks migration without changing the original journal (18.301ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\journal-v5.test.cjs:25:9)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /backup denied/,
+    operator: 'rejects'
+  }
+
+✖ v5 rejects a segment plan whose tail does not cover the declared total (12.9394ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /coverage|bounds/i. Input:
+
+  'Error: Unsupported download journal'
+
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\journal-v5.test.cjs:30:60)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: Unsupported download journal
+        at DownloadManager.init (I:\dich_nguoc\FlowDM\src\core\download-manager.cjs:46:87)
+        at async waitForActual (node:assert:871:5)
+        at async Function.rejects (node:assert:992:25)
+        at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\journal-v5.test.cjs:30:60)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async Test.processPendingSubtests (node:internal/test_runner/test:629:7),
+    expected: /coverage|bounds/i,
+    operator: 'rejects'
+  }
+
+ℹ tests 3
+ℹ suites 0
+ℹ pass 0
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 127.3268
+
+✖ failing tests:
+
+test at tests\core\journal-v5.test.cjs:16:1
+✖ journal v4 migration preserves an exact private backup before writing v5 (24.4184ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  4 !== 5
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\journal-v5.test.cjs:18:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 4,
+    expected: 5,
+    operator: 'strictEqual'
+  }
+
+test at tests\core\journal-v5.test.cjs:22:1
+✖ backup failure blocks migration without changing the original journal (18.301ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\journal-v5.test.cjs:25:9)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /backup denied/,
+    operator: 'rejects'
+  }
+
+test at tests\core\journal-v5.test.cjs:28:1
+✖ v5 rejects a segment plan whose tail does not cover the declared total (12.9394ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /coverage|bounds/i. Input:
+
+  'Error: Unsupported download journal'
+
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\journal-v5.test.cjs:30:60)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: Unsupported download journal
+        at DownloadManager.init (I:\dich_nguoc\FlowDM\src\core\download-manager.cjs:46:87)
+        at async waitForActual (node:assert:871:5)
+        at async Function.rejects (node:assert:992:25)
+        at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\journal-v5.test.cjs:30:60)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async Test.processPendingSubtests (node:internal/test_runner/test:629:7),
+    expected: /coverage|bounds/i,
+    operator: 'rejects'
+  }

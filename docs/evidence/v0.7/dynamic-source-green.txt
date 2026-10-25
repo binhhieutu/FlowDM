@@ -1,0 +1,10 @@
+✔ actual desktop resizes 1→4→1, resumes committed ranges after relaunch and redistributes a slow range (26560.3885ms)
+ℹ {"live":{"transitions":[1,4,1],"initialBytes":65536,"pausedBytes":253952,"restoredBytes":253952,"restoredConnections":1,"peakServerConnections":4,"capSamples":[{"configured":1,"active":1,"server":1},{"configured":1,"active":1,"server":1},{"configured":1,"active":1,"server":1},{"configured":1,"active":1,"server":1},{"configured":1,"active":1,"server":1},{"configured":1,"active":1,"server":1},{"configured":1,"active":1,"server":1},{"configured":1,"active":1,"server":1},{"configured":1,"active":1,"server":1},{"configured":1,"active":1,"server":1}],"committedReplay":false,"wholeFileDecoded":true},"benchmark":{"slowFirstQuarterChunkBytes":8192,"slowChunkDelayMs":40,"fastChunkBytes":65536,"fastChunkDelayMs":5,"baseline":{"milliseconds":5985,"bytes":4194304,"sha256":"d6081daf4fa5aba1f01aa25d510439301b6ef798eb05b21875e50602a53dff0f","connections":4,"peakServerConnections":4},"dynamic":{"milliseconds":3304,"connections":4,"peakServerConnections":4,"bytes":4194304,"sha256":"d6081daf4fa5aba1f01aa25d510439301b6ef798eb05b21875e50602a53dff0f","wholeFileDecoded":true},"speedup":1.8114406779661016}}
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 26897.7963

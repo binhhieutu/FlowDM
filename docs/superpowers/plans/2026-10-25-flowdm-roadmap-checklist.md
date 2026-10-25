@@ -4,7 +4,7 @@
 
 **Ngày:** 2026-10-25. **Trạng thái:** kế hoạch; chưa triển khai các mục chưa đánh dấu.
 
-**Tiến độ 2026-10-25:** Task 1–2 hoàn tất trong phạm vi đã nghiệm thu của 0.6.0; Task 3–10 chưa triển khai. Xem [VERIFICATION_V6.md](../../VERIFICATION_V6.md) và [review](../../source-refresh-v6-review.md). External HTTP fallback thiếu validator vẫn bị từ chối; legacy DASH thiếu base hash được giữ nguyên nhưng không resume an toàn.
+**Tiến độ 2026-10-25:** Task 1–2 hoàn tất ở 0.6.0, Task 3 hoàn tất ở 0.7.0; Task 4–10 chưa triển khai. Xem [VERIFICATION_V7.md](../../VERIFICATION_V7.md) và [review Task 3](../../dynamic-ranges-v7-review.md). Xem [VERIFICATION_V6.md](../../VERIFICATION_V6.md) và [review](../../source-refresh-v6-review.md). External HTTP fallback thiếu validator vẫn bị từ chối; legacy DASH thiếu base hash được giữ nguyên nhưng không resume an toàn.
 
 **Goal:** Hoàn thiện những khả năng tải xuống còn thiếu theo hướng sử dụng tương tự IDM, giữ được dữ liệu tải dở và kiểm chứng thực tế trên Windows/Linux/macOS.
 
@@ -81,15 +81,17 @@ Các task tùy chọn 7–8 không chặn bản phát hành A/B. Không mở t�
 
 ## Task 3 — Chia lại range động và đổi số kết nối
 
-**Files:** tạo `src/core/range-scheduler.cjs`, `tests/core/range-scheduler.test.cjs`; sửa `src/core/download-manager.cjs`, `src/ui/app.js`; mở rộng `tests/e2e/concurrency.test.cjs`.
+**Files thực tế:** tạo `src/core/range-scheduler.cjs`, `src/core/http-range-pool.cjs` và core tests; sửa manager/storage/main/preload/UI. Thêm `tests/e2e/dynamic-concurrency.test.cjs`; giữ `tests/e2e/concurrency.test.cjs` làm hồi quy HLS/DASH. Schema 5 có backup nguyên byte trước migration, đọc v1–v5.
 
 **Interface mới:** `splitPendingRange(range, minBytes) -> { retained, pending } | null`. Range là inclusive `[start,end]`, offset committed được lưu riêng. Chỉ split vùng chưa commit sau khi khóa/settle worker sở hữu; checkpoint lưu ownership mới nguyên tử. Native yt-dlp không áp dụng thuật toán HTTP này; HLS/DASH tiếp tục dùng fragment workers.
 
-- [ ] RED: test range rất nhỏ/lớn, worker nhanh/chậm, retry, pause khi split, đổi N từ 1→4→1; hợp vùng luôn đúng `[0,total-1]`, không overlap/gap và active <=N<=16.
-- [ ] Chạy `node --test tests/core/range-scheduler.test.cjs`; xác nhận FAIL.
-- [ ] Implement work stealing cho phần còn lại; đổi N chỉ tăng/giảm worker ở điểm an toàn; giữ aggregate rate cap và per-host cap.
-- [ ] GREEN: test trên và `node --test tests/e2e/concurrency.test.cjs`; fixture có một range chậm, so sánh fixed/dynamic cùng điều kiện, log số kết nối, byte và SHA. Không dùng mạng YouTube biến động làm benchmark chính.
-- [ ] Review rồi commit `feat: redistribute unfinished HTTP ranges`.
+**Interface đã giao:** `manager.setConnections(id, connections) -> Promise<TaskSnapshot>`, N nguyên 1–16 cho direct HTTP; UI chọn 1/2/4/8/16. `activeConnections` phản ánh worker thực tế, không phải số vùng đã lưu. Tối thiểu mỗi nửa mới 256 KiB, tối đa 1.024 vùng; dừng nhóm writer trước chia/đổi ownership.
+
+- [x] RED: test range rất nhỏ/lớn, worker nhanh/chậm, retry, pause khi split, đổi N từ 1→4→1; hợp vùng luôn đúng `[0,total-1]`, không overlap/gap và active <=N<=16.
+- [x] Chạy `node --test tests/core/range-scheduler.test.cjs`; xác nhận FAIL.
+- [x] Implement work stealing cho phần còn lại; đổi N chỉ tăng/giảm worker ở điểm an toàn; giữ aggregate rate cap và per-host cap.
+- [x] GREEN: test trên và `node --test tests/e2e/dynamic-concurrency.test.cjs tests/e2e/concurrency.test.cjs`; fixture có một range chậm, so sánh fixed/dynamic cùng điều kiện server/payload, log số kết nối, byte và SHA. Bản Windows cuối đạt 1→4→1/relaunch, không replay byte commit; tải W3C HTTP thật khớp bản tải liên tục và full decode. Không dùng mạng YouTube biến động làm benchmark chính.
+- [x] Review rồi commit `feat: redistribute unfinished HTTP ranges`.
 
 ## Task 4 — Chọn video/audio, phụ đề và playlist
 
@@ -186,4 +188,4 @@ Tách thành các deliverable nhỏ để không chặn toàn roadmap:
 
 ## Điểm bắt đầu thực thi
 
-Task 1–2 đã qua RED/GREEN, review và kiểm thử thực tế trong 0.6.0; dùng chung một commit vì cùng hợp đồng HTTP identity/preflight (ruling tại PROGRESS.md). Task 3 là mục tiếp theo khi được yêu cầu. Chỉ đánh dấu các mục sau khi có bằng chứng GREEN và review; chưa triển khai Task 3–10.
+Task 1–2 đã qua RED/GREEN, review và kiểm thử thực tế trong 0.6.0; dùng chung một commit vì cùng hợp đồng HTTP identity/preflight (ruling tại PROGRESS.md). Task 3 đã qua RED/GREEN, review và kiểm thử GUI/HTTP Internet thật ở 0.7.0. Journal nâng schema 5 với backup trước migration; đọc được v1–v5. HTTP range pool dừng nhóm writer trước khi chia, tối thiểu 256 KiB mỗi nửa, tối đa 1.024 vùng. Task 4 là mục tiếp theo khi được yêu cầu; Task 4–10 chưa triển khai.

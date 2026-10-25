@@ -6,7 +6,8 @@ const crypto = require('node:crypto');
 const { setTimeout: delay } = require('node:timers/promises');
 const { inputOptions, integer, checkedUrl } = require('./policy.cjs');
 const { probe, retryRequest, rangeInfo, contentLength } = require('./http-client.cjs');
-const { atomicJournal, uniqueDestination, openPartial, hashFile, publish, recoverPublished, preflightPublication } = require('./storage.cjs');
+const { atomicJournal, backupJournal, uniqueDestination, openPartial, hashFile, publish, recoverPublished, preflightPublication } = require('./storage.cjs');
+const { HttpRangePool, MAX_SEGMENTS } = require('./http-range-pool.cjs');
 const { loadPlaylist, getResource } = require('../media/hls.cjs');
 const { createValidator } = require('../media/container-check.cjs');
 const { transferHlsParallel } = require('../media/hls-parallel.cjs');
@@ -43,11 +44,12 @@ class DownloadManager extends EventEmitter {
     let saved;
     try { saved = JSON.parse(await fs.readFile(this.journal, 'utf8')); } catch (error) { if (error.code !== 'ENOENT') throw Error(`Cannot read download journal: ${error.message}`); }
     if (saved) {
-      if (![1, 2, 3, 4].includes(saved.version) || !Array.isArray(saved.tasks)) throw Error('Unsupported download journal');
+      if (![1, 2, 3, 4, 5].includes(saved.version) || !Array.isArray(saved.tasks)) throw Error('Unsupported download journal');
+      for (const task of saved.tasks) this._validateStored(task, saved.version);
+      if (saved.version < 5) await backupJournal(this.journal, saved.version);
       for (const task of saved.tasks) {
-        this._validateStored(task);
         const needsPause = task.status === 'downloading' || (task.status === 'queued' && task.requiresHeaders);
-        const restored = { ...task, status: needsPause ? 'paused' : task.status, speed: 0 };
+        const restored = { ...task, ...(task.activeConnections === undefined ? {} : { activeConnections: 0 }), status: needsPause ? 'paused' : task.status, speed: 0 };
         await this._recoverPublished(restored);
         this.tasks.set(task.id, restored);
       }
@@ -59,12 +61,12 @@ class DownloadManager extends EventEmitter {
     return this;
   }
 
-  _validateStored(task) {
+  _validateStored(task, version = 5) {
     if (!task || !/^[a-f0-9-]{36}$/.test(task.id) || !STATES.includes(task.status) || !path.isAbsolute(task.path) || path.basename(task.path) !== task.filename) throw Error('Invalid download journal task');
     checkedUrl(task.url);
     if (task.mediaType !== undefined && !['direct', 'hls', 'dash', 'youtube'].includes(task.mediaType)) throw Error('Invalid journal media type');
     integer(task.connections, 1, 16, 'Connections'); integer(task.speedLimit, 0, Number.MAX_SAFE_INTEGER, 'Speed limit');
-    if (!Array.isArray(task.segments) || task.segments.length > 16) throw Error('Invalid journal segments');
+    if (!Array.isArray(task.segments) || task.segments.length > (version < 5 ? 16 : MAX_SEGMENTS)) throw Error('Invalid journal segments');
     let received = 0, next = 0;
     for (const segment of task.segments) {
       integer(segment.start, 0, this.maxBytes, 'Segment start'); integer(segment.received, 0, this.maxBytes, 'Segment bytes');
@@ -72,6 +74,7 @@ class DownloadManager extends EventEmitter {
       next = segment.end === null ? 0 : segment.end + 1; received += segment.received;
     }
     if (received !== task.downloadedBytes || (task.totalBytes !== null && (!Number.isSafeInteger(task.totalBytes) || task.totalBytes > this.maxBytes || task.totalBytes < received))) throw Error('Invalid journal byte count');
+    if ((!task.mediaType || task.mediaType === 'direct') && task.totalBytes !== null && task.segments.length && task.segments.every(segment => segment.end !== null) && next !== task.totalBytes) throw Error('Invalid journal segment coverage');
   }
 
   list() { return clone([...this.tasks.values()]); }
@@ -115,7 +118,7 @@ class DownloadManager extends EventEmitter {
   _notify() { this.emit('change', this.list()); }
   _persist() {
     const snapshot = this.list();
-    const write = this.persistence.catch(() => {}).then(() => atomicJournal(this.journal, snapshot, 4));
+    const write = this.persistence.catch(() => {}).then(() => atomicJournal(this.journal, snapshot, 5));
     this.persistence = write; return write;
   }
   _mutate(operation) {
@@ -148,6 +151,21 @@ class DownloadManager extends EventEmitter {
   }
 
   pause(id) { return this._mutate(() => this._pause(id)); }
+  setConnections(id, value) {
+    return this._mutate(async () => {
+      this._ready(); const connections = integer(value, 1, 16, 'Connections'); const task = this._require(id);
+      if (task.mediaType && task.mediaType !== 'direct') throw Error('Live connection changes are supported for direct HTTP downloads');
+      if (!['queued', 'downloading', 'paused', 'failed'].includes(task.status)) throw Error('This download cannot change connections');
+      if (task.connections === connections) return clone(task);
+      const pool = this.running.get(id)?.rangePool;
+      if (pool) await pool.resize(connections);
+      else {
+        const previous = task.connections; task.connections = connections;
+        try { await this._persist(); } catch (error) { task.connections = previous; throw error; }
+      }
+      this._notify(); return clone(task);
+    });
+  }
   refreshSource(id, input) {
     return this._mutate(async () => {
       this._ready(); const task = this._require(id);
@@ -362,9 +380,9 @@ class DownloadManager extends EventEmitter {
   }
 
   async _transfer(task, headers, handle, runtime) {
-    const results = await Promise.allSettled(task.segments.map(segment => this._segment(task, segment, headers, handle, runtime).catch(error => { runtime.controller.abort(); throw error; })));
-    const failure = results.find(result => result.status === 'rejected' && result.reason.name !== 'AbortError') || results.find(result => result.status === 'rejected');
-    if (failure) throw failure.reason;
+    const pool = new HttpRangePool({ task, runtime, transfer: (segment, signal) => this._segment(task, segment, headers, handle, runtime, signal), persist: () => this._persist(), notify: () => this._notify() });
+    runtime.rangePool = pool;
+    try { await pool.run(); } finally { runtime.rangePool = null; }
   }
 
   _safeError(error) {
@@ -374,35 +392,39 @@ class DownloadManager extends EventEmitter {
     return message.replace(/https?:\/\/\S+/g, '[URL]').slice(0, 300);
   }
 
-  async _segment(task, segment, headers, handle, runtime) {
+  async _segment(task, segment, headers, handle, runtime, signal = runtime.controller.signal) {
     for (let attempt = 0; ; attempt++) {
-      try { return await this._segmentOnce(task, segment, headers, handle, runtime); }
+      try { return await this._segmentOnce(task, segment, headers, handle, runtime, signal); }
       catch (error) {
+        // Node can surface a deliberately destroyed response as ECONNRESET
+        // rather than AbortError. Only normalize cancellation/network teardown;
+        // validator/protocol/storage failures must remain substantive errors.
+        if (signal.aborted && ['ABORT_ERR', 'ECONNRESET', 'ERR_STREAM_PREMATURE_CLOSE'].includes(error.code)) throw Object.assign(Error('Aborted'), { name: 'AbortError' });
         // A validated range may continue from its fsynced offset after a dropped stream.
         // Other protocol errors remain visible; a non-range retry starts via resume().
         const retryable = ['ECONNRESET', 'ERR_STREAM_PREMATURE_CLOSE', 'ETIMEDOUT'].includes(error.code);
-        if (!task.ranges || !retryable || attempt >= 2 || runtime.controller.signal.aborted) throw error;
-        await delay(100 * 2 ** attempt + Math.floor(Math.random() * 40), undefined, { signal: runtime.controller.signal });
+        if (!task.ranges || !retryable || attempt >= 2 || signal.aborted) throw error;
+        await delay(100 * 2 ** attempt + Math.floor(Math.random() * 40), undefined, { signal });
       }
     }
   }
 
-  async _segmentOnce(task, segment, headers, handle, runtime) {
+  async _segmentOnce(task, segment, headers, handle, runtime, signal = runtime.controller.signal) {
     if (segment.end !== null && segment.received === segment.end - segment.start + 1) return;
     const start = segment.start + segment.received;
     const requestHeaders = { ...headers };
     if (task.ranges) requestHeaders.range = `bytes=${start}-${segment.end}`;
     if (task.ranges && task.validator) requestHeaders['if-range'] = task.validator.value;
-    const { response, finalUrl } = await retryRequest(task.url, requestHeaders, runtime.controller.signal);
+    const { response, finalUrl } = await retryRequest(task.url, requestHeaders, signal);
     try {
       if (task.finalUrl && new URL(finalUrl).origin !== new URL(task.finalUrl).origin) throw Error('Remote response origin changed; retained bytes were preserved');
       this._checkResponse(task, segment, response, start);
       for await (const chunk of response) {
-        if (runtime.controller.signal.aborted) throw Object.assign(Error('Aborted'), { name: 'AbortError' });
+        if (signal.aborted) throw Object.assign(Error('Aborted'), { name: 'AbortError' });
         const remaining = segment.end === null ? this.maxBytes - task.downloadedBytes : segment.end - segment.start + 1 - segment.received;
         if (chunk.length > remaining || task.downloadedBytes + chunk.length > this.maxBytes) throw Error('Response exceeds expected size or size limit');
         runtime.transferred += chunk.length;
-        if (task.speedLimit) await delay(Math.max(0, runtime.transferred * 1000 / task.speedLimit - (Date.now() - runtime.began)), undefined, { signal: runtime.controller.signal });
+        if (task.speedLimit) await delay(Math.max(0, runtime.transferred * 1000 / task.speedLimit - (Date.now() - runtime.began)), undefined, { signal });
         let written = 0;
         while (written < chunk.length) {
           const result = await handle.write(chunk, written, chunk.length - written, segment.start + segment.received + written);
@@ -415,6 +437,7 @@ class DownloadManager extends EventEmitter {
         await this._persist();
         if (Date.now() - runtime.lastEvent > 100) { runtime.lastEvent = Date.now(); this._notify(); }
       }
+      if (signal.aborted) throw Object.assign(Error('Aborted'), { name: 'AbortError' });
       if (segment.end !== null && segment.received !== segment.end - segment.start + 1) throw Error('Truncated response');
     } finally { response.destroy(); }
   }

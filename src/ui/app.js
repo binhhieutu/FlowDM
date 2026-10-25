@@ -2,6 +2,7 @@
 const $ = id => document.getElementById(id);
 const labels = { queued: 'Chờ tải', downloading: 'Đang tải', paused: 'Tạm dừng', completed: 'Hoàn tất', failed: 'Thất bại', canceled: 'Đã hủy' };
 let tasks = []; let filter = 'all'; let selected = null; let defaultDirectory = ''; let toastTimer; let refreshingId = null;
+let connectionTask = null; let connectionDraft = null; let changingConnections = false;
 const bytes = number => {
   if (number === null || number === undefined) return 'Chưa rõ';
   if (number < 1024) return `${Math.max(0, number).toFixed(0)} B`;
@@ -73,15 +74,33 @@ function render() {
   $('details').hidden = !task;
   if (task) {
     $('detail-name').textContent = task.filename; $('detail-state').textContent = labels[task.status];
-    const streamed = ['hls', 'dash', 'youtube'].includes(task.mediaType); $('detail-path').textContent = task.path; $('detail-connections').textContent = streamed ? `${task.connections} kết nối tối đa · ${task.media?.completedSegments || 0}/${task.media?.segmentCount || '?'} đoạn ${task.mediaType.toUpperCase()}` : `${task.segments?.length || task.connections} kết nối`;
+    const streamed = ['hls', 'dash', 'youtube'].includes(task.mediaType); $('detail-path').textContent = task.path; $('detail-connections').textContent = streamed ? `${task.connections} kết nối tối đa · ${task.media?.completedSegments || 0}/${task.media?.segmentCount || '?'} đoạn ${task.mediaType.toUpperCase()}` : `${task.activeConnections || 0}/${task.connections} kết nối · ${task.segments.length} vùng`;
+    if (connectionTask !== task.id) { connectionTask = task.id; connectionDraft = null; $('connection-change-error').hidden = true; }
+    $('connection-controls').hidden = streamed || !['queued', 'downloading', 'paused', 'failed'].includes(task.status);
+    const count = String(connectionDraft ?? task.connections);
+    if (![...$('live-connections').options].some(option => option.value === count)) $('live-connections').add(new Option(`${count} kết nối`, count));
+    $('live-connections').value = count; $('live-connections').disabled = changingConnections; $('apply-connections').disabled = changingConnections;
+    $('connection-hint').textContent = task.ranges ? 'Giữ tiến độ khi đổi số kết nối; tự chia phần còn thiếu.' : 'Số kết nối thực tế phụ thuộc máy chủ; có thể chỉ dùng một kết nối.';
     $('detail-hash').textContent = task.sha256 || 'Được tính khi tải hoàn tất';
     $('detail-error').hidden = !task.error && !streamed; $('detail-error').textContent = task.error || (streamed ? `Giữ lại các đoạn đã tải khi tạm dừng hoặc đóng app. Đã dùng lại ${task.media?.reusedResources || 0} đoạn; đoạn còn dở có thể tải lại riêng.` : '');
     $('segments').replaceChildren(...(task.segments || []).map((segment, index) => {
-      const meter = element('progress', 'meter'); meter.max = Math.max(1, segment.end - segment.start + 1); meter.value = segment.received || 0; meter.title = `Kết nối ${index + 1}: ${bytes(segment.received)}`; return meter;
+      const meter = element('progress', 'meter'); meter.max = Math.max(1, segment.end - segment.start + 1); meter.value = segment.received || 0; meter.title = `Vùng ${index + 1}: ${bytes(segment.received)}`; return meter;
     }));
   }
 }
 function showAdd() { $('form-error').hidden = true; $('directory').value = defaultDirectory; $('add-dialog').showModal(); $('url').focus(); }
+$('live-connections').addEventListener('change', () => { connectionDraft = Number($('live-connections').value); });
+$('apply-connections').addEventListener('click', async () => {
+  if (changingConnections) return;
+  const id = selected; const count = Number($('live-connections').value);
+  changingConnections = true; $('connection-change-error').hidden = true; render();
+  try {
+    const result = await window.flow.setConnections(id, count);
+    if (!result.ok) throw Error(result.error);
+    connectionDraft = null; toast(`Đã đặt tối đa ${count} kết nối và giữ tiến độ.`); await refresh();
+  } catch (error) { $('connection-change-error').textContent = error.message; $('connection-change-error').hidden = false; }
+  finally { changingConnections = false; render(); }
+});
 for (const id of ['refresh-close', 'refresh-cancel']) $(id).addEventListener('click', () => $('refresh-dialog').close());
 $('refresh-form').addEventListener('submit', async event => {
   event.preventDefault(); if ($('refresh-submit').disabled) return;
