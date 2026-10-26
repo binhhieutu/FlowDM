@@ -1,0 +1,17 @@
+✔ linux registration preserves exact previous manifest in a private Unicode home (43.3815ms)
+✔ darwin registration preserves exact previous manifest in a private Unicode home (33.7801ms)
+﹣ native POSIX host wrapper executes through Unicode, spaces and apostrophes with private modes (0.1925ms) # SKIP
+✔ media tools prefer packaged/source binaries and validate explicit configuration (29.2235ms)
+✔ verifies a standalone linux archive without requiring other platforms (154.036ms)
+✔ verifies a standalone mac-x64 archive without requiring other platforms (124.5739ms)
+✔ verifies a standalone mac-arm64 archive without requiring other platforms (110.1505ms)
+✔ platform verifier refuses stale runtime bytes and missing selected archive (170.5991ms)
+✔ platform verifier rejects unknown, repeated and missing platform arguments (364.6526ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 1043.6901

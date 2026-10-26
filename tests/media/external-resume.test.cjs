@@ -1,4 +1,5 @@
 'use strict';
+const { resolveTools } = require('../../src/tools/media-tools.cjs');
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
@@ -140,7 +141,7 @@ test('aborting from initial cached-progress notification never starts a transfer
   await assert.rejects(fs.stat(marker), { code: 'ENOENT' });
 });
 
-test('pinned DASH resumes retained fragments after child exit and a fresh invocation', async t => {
+test('native tool DASH resumes retained fragments after child exit and a fresh invocation', async t => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'flowdm-dash-resume-'));
   const names = ['init.mp4', 'fragment00.m4s', 'fragment01.m4s', 'fragment02.m4s'];
   const files = Object.fromEntries(await Promise.all(names.map(async name => [name, await fs.readFile(path.resolve('tests/fixtures/video', name))])));
@@ -157,7 +158,7 @@ test('pinned DASH resumes retained fragments after child exit and a fresh invoca
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   t.after(async () => { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); await fs.rm(root, { recursive: true, force: true }); });
-  const tools = { ytDlp: path.resolve('vendor/media-tools/yt-dlp.exe'), ffmpeg: path.resolve('vendor/media-tools/ffmpeg.exe'), jsRuntime: process.execPath };
+  const tools = await resolveTools({ packaged: false });
   const input = { url: `http://127.0.0.1:${server.address().port}/manifest.mpd`, mediaType: 'dash', output: path.join(root, 'video.mp4'), checkpointDir: path.join(root, 'checkpoint'), maxBytes: 10 * 1024 * 1024, connections: 1, tools, timeoutMs: 30000 };
   const controller = new AbortController();
   const progress = [];

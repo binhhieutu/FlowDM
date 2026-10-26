@@ -32,6 +32,7 @@ async function fixture(t, { slow = false, size = 4 * 1024 ** 2, managerOptions =
   return { body, requests, root, options, url: `http://127.0.0.1:${server.address().port}/video.mp4`, get active() { return active; }, get peak() { return peak; }, get dropped() { return dropped; }, get manager() { return manager; }, async relaunch() { await manager.close(); manager = await new DownloadManager(options).init(); } };
 }
 function snapshot(f, id) { return f.manager.list().find(task => task.id === id); }
+const boundaries = task => JSON.stringify(task?.segments.map(({ start, end }) => ({ start, end })));
 function assertPlan(task) {
   let next = 0, received = 0;
   for (const segment of task.segments) { assert.equal(segment.start, next); assert.ok(segment.received >= 0 && segment.received <= segment.end - segment.start + 1); next = segment.end + 1; received += segment.received; }
@@ -81,24 +82,25 @@ test('live resizing retains the aggregate speed budget rather than resetting it 
 });
 
 test('pause during a pending ownership journal waits and never starts replacement requests', async t => {
-  const f = await fixture(t, { slow: true }); const persist = f.manager._persist.bind(f.manager); let entered, release; let intercepted = false;
-  const barrier = new Promise(resolve => { entered = resolve; });
+  const f = await fixture(t, { slow: true }); const persist = f.manager._persist.bind(f.manager); let initialBoundaries, release; let intercepted = false;
   f.manager._persist = () => {
     const task = f.manager.list()[0];
-    if (!intercepted && task?.downloadedBytes > 0 && task.segments.length !== 4) { intercepted = true; entered(); return new Promise(resolve => { release = async () => { await persist(); resolve(); }; }); }
+    if (!initialBoundaries && task?.ranges && task.downloadedBytes === 0) initialBoundaries = boundaries(task);
+    if (!intercepted && initialBoundaries && task?.downloadedBytes > 0 && boundaries(task) !== initialBoundaries) { intercepted = true; return new Promise(resolve => { release = async () => { await persist(); resolve(); }; }); }
     return persist();
   };
-  const added = await f.manager.add({ url: f.url, connections: 4 }); await barrier;
+  const added = await f.manager.add({ url: f.url, connections: 4 }); await until(() => intercepted);
   const requests = f.requests.length; const paused = f.manager.pause(added.id); await sleep(20); await release(); await paused;
   assert.equal(f.requests.length, requests); assert.equal(snapshot(f, added.id).status, 'paused'); assertPlan(snapshot(f, added.id));
   await f.relaunch(); await f.manager.resume(added.id); await complete(f, added.id);
 });
 
 test('a failed ownership journal restores the old plan and never starts uncommitted ranges', async t => {
-  const f = await fixture(t, { slow: true }); const persist = f.manager._persist.bind(f.manager); let intercepted = false, requests;
+  const f = await fixture(t, { slow: true }); const persist = f.manager._persist.bind(f.manager); let intercepted = false, requests, initialBoundaries;
   f.manager._persist = () => {
     const task = f.manager.list()[0];
-    if (!intercepted && task?.downloadedBytes > 0 && task.segments.length !== 4) { intercepted = true; requests = f.requests.length; return Promise.reject(Error('ownership save denied')); }
+    if (!initialBoundaries && task?.ranges && task.downloadedBytes === 0) initialBoundaries = boundaries(task);
+    if (!intercepted && initialBoundaries && task?.downloadedBytes > 0 && boundaries(task) !== initialBoundaries) { intercepted = true; requests = f.requests.length; return Promise.reject(Error('ownership save denied')); }
     return persist();
   };
   const added = await f.manager.add({ url: f.url, connections: 4 });

@@ -1,0 +1,156 @@
+✖ native runner refuses a target that differs from the real execution OS (48.5571ms)
+  AssertionError [ERR_ASSERTION]: node:internal/modules/cjs/loader:1412
+    throw err;
+    ^
+
+  Error: Cannot find module 'I:\dich_nguoc\FlowDM\scripts\test-native.cjs'
+      at Function._resolveFilename (node:internal/modules/cjs/loader:1409:15)
+      at defaultResolveImpl (node:internal/modules/cjs/loader:1060:19)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1065:22)
+      at Function._load (node:internal/modules/cjs/loader:1214:37)
+      at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:234:24)
+      at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:151:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+
+  Node.js v23.6.0
+
+
+  1 !== 2
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\native-runner.test.cjs:9:10)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.start (node:internal/test_runner/test:829:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:297:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 2,
+    operator: 'strictEqual'
+  }
+
+✖ native runner rejects an unknown platform before launching any desktop (48.0695ms)
+  AssertionError [ERR_ASSERTION]: node:internal/modules/cjs/loader:1412
+    throw err;
+    ^
+
+  Error: Cannot find module 'I:\dich_nguoc\FlowDM\scripts\test-native.cjs'
+      at Function._resolveFilename (node:internal/modules/cjs/loader:1409:15)
+      at defaultResolveImpl (node:internal/modules/cjs/loader:1060:19)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1065:22)
+      at Function._load (node:internal/modules/cjs/loader:1214:37)
+      at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:234:24)
+      at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:151:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+
+  Node.js v23.6.0
+
+
+  1 !== 2
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\native-runner.test.cjs:15:10)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 2,
+    operator: 'strictEqual'
+  }
+
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 174.3238
+
+✖ failing tests:
+
+test at tests\tools\native-runner.test.cjs:6:1
+✖ native runner refuses a target that differs from the real execution OS (48.5571ms)
+  AssertionError [ERR_ASSERTION]: node:internal/modules/cjs/loader:1412
+    throw err;
+    ^
+
+  Error: Cannot find module 'I:\dich_nguoc\FlowDM\scripts\test-native.cjs'
+      at Function._resolveFilename (node:internal/modules/cjs/loader:1409:15)
+      at defaultResolveImpl (node:internal/modules/cjs/loader:1060:19)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1065:22)
+      at Function._load (node:internal/modules/cjs/loader:1214:37)
+      at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:234:24)
+      at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:151:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+
+  Node.js v23.6.0
+
+
+  1 !== 2
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\native-runner.test.cjs:9:10)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.start (node:internal/test_runner/test:829:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:297:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 2,
+    operator: 'strictEqual'
+  }
+
+test at tests\tools\native-runner.test.cjs:13:1
+✖ native runner rejects an unknown platform before launching any desktop (48.0695ms)
+  AssertionError [ERR_ASSERTION]: node:internal/modules/cjs/loader:1412
+    throw err;
+    ^
+
+  Error: Cannot find module 'I:\dich_nguoc\FlowDM\scripts\test-native.cjs'
+      at Function._resolveFilename (node:internal/modules/cjs/loader:1409:15)
+      at defaultResolveImpl (node:internal/modules/cjs/loader:1060:19)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1065:22)
+      at Function._load (node:internal/modules/cjs/loader:1214:37)
+      at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:234:24)
+      at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:151:5)
+      at node:internal/main/run_main_module:33:47 {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: []
+  }
+
+  Node.js v23.6.0
+
+
+  1 !== 2
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\native-runner.test.cjs:15:10)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 2,
+    operator: 'strictEqual'
+  }

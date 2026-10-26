@@ -1,0 +1,131 @@
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+100 29.5M  100 29.5M    0     0  26.6M      0  0:00:01  0:00:01 --:--:-- 26.6M
+downloads/node-v22.23.4-linux-x64.tar.xz: OK
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+100  1595  100  1595    0     0   1588      0  0:00:01  0:00:01 --:--:--  4907
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+100 38.6M  100 38.6M    0     0  23.2M      0  0:00:01  0:00:01 --:--:-- 39.0M
+100 38.6M  100 38.6M    0     0  23.2M      0  0:00:01  0:00:01 --:--:-- 39.0M
+yt-dlp_linux: OK
+npm warn deprecated rimraf@2.6.3: Rimraf versions prior to v4 are no longer supported
+npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+npm warn deprecated boolean@3.2.0: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+
+added 323 packages in 7s
+npm notice
+npm notice New major version of npm available! 10.9.9 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice
+v22.23.4
+2026.10.21
+ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers
+aria2 version 1.37.0
+TAP version 13
+# Subtest: linux registration preserves exact previous manifest in a private Unicode home
+ok 1 - linux registration preserves exact previous manifest in a private Unicode home
+  ---
+  duration_ms: 106.3073
+  type: 'test'
+  ...
+# Subtest: darwin registration preserves exact previous manifest in a private Unicode home
+ok 2 - darwin registration preserves exact previous manifest in a private Unicode home
+  ---
+  duration_ms: 62.6421
+  type: 'test'
+  ...
+# Subtest: native POSIX host wrapper executes through Unicode, spaces and apostrophes with private modes
+ok 3 - native POSIX host wrapper executes through Unicode, spaces and apostrophes with private modes
+  ---
+  duration_ms: 620.8204
+  type: 'test'
+  ...
+# Subtest: native Unix refuses an explicit non-executable media tool before admission
+not ok 4 - native Unix refuses an explicit non-executable media tool before admission
+  ---
+  duration_ms: 31.8027
+  type: 'test'
+  location: '/home/flowdm/task9/source/tests/tools/platform-tools.test.cjs:17:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+
+    true !== false
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/home/flowdm/task9/source/tests/tools/platform-tools.test.cjs:21:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: native Unix PATH skips non-executable files and relative directories
+not ok 5 - native Unix PATH skips non-executable files and relative directories
+  ---
+  duration_ms: 21.3643
+  type: 'test'
+  location: '/home/flowdm/task9/source/tests/tools/platform-tools.test.cjs:27:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+
+    + '/tmp/flowdm-tools-unix-3zX7EO/blocked/yt-dlp'
+    - "/tmp/flowdm-tools-unix-3zX7EO/Công cụ ' có khoảng trắng/yt-dlp"
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: "/tmp/flowdm-tools-unix-3zX7EO/Công cụ ' có khoảng trắng/yt-dlp"
+  actual: '/tmp/flowdm-tools-unix-3zX7EO/blocked/yt-dlp'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/home/flowdm/task9/source/tests/tools/platform-tools.test.cjs:32:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: native Unix follows executable symlinks and refuses dangling or non-executable targets
+not ok 6 - native Unix follows executable symlinks and refuses dangling or non-executable targets
+  ---
+  duration_ms: 11.4277
+  type: 'test'
+  location: '/home/flowdm/task9/source/tests/tools/platform-tools.test.cjs:36:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (/home/flowdm/task9/source/tests/tools/platform-tools.test.cjs:43:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 3
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1000.5955

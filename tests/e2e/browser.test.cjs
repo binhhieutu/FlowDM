@@ -67,6 +67,8 @@ test('real Chromium extension auto capture, video/HLS, cookie consent and host-d
     assert.equal(path.dirname(root), os.tmpdir()); assert.ok(path.basename(root).startsWith('flowdm-browser-e2e-'));
     await fs.rm(root, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 });
     if (cleanupErrors.length) throw new AggregateError(cleanupErrors, 'Browser registration restoration failed');
+    await fs.mkdir('test-results', { recursive: true });
+    await fs.writeFile('test-results/browser-registration-restored.json', JSON.stringify({ at: new Date().toISOString(), platform: process.platform, browsers, restored: true }, null, 2));
   });
   await fs.mkdir(extension, { recursive: true }); await fs.cp(path.resolve('extension'), extension, { recursive: true });
   // Pregrant only the optional cookie API in this disposable test profile. The
@@ -77,14 +79,19 @@ test('real Chromium extension auto capture, video/HLS, cookie consent and host-d
   const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => key.toUpperCase() !== 'ELECTRON_RUN_AS_NODE'));
   async function openDesktop() {
     const executablePath = process.env.FLOWDM_EXECUTABLE;
-    const app = await _electron.launch({ ...(executablePath ? { executablePath } : {}), args: executablePath ? [] : [path.resolve('.')], env: { ...env, FLOWDM_DATA_DIR: stateDir, FLOWDM_DOWNLOAD_DIR: output } });
+    const app = await _electron.launch({ chromiumSandbox: true, ...(executablePath ? { executablePath } : {}), args: executablePath ? [] : [path.resolve('.')], env: { ...env, FLOWDM_DATA_DIR: stateDir, FLOWDM_DOWNLOAD_DIR: output } });
     const page = await app.firstWindow(); page.setDefaultTimeout(15000); await page.getByRole('button', { name: 'Thêm liên kết', exact: true }).waitFor();
     if (proxyFixture) { const configured = await page.evaluate(proxy => window.flow.configure({ proxy }), proxyFixture.config); assert.equal(configured.ok, true, configured.error); }
     return { app, page };
   }
   if (process.env.FLOWDM_TEST_PROXY === '1') proxyFixture = await createProxyFixture(t, { requireAuth: true });
   desktop = await openDesktop();
-  context = await chromium.launchPersistentContext(profile, { channel: 'chromium', ...(process.env.FLOWDM_BROWSER_EXECUTABLE ? { executablePath: process.env.FLOWDM_BROWSER_EXECUTABLE } : {}), headless: true, acceptDownloads: true, downloadsPath: path.join(root, 'browser-files'), args: [`--disable-extensions-except=${extension}`, `--load-extension=${extension}`] });
+  context = await chromium.launchPersistentContext(profile, { chromiumSandbox: true, channel: 'chromium', ...(process.env.FLOWDM_BROWSER_EXECUTABLE ? { executablePath: process.env.FLOWDM_BROWSER_EXECUTABLE } : {}), headless: true, acceptDownloads: true, downloadsPath: path.join(root, 'browser-files'), args: ['--enable-automation', `--disable-extensions-except=${extension}`, `--load-extension=${extension}`] });
+  const browserSession = await context.browser().newBrowserCDPSession();
+  const browserCommand = await browserSession.send('Browser.getBrowserCommandLine');
+  assert.ok(!browserCommand.arguments.includes('--no-sandbox'));
+  assert.ok(!browserCommand.arguments.includes('--disable-setuid-sandbox'));
+  await browserSession.detach();
   context.setDefaultTimeout(15000);
   const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker'); const extensionId = new URL(worker.url()).hostname;
   t.diagnostic(`Loaded real extension ${extensionId}`);
@@ -242,7 +249,7 @@ test('real Chromium extension auto capture, video/HLS, cookie consent and host-d
   const fallbackDownload = page.waitForEvent('download'); await page.locator('#fallback').click(); const fallback = await fallbackDownload;
   assert.equal(await fallback.failure(), null); assert.deepEqual(await fs.readFile(await fallback.path()), body);
   await fs.mkdir('test-results', { recursive: true }); await page.screenshot({ path: 'test-results/browser-video-v2.png' });
-  const report = { at: new Date().toISOString(), platform: process.platform, extensionId, browser: context.browser().version(), nativeMessaging: true, automaticCapture: true, disabledFallback: true, hostDownFallback: true, cookieConsent: true, syntheticClickBlocked: true, hlsTsFmp4ByteExact: true, decoder: 'ffmpeg', fixturesPregrantCookieApi: true, events };
+  const report = { at: new Date().toISOString(), platform: process.platform, extensionId, browser: context.browser().version(), chromiumSandbox: true, nativeMessaging: true, automaticCapture: true, disabledFallback: true, hostDownFallback: true, cookieConsent: true, syntheticClickBlocked: true, hlsTsFmp4ByteExact: true, decoder: 'ffmpeg', fixturesPregrantCookieApi: true, events };
   report.proxy = proxyFixture ? { enabled: true, authenticated: true, requests: proxyFixture.events.filter(e => e.type === 'http-forward' || e.type === 'http-connect').length, authAtOrigin: proxyAuthAtOrigin } : null; if (proxyFixture) { assert.ok(report.proxy.requests > 0); assert.equal(proxyAuthAtOrigin, false); }
   await fs.writeFile('test-results/browser-v2.json', JSON.stringify(report, null, 2));
 });

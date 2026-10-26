@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-26T07:44:58.225329+00:00",
+  "archive": "flowdm-0.13.0.tar.gz",
+  "bytes": 125715216,
+  "sha256": "0dbef2d41c7fe5391c7e35a4f83d6eecf179f7f7b067eaeaa876b7dc3445afec",
+  "filesMatched": 71,
+  "executableModes": {
+    "flowdm": "0o755",
+    "chrome-sandbox": "0o755",
+    "chrome_crashpad_handler": "0o755"
+  },
+  "asarSha256": "6c962eafd8d22e27df7e9c2fd15259a30929e9c3745446fb9c5d3c539bf92ede",
+  "testedExtraction": true
+}

@@ -1,0 +1,19 @@
+{
+  "at": "2026-10-26T07:45:11.223Z",
+  "platform": "linux",
+  "arch": "x64",
+  "version": "0.13.0",
+  "packaged": true,
+  "pausedBytes": 114688,
+  "restoredBytes": 114688,
+  "bytes": 3145728,
+  "sha256": "e54931e86c418830de27c066b74fa6cf47209bc6bf9dc73c6a1d5d315278a12f",
+  "resumedRequests": [
+    {
+      "method": "GET",
+      "start": 114688,
+      "end": 3145727
+    }
+  ],
+  "noCommittedPrefixReplay": true
+}

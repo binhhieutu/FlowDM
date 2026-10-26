@@ -1,0 +1,51 @@
+✔ native runner refuses a target that differs from the real execution OS (60.7623ms)
+✔ native runner rejects an unknown platform before launching any desktop (57.8169ms)
+✖ native evidence binds the exact executable, ASAR path and application version (1.1923ms)
+  AssertionError [ERR_ASSERTION]: Native artifact binding is required
+
+  false !== true
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\native-runner.test.cjs:22:10)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual'
+  }
+
+ℹ tests 3
+ℹ suites 0
+ℹ pass 2
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 199.8408
+
+✖ failing tests:
+
+test at tests\tools\native-runner.test.cjs:20:1
+✖ native evidence binds the exact executable, ASAR path and application version (1.1923ms)
+  AssertionError [ERR_ASSERTION]: Native artifact binding is required
+
+  false !== true
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\native-runner.test.cjs:22:10)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual'
+  }

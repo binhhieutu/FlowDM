@@ -95,3 +95,7 @@ Xuất/Reload tiện ích và ngắt/kết nối lại native host để cập n
 ###0.12: proxy, phân loại và trùng
 
 Xuất/Reload/kết nối host cùng bundle. Proxy cấu hình ởdesktop đi cùng browseradmission/rebind; browser không gửi mật khẩuproxy. requiresProxy giữ qua restart, refresh/rebind không được probe trực tiếp khi thiếuproxy. Duplicatehistoryguard từ chối nativehandofftrùng và giữ browserstream, không trảACKthànhcônggiả. CategoryMIMEhint dùngprobe khi bật, không di chuyểnjobcũ. FTP chỉdesktop, không nới scheme HTTP(S) của extension/native. Journal8 không mở bằngbinary0.11. [Báo cáo0.12](VERIFICATION_V12.md).
+
+## Linux / WSL2 in 0.13
+
+Chromium Linux on Ubuntu 24.04 x64/WSL2 passed actual native messaging, automatic HTTP capture, HLS/DASH media, consent and host-down fallback with a private profile. The generated POSIX host wrapper ran through Unicode/space/apostrophe paths, and native registration was restored after tests. App and browser sandbox were enabled; no --no-sandbox workaround. Firefox Linux and all macOS browser flows are untested. See [platform verification](PLATFORM_VERIFICATION.md).

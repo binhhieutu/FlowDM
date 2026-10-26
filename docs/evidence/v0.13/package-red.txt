@@ -1,0 +1,309 @@
+✖ verifies a standalone linux archive without requiring other platforms (237.1497ms)
+  AssertionError [ERR_ASSERTION]: node:fs:563
+    return binding.open(
+                   ^
+
+  Error: ENOENT: no such file or directory, open 'C:\Users\hieuPC\AppData\Local\Temp\flowdm-package-platform-yHI37Y\dist\win-unpacked\resources\app.asar'
+      at Object.openSync (node:fs:563:18)
+      at readArchiveHeaderSync (I:\dich_nguoc\FlowDM\node_modules\@electron\asar\lib\disk.js:129:37)
+      at Object.readFilesystemSync (I:\dich_nguoc\FlowDM\node_modules\@electron\asar\lib\disk.js:153:24)
+      at Object.extractFile (I:\dich_nguoc\FlowDM\node_modules\@electron\asar\lib\asar.js:255:29)
+      at Object.<anonymous> (C:\Users\hieuPC\AppData\Local\Temp\flowdm-package-platform-yHI37Y\scripts\verify-package.cjs:14:25)
+      at Module._compile (node:internal/modules/cjs/loader:1739:14)
+      at Object..js (node:internal/modules/cjs/loader:1904:10)
+      at Module.load (node:internal/modules/cjs/loader:1473:32)
+      at Function._load (node:internal/modules/cjs/loader:1285:12)
+      at TracingChannel.traceSync (node:diagnostics_channel:322:14) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\hieuPC\\AppData\\Local\\Temp\\flowdm-package-platform-yHI37Y\\dist\\win-unpacked\\resources\\app.asar'
+  }
+
+  Node.js v23.6.0
+
+
+  1 !== 0
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\package-platform.test.cjs:35:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual'
+  }
+
+✖ verifies a standalone mac-x64 archive without requiring other platforms (131.3509ms)
+  AssertionError [ERR_ASSERTION]: node:fs:563
+    return binding.open(
+                   ^
+
+  Error: ENOENT: no such file or directory, open 'C:\Users\hieuPC\AppData\Local\Temp\flowdm-package-platform-gjKZqf\dist\win-unpacked\resources\app.asar'
+      at Object.openSync (node:fs:563:18)
+      at readArchiveHeaderSync (I:\dich_nguoc\FlowDM\node_modules\@electron\asar\lib\disk.js:129:37)
+      at Object.readFilesystemSync (I:\dich_nguoc\FlowDM\node_modules\@electron\asar\lib\disk.js:153:24)
+      at Object.extractFile (I:\dich_nguoc\FlowDM\node_modules\@electron\asar\lib\asar.js:255:29)
+      at Object.<anonymous> (C:\Users\hieuPC\AppData\Local\Temp\flowdm-package-platform-gjKZqf\scripts\verify-package.cjs:14:25)
+      at Module._compile (node:internal/modules/cjs/loader:1739:14)
+      at Object..js (node:internal/modules/cjs/loader:1904:10)
+      at Module.load (node:internal/modules/cjs/loader:1473:32)
+      at Function._load (node:internal/modules/cjs/loader:1285:12)
+      at TracingChannel.traceSync (node:diagnostics_channel:322:14) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\hieuPC\\AppData\\Local\\Temp\\flowdm-package-platform-gjKZqf\\dist\\win-unpacked\\resources\\app.asar'
+  }
+
+  Node.js v23.6.0
+
+
+  1 !== 0
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\package-platform.test.cjs:35:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual'
+  }
+
+✖ verifies a standalone mac-arm64 archive without requiring other platforms (122.7458ms)
+  AssertionError [ERR_ASSERTION]: node:fs:563
+    return binding.open(
+                   ^
+
+  Error: ENOENT: no such file or directory, open 'C:\Users\hieuPC\AppData\Local\Temp\flowdm-package-platform-Q55zBE\dist\win-unpacked\resources\app.asar'
+      at Object.openSync (node:fs:563:18)
+      at readArchiveHeaderSync (I:\dich_nguoc\FlowDM\node_modules\@electron\asar\lib\disk.js:129:37)
+      at Object.readFilesystemSync (I:\dich_nguoc\FlowDM\node_modules\@electron\asar\lib\disk.js:153:24)
+      at Object.extractFile (I:\dich_nguoc\FlowDM\node_modules\@electron\asar\lib\asar.js:255:29)
+      at Object.<anonymous> (C:\Users\hieuPC\AppData\Local\Temp\flowdm-package-platform-Q55zBE\scripts\verify-package.cjs:14:25)
+      at Module._compile (node:internal/modules/cjs/loader:1739:14)
+      at Object..js (node:internal/modules/cjs/loader:1904:10)
+      at Module.load (node:internal/modules/cjs/loader:1473:32)
+      at Function._load (node:internal/modules/cjs/loader:1285:12)
+      at TracingChannel.traceSync (node:diagnostics_channel:322:14) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\hieuPC\\AppData\\Local\\Temp\\flowdm-package-platform-Q55zBE\\dist\\win-unpacked\\resources\\app.asar'
+  }
+
+  Node.js v23.6.0
+
+
+  1 !== 0
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\package-platform.test.cjs:35:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual'
+  }
+
+✖ platform verifier refuses stale runtime bytes and missing selected archive (169.0079ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /stale|corrupted/. Input:
+
+  'node:fs:563\r\n' +
+    '  return binding.open(\r\n' +
+    '                 ^\r\n' +
+    '\r\n' +
+    "Error: ENOENT: no such file or directory, open 'C:\\Users\\hieuPC\\AppData\\Local\\Temp\\flowdm-package-platform-YaKsAq\\dist\\win-unpacked\\resources\\app.asar'\r\n" +
+    '    at Object.openSync (node:fs:563:18)\r\n' +
+    '    at readArchiveHeaderSync (I:\\dich_nguoc\\FlowDM\\node_modules\\@electron\\asar\\lib\\disk.js:129:37)\r\n' +
+    '    at Object.readFilesystemSync (I:\\dich_nguoc\\FlowDM\\node_modules\\@electron\\asar\\lib\\disk.js:153:24)\r\n' +
+    '    at Object.extractFile (I:\\dich_nguoc\\FlowDM\\node_modules\\@electron\\asar\\lib\\asar.js:255:29)\r\n' +
+    '    at Object.<anonymous> (C:\\Users\\hieuPC\\AppData\\Local\\Temp\\flowdm-package-platform-YaKsAq\\scripts\\verify-package.cjs:14:25)\r\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1739:14)\r\n' +
+    '    at Object..js (node:internal/modules/cjs/loader:1904:10)\r\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1473:32)\r\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1285:12)\r\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14) {\r\n' +
+    '  errno: -4058,\r\n' +
+    "  code: 'ENOENT',\r\n" +
+    "  syscall: 'open',\r\n" +
+    "  path: 'C:\\\\Users\\\\hieuPC\\\\AppData\\\\Local\\\\Temp\\\\flowdm-package-platform-YaKsAq\\\\dist\\\\win-unpacked\\\\resources\\\\app.asar'\r\n" +
+    '}\r\n' +
+    '\r\n' +
+    'Node.js v23.6.0\r\n'
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\package-platform.test.cjs:44:86)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: "node:fs:563\r\n  return binding.open(\r\n                 ^\r\n\r\nError: ENOENT: no such file or directory, open 'C:\\Users\\hieuPC\\AppData\\Local\\Temp\\flowdm-package-platform-YaKsAq\\dist\\win-unpacked\\resources\\app.asar'\r\n    at Object.openSync (node:fs:563:18)\r\n    at readArchiveHeaderSync (I:\\dich_nguoc\\FlowDM\\node_modules\\@electron\\asar\\lib\\disk.js:129:37)\r\n    at Object.readFilesystemSync (I:\\dich_nguoc\\FlowDM\\node_modules\\@electron\\asar\\lib\\disk.js:153:24)\r\n    at Object.extractFile (I:\\dich_nguoc\\FlowDM\\node_modules\\@electron\\asar\\lib\\asar.js:255:29)\r\n    at Object.<anonymous> (C:\\Users\\hieuPC\\AppData\\Local\\Temp\\flowdm-package-platform-YaKsAq\\scripts\\verify-package.cjs:14:25)\r\n    at Module._compile (node:internal/modules/cjs/loader:1739:14)\r\n    at Object..js (node:internal/modules/cjs/loader:1904:10)\r\n    at Module.load (node:internal/modules/cjs/loader:1473:32)\r\n    at Function._load (node:internal/modules/cjs/loader:1285:12)\r\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14) {\r\n  errno: -4058,\r\n  code: 'ENOENT',\r\n  syscall: 'open',\r\n  path: 'C:\\\\Users\\\\hieuPC\\\\AppData\\\\Local\\\\Temp\\\\flowdm-package-platform-YaKsAq\\\\dist\\\\win-unpacked\\\\resources\\\\app.asar'\r\n}\r\n\r\nNode.js v23.6.0\r\n",
+    expected: /stale|corrupted/,
+    operator: 'match'
+  }
+
+✔ platform verifier rejects unknown, repeated and missing platform arguments (469.1449ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 1
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1269.5822
+
+✖ failing tests:
+
+test at tests\tools\package-platform.test.cjs:32:59
+✖ verifies a standalone linux archive without requiring other platforms (237.1497ms)
+  AssertionError [ERR_ASSERTION]: node:fs:563
+    return binding.open(
+                   ^
+
+  Error: ENOENT: no such file or directory, open 'C:\Users\hieuPC\AppData\Local\Temp\flowdm-package-platform-yHI37Y\dist\win-unpacked\resources\app.asar'
+      at Object.openSync (node:fs:563:18)
+      at readArchiveHeaderSync (I:\dich_nguoc\FlowDM\node_modules\@electron\asar\lib\disk.js:129:37)
+      at Object.readFilesystemSync (I:\dich_nguoc\FlowDM\node_modules\@electron\asar\lib\disk.js:153:24)
+      at Object.extractFile (I:\dich_nguoc\FlowDM\node_modules\@electron\asar\lib\asar.js:255:29)
+      at Object.<anonymous> (C:\Users\hieuPC\AppData\Local\Temp\flowdm-package-platform-yHI37Y\scripts\verify-package.cjs:14:25)
+      at Module._compile (node:internal/modules/cjs/loader:1739:14)
+      at Object..js (node:internal/modules/cjs/loader:1904:10)
+      at Module.load (node:internal/modules/cjs/loader:1473:32)
+      at Function._load (node:internal/modules/cjs/loader:1285:12)
+      at TracingChannel.traceSync (node:diagnostics_channel:322:14) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\hieuPC\\AppData\\Local\\Temp\\flowdm-package-platform-yHI37Y\\dist\\win-unpacked\\resources\\app.asar'
+  }
+
+  Node.js v23.6.0
+
+
+  1 !== 0
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\package-platform.test.cjs:35:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual'
+  }
+
+test at tests\tools\package-platform.test.cjs:32:59
+✖ verifies a standalone mac-x64 archive without requiring other platforms (131.3509ms)
+  AssertionError [ERR_ASSERTION]: node:fs:563
+    return binding.open(
+                   ^
+
+  Error: ENOENT: no such file or directory, open 'C:\Users\hieuPC\AppData\Local\Temp\flowdm-package-platform-gjKZqf\dist\win-unpacked\resources\app.asar'
+      at Object.openSync (node:fs:563:18)
+      at readArchiveHeaderSync (I:\dich_nguoc\FlowDM\node_modules\@electron\asar\lib\disk.js:129:37)
+      at Object.readFilesystemSync (I:\dich_nguoc\FlowDM\node_modules\@electron\asar\lib\disk.js:153:24)
+      at Object.extractFile (I:\dich_nguoc\FlowDM\node_modules\@electron\asar\lib\asar.js:255:29)
+      at Object.<anonymous> (C:\Users\hieuPC\AppData\Local\Temp\flowdm-package-platform-gjKZqf\scripts\verify-package.cjs:14:25)
+      at Module._compile (node:internal/modules/cjs/loader:1739:14)
+      at Object..js (node:internal/modules/cjs/loader:1904:10)
+      at Module.load (node:internal/modules/cjs/loader:1473:32)
+      at Function._load (node:internal/modules/cjs/loader:1285:12)
+      at TracingChannel.traceSync (node:diagnostics_channel:322:14) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\hieuPC\\AppData\\Local\\Temp\\flowdm-package-platform-gjKZqf\\dist\\win-unpacked\\resources\\app.asar'
+  }
+
+  Node.js v23.6.0
+
+
+  1 !== 0
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\package-platform.test.cjs:35:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual'
+  }
+
+test at tests\tools\package-platform.test.cjs:32:59
+✖ verifies a standalone mac-arm64 archive without requiring other platforms (122.7458ms)
+  AssertionError [ERR_ASSERTION]: node:fs:563
+    return binding.open(
+                   ^
+
+  Error: ENOENT: no such file or directory, open 'C:\Users\hieuPC\AppData\Local\Temp\flowdm-package-platform-Q55zBE\dist\win-unpacked\resources\app.asar'
+      at Object.openSync (node:fs:563:18)
+      at readArchiveHeaderSync (I:\dich_nguoc\FlowDM\node_modules\@electron\asar\lib\disk.js:129:37)
+      at Object.readFilesystemSync (I:\dich_nguoc\FlowDM\node_modules\@electron\asar\lib\disk.js:153:24)
+      at Object.extractFile (I:\dich_nguoc\FlowDM\node_modules\@electron\asar\lib\asar.js:255:29)
+      at Object.<anonymous> (C:\Users\hieuPC\AppData\Local\Temp\flowdm-package-platform-Q55zBE\scripts\verify-package.cjs:14:25)
+      at Module._compile (node:internal/modules/cjs/loader:1739:14)
+      at Object..js (node:internal/modules/cjs/loader:1904:10)
+      at Module.load (node:internal/modules/cjs/loader:1473:32)
+      at Function._load (node:internal/modules/cjs/loader:1285:12)
+      at TracingChannel.traceSync (node:diagnostics_channel:322:14) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\hieuPC\\AppData\\Local\\Temp\\flowdm-package-platform-Q55zBE\\dist\\win-unpacked\\resources\\app.asar'
+  }
+
+  Node.js v23.6.0
+
+
+  1 !== 0
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\package-platform.test.cjs:35:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual'
+  }
+
+test at tests\tools\package-platform.test.cjs:41:1
+✖ platform verifier refuses stale runtime bytes and missing selected archive (169.0079ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /stale|corrupted/. Input:
+
+  'node:fs:563\r\n' +
+    '  return binding.open(\r\n' +
+    '                 ^\r\n' +
+    '\r\n' +
+    "Error: ENOENT: no such file or directory, open 'C:\\Users\\hieuPC\\AppData\\Local\\Temp\\flowdm-package-platform-YaKsAq\\dist\\win-unpacked\\resources\\app.asar'\r\n" +
+    '    at Object.openSync (node:fs:563:18)\r\n' +
+    '    at readArchiveHeaderSync (I:\\dich_nguoc\\FlowDM\\node_modules\\@electron\\asar\\lib\\disk.js:129:37)\r\n' +
+    '    at Object.readFilesystemSync (I:\\dich_nguoc\\FlowDM\\node_modules\\@electron\\asar\\lib\\disk.js:153:24)\r\n' +
+    '    at Object.extractFile (I:\\dich_nguoc\\FlowDM\\node_modules\\@electron\\asar\\lib\\asar.js:255:29)\r\n' +
+    '    at Object.<anonymous> (C:\\Users\\hieuPC\\AppData\\Local\\Temp\\flowdm-package-platform-YaKsAq\\scripts\\verify-package.cjs:14:25)\r\n' +
+    '    at Module._compile (node:internal/modules/cjs/loader:1739:14)\r\n' +
+    '    at Object..js (node:internal/modules/cjs/loader:1904:10)\r\n' +
+    '    at Module.load (node:internal/modules/cjs/loader:1473:32)\r\n' +
+    '    at Function._load (node:internal/modules/cjs/loader:1285:12)\r\n' +
+    '    at TracingChannel.traceSync (node:diagnostics_channel:322:14) {\r\n' +
+    '  errno: -4058,\r\n' +
+    "  code: 'ENOENT',\r\n" +
+    "  syscall: 'open',\r\n" +
+    "  path: 'C:\\\\Users\\\\hieuPC\\\\AppData\\\\Local\\\\Temp\\\\flowdm-package-platform-YaKsAq\\\\dist\\\\win-unpacked\\\\resources\\\\app.asar'\r\n" +
+    '}\r\n' +
+    '\r\n' +
+    'Node.js v23.6.0\r\n'
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\package-platform.test.cjs:44:86)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: "node:fs:563\r\n  return binding.open(\r\n                 ^\r\n\r\nError: ENOENT: no such file or directory, open 'C:\\Users\\hieuPC\\AppData\\Local\\Temp\\flowdm-package-platform-YaKsAq\\dist\\win-unpacked\\resources\\app.asar'\r\n    at Object.openSync (node:fs:563:18)\r\n    at readArchiveHeaderSync (I:\\dich_nguoc\\FlowDM\\node_modules\\@electron\\asar\\lib\\disk.js:129:37)\r\n    at Object.readFilesystemSync (I:\\dich_nguoc\\FlowDM\\node_modules\\@electron\\asar\\lib\\disk.js:153:24)\r\n    at Object.extractFile (I:\\dich_nguoc\\FlowDM\\node_modules\\@electron\\asar\\lib\\asar.js:255:29)\r\n    at Object.<anonymous> (C:\\Users\\hieuPC\\AppData\\Local\\Temp\\flowdm-package-platform-YaKsAq\\scripts\\verify-package.cjs:14:25)\r\n    at Module._compile (node:internal/modules/cjs/loader:1739:14)\r\n    at Object..js (node:internal/modules/cjs/loader:1904:10)\r\n    at Module.load (node:internal/modules/cjs/loader:1473:32)\r\n    at Function._load (node:internal/modules/cjs/loader:1285:12)\r\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14) {\r\n  errno: -4058,\r\n  code: 'ENOENT',\r\n  syscall: 'open',\r\n  path: 'C:\\\\Users\\\\hieuPC\\\\AppData\\\\Local\\\\Temp\\\\flowdm-package-platform-YaKsAq\\\\dist\\\\win-unpacked\\\\resources\\\\app.asar'\r\n}\r\n\r\nNode.js v23.6.0\r\n",
+    expected: /stale|corrupted/,
+    operator: 'match'
+  }

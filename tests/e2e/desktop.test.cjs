@@ -8,13 +8,15 @@ const os = require('node:os');
 const crypto = require('node:crypto');
 
 test('desktop downloads exact bytes, pause/resume, persists, rejects invalid URLs and keeps isolation', { timeout: 120000 }, async t => {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'flowdm-e2e-'));
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'flowdm-e2e-kiểm thử '));
   const body = crypto.randomBytes(3 * 1024 * 1024);
+  const requests = [];
   const server = createServer((req, res) => {
     if (req.url === '/missing') { res.writeHead(404).end(); return; }
     let start = 0; let end = body.length - 1;
     const range = /^bytes=(\d+)-(\d*)$/.exec(req.headers.range || '');
     if (range) { start = Number(range[1]); end = range[2] ? Math.min(Number(range[2]), end) : end; }
+    requests.push({ method: req.method, start, end });
     const headers = { 'Content-Length': end - start + 1, 'Accept-Ranges': 'bytes', ETag: '"fixture-v1"' };
     if (range) headers['Content-Range'] = `bytes ${start}-${end}/${body.length}`;
     res.writeHead(range ? 206 : 200, headers);
@@ -44,7 +46,7 @@ test('desktop downloads exact bytes, pause/resume, persists, rejects invalid URL
   const launch = async () => {
     const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => key.toUpperCase() !== 'ELECTRON_RUN_AS_NODE'));
     const executablePath = process.env.FLOWDM_EXECUTABLE;
-    const app = await _electron.launch({ ...(executablePath ? { executablePath } : {}), args: executablePath ? [] : [path.resolve(__dirname, '../..')], env: { ...env, ...(coverageDir ? { NODE_V8_COVERAGE: coverageDir } : {}), FLOWDM_DATA_DIR: path.join(root, 'data'), FLOWDM_DOWNLOAD_DIR: path.join(root, 'downloads') } });
+    const app = await _electron.launch({ chromiumSandbox: true, ...(executablePath ? { executablePath } : {}), args: executablePath ? [] : [path.resolve(__dirname, '../..')], env: { ...env, ...(coverageDir ? { NODE_V8_COVERAGE: coverageDir } : {}), FLOWDM_DATA_DIR: path.join(root, 'data'), FLOWDM_DOWNLOAD_DIR: path.join(root, 'downloads') } });
     const page = await app.firstWindow();
     page.setDefaultTimeout(15000);
     page.on('pageerror', e => errors.push(e.message));
@@ -71,25 +73,36 @@ test('desktop downloads exact bytes, pause/resume, persists, rejects invalid URL
   await page.getByRole('button', { name: 'Đóng kết nối trình duyệt', exact: true }).click();
   await page.getByRole('button', { name: 'Thêm liên kết', exact: true }).click();
   await page.getByLabel('Địa chỉ tải').fill(`http://127.0.0.1:${server.address().port}/fixture.bin`);
-  await page.getByLabel('Tên tệp').fill('fixture.bin');
+  await page.getByLabel('Tên tệp').fill('tệp tải thử.bin');
+  await page.locator('#connections').selectOption('1');
   await page.getByRole('button', { name: 'Bắt đầu tải', exact: true }).click();
   await page.waitForFunction(() => [...document.querySelectorAll('[data-task]')].some(row => row.textContent.includes('Đang tải')));
-  const row = page.locator('[data-task]').filter({ hasText: 'fixture.bin' });
+  await page.waitForFunction(async () => (await window.flow.list()).data.some(task => task.status === 'downloading' && task.downloadedBytes >= 65536));
+  const row = page.locator('[data-task]').filter({ hasText: 'tệp tải thử.bin' });
   await row.getByRole('button', { name: 'Tạm dừng', exact: true }).click();
   await row.getByText('Tạm dừng', { exact: true }).waitFor();
+  const paused = (await page.evaluate(() => window.flow.list())).data.find(task => task.filename === 'tệp tải thử.bin');
+  assert.ok(paused.downloadedBytes >= 65536 && paused.downloadedBytes < body.length);
   await fs.mkdir(path.resolve('test-results'), { recursive: true });
   await page.screenshot({ path: 'test-results/desktop-paused.png' });
   await saveCoverage(page);
   await desktop.app.close(); desktop = null;
   desktop = await launch();
-  const restored = desktop.page.locator('[data-task]').filter({ hasText: 'fixture.bin' });
+  const restored = desktop.page.locator('[data-task]').filter({ hasText: 'tệp tải thử.bin' });
   await restored.getByText('Tạm dừng', { exact: true }).waitFor();
+  const checkpoint = (await desktop.page.evaluate(() => window.flow.list())).data.find(task => task.id === paused.id);
+  assert.equal(checkpoint.downloadedBytes, paused.downloadedBytes);
+  const resumeMark = requests.length;
   await restored.getByRole('button', { name: 'Tiếp tục', exact: true }).click();
   await restored.getByText('Hoàn tất', { exact: true }).waitFor({ timeout: 45000 });
-  const output = await fs.readFile(path.join(root, 'downloads', 'fixture.bin'));
+  const output = await fs.readFile(path.join(root, 'downloads', 'tệp tải thử.bin'));
   assert.deepEqual(output, body);
   const result = await desktop.page.evaluate(() => window.flow.list());
   assert.equal(result.ok, true); assert.equal(result.data[0].sha256, crypto.createHash('sha256').update(body).digest('hex'));
+  const resumedRequests = requests.slice(resumeMark).filter(item => item.method === 'GET' && item.end > 0);
+  assert.ok(resumedRequests.length > 0);
+  assert.ok(resumedRequests.every(item => item.start >= checkpoint.downloadedBytes), 'Resume must not replay the committed HTTP prefix');
+  await fs.writeFile('test-results/desktop-http-resume.json', JSON.stringify({ at: new Date().toISOString(), platform: process.platform, arch: process.arch, version: (await desktop.page.evaluate(() => window.flow.info())).data.version, packaged: !!process.env.FLOWDM_EXECUTABLE, pausedBytes: paused.downloadedBytes, restoredBytes: checkpoint.downloadedBytes, bytes: output.length, sha256: result.data[0].sha256, resumedRequests, noCommittedPrefixReplay: true }, null, 2));
   const invalid = await desktop.page.evaluate(() => window.flow.add({ url: 'file:///etc/passwd' }));
   assert.equal(invalid.ok, false);
   const failure = await desktop.page.evaluate(url => window.flow.add({ url, filename: 'missing.bin' }), `http://127.0.0.1:${server.address().port}/missing`);

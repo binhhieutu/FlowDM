@@ -1,0 +1,156 @@
+{
+  "at": "2026-10-26T07:51:20.336Z",
+  "version": "0.13.0",
+  "baseline": "5e00ab6",
+  "task": 9,
+  "status": "partial",
+  "linux": {
+    "status": "passed",
+    "environment": "Ubuntu 24.04 x64 on WSL2 / WSLg",
+    "kernel": "6.18.54.1-microsoft-standard-WSL2",
+    "archiveExtractedAndTested": true,
+    "unit": {
+      "tests": 475,
+      "pass": 473,
+      "fail": 0,
+      "skip": 2
+    },
+    "nativeGateCases": [
+      {
+        "name": "integrity",
+        "exitCode": 0,
+        "signal": null,
+        "elapsedMs": 313,
+        "pass": 0,
+        "skipped": 0,
+        "status": "passed"
+      },
+      {
+        "name": "platform-unit",
+        "exitCode": 0,
+        "signal": null,
+        "elapsedMs": 2200,
+        "pass": 15,
+        "skipped": 0,
+        "status": "passed"
+      },
+      {
+        "name": "sandbox",
+        "exitCode": 0,
+        "signal": null,
+        "elapsedMs": 4154,
+        "pass": 1,
+        "skipped": 0,
+        "status": "passed"
+      },
+      {
+        "name": "http-resume",
+        "exitCode": 0,
+        "signal": null,
+        "elapsedMs": 6347,
+        "pass": 1,
+        "skipped": 0,
+        "status": "passed"
+      },
+      {
+        "name": "media-resume",
+        "exitCode": 0,
+        "signal": null,
+        "elapsedMs": 14645,
+        "pass": 1,
+        "skipped": 1,
+        "status": "passed"
+      },
+      {
+        "name": "browser-capture",
+        "exitCode": 0,
+        "signal": null,
+        "elapsedMs": 23174,
+        "pass": 1,
+        "skipped": 0,
+        "status": "passed"
+      }
+    ],
+    "publicHttps": {
+      "at": "2026-10-26T07:48:35.251Z",
+      "version": "0.13.0",
+      "platform": "linux",
+      "noSandbox": false,
+      "url": "https://www.rfc-editor.org/rfc/rfc9110.txt",
+      "bytes": 502941,
+      "sha256": "21c1cdce6ab0e5509b04d84a28000836c7a087cf786efe6f04877ebfff47232a",
+      "expectedSha256": "21c1cdce6ab0e5509b04d84a28000836c7a087cf786efe6f04877ebfff47232a",
+      "status": "passed",
+      "packaged": true
+    },
+    "http": {
+      "at": "2026-10-26T07:45:11.223Z",
+      "platform": "linux",
+      "arch": "x64",
+      "version": "0.13.0",
+      "packaged": true,
+      "pausedBytes": 114688,
+      "restoredBytes": 114688,
+      "bytes": 3145728,
+      "sha256": "e54931e86c418830de27c066b74fa6cf47209bc6bf9dc73c6a1d5d315278a12f",
+      "resumedRequests": [
+        {
+          "method": "GET",
+          "start": 114688,
+          "end": 3145727
+        }
+      ],
+      "noCommittedPrefixReplay": true
+    },
+    "bareMetalOrSeparateLinuxDesktop": "not tested",
+    "firefox": "not tested on Linux"
+  },
+  "macOS": {
+    "x64": "not tested: no macOS host available",
+    "arm64": "not tested: no macOS host available",
+    "gatekeeper": "not tested",
+    "built": false
+  },
+  "windows": {
+    "unit": {
+      "tests": 475,
+      "pass": 471,
+      "fail": 0,
+      "skip": 4
+    },
+    "coverage": {
+      "lines": 93.18,
+      "branches": 85.95,
+      "functions": 87.24
+    },
+    "packagedHttpResume": "passed",
+    "portableHttpResumeAndTools": "passed"
+  },
+  "auditVulnerabilities": 0,
+  "artifacts": [
+    {
+      "file": "dist/FlowDM 0.13.0.exe",
+      "bytes": 263254043,
+      "sha256": "6b3f60b173c1856fa86ed20189668bda391e4570eea34a55cffdab8d465df11d"
+    },
+    {
+      "file": "dist/flowdm-0.13.0.tar.gz",
+      "bytes": 125715216,
+      "sha256": "0dbef2d41c7fe5391c7e35a4f83d6eecf179f7f7b067eaeaa876b7dc3445afec"
+    }
+  ],
+  "asarSha256": "6c962eafd8d22e27df7e9c2fd15259a30929e9c3745446fb9c5d3c539bf92ede",
+  "integrity": {
+    "runtimeAssetsExtensionFiles": 68,
+    "ftpDependencyFiles": 16,
+    "linuxArchivePayloadFiles": 71
+  },
+  "limitations": [
+    "Task 8c YouTube proxy full download remains blocked HTTP401; not retried here",
+    "Task 8e FAT/exFAT remains unsupported",
+    "YouTube Internet opt-in test skipped in native media suite; local HLS/DASH are actual controlled video transfers",
+    "No macOS host, signing, Gatekeeper or ARM64 execution",
+    "No push or publication"
+  ],
+  "provenance": "Native reports come from the final tar extraction; older v2/v5 harness filenames do not denote app version. Logs normalize only ANSI/trailing whitespace. No product runtime changes after build."
+}

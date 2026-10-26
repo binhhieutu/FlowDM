@@ -4,11 +4,26 @@ const crypto = require('node:crypto');
 const asar = require('@electron/asar');
 const root = path.resolve(__dirname, '..');
 const manifest = [];
+const archives = {
+  win: ['win-unpacked', 'win-unpacked/resources/app.asar'],
+  linux: ['linux-unpacked', 'linux-unpacked/resources/app.asar'],
+  'mac-x64': ['mac-x64', 'mac/FlowDM.app/Contents/Resources/app.asar'],
+  'mac-arm64': ['mac-arm64', 'mac-arm64/FlowDM.app/Contents/Resources/app.asar']
+};
+const args = process.argv.slice(2);
+const targets = [];
+for (let index = 0; index < args.length; index += 2) {
+  const target = args[index + 1];
+  if (args[index] !== '--platform' || !Object.hasOwn(archives, target) || targets.includes(target)) throw new Error('Usage: --platform win|linux|mac-x64|mac-arm64 (no repeated platforms)');
+  targets.push(target);
+}
+if (!targets.length) targets.push('win', 'linux');
 function walk(directory) {
   return fs.readdirSync(path.join(root, directory), { withFileTypes: true }).flatMap(entry => entry.isDirectory() ? walk(`${directory}/${entry.name}`) : [`${directory}/${entry.name}`]);
 }
-for (const platform of ['win-unpacked', 'linux-unpacked']) {
-  const archive = path.join(root, 'dist', platform, 'resources', 'app.asar');
+for (const target of targets) {
+  const [platform, relativeArchive] = archives[target];
+  const archive = path.join(root, 'dist', relativeArchive);
   let verified = 0;
   for (const filename of [...walk('src'), ...walk('assets'), ...walk('extension')]) {
     const actual = asar.extractFile(archive, filename.split('/').join(path.sep)); const expected = fs.readFileSync(path.join(root, filename));

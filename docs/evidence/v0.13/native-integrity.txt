@@ -1,0 +1,1 @@
+[{"platform":"linux-unpacked","filesVerified":68,"ftpDependency":{"version":"6.2.3","filesVerified":16,"license":"MIT"},"asarSha256":"6c962eafd8d22e27df7e9c2fd15259a30929e9c3745446fb9c5d3c539bf92ede"}]

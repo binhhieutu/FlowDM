@@ -1,0 +1,2855 @@
+
+> flowdm@0.13.0 test
+> node --test tests/core/*.test.cjs tests/media/*.test.cjs tests/bridge/*.test.cjs tests/browser/*.test.cjs tests/tools/*.test.cjs
+
+TAP version 13
+# Subtest: previewBatch accepts only bounded canonical HTTP links, not credentials or job options
+ok 1 - previewBatch accepts only bounded canonical HTTP links, not credentials or job options
+  ---
+  duration_ms: 11.3502
+  type: 'test'
+  ...
+# Subtest: native preview is replay-safe, stages once and never creates downloads
+ok 2 - native preview is replay-safe, stages once and never creates downloads
+  ---
+  duration_ms: 28.1331
+  type: 'test'
+  ...
+# Subtest: bridge accepts only bounded integer connection choices
+ok 3 - bridge accepts only bounded integer connection choices
+  ---
+  duration_ms: 2.6836
+  type: 'test'
+  ...
+# Subtest: frames preserve Unicode through partial prefixes, payload and multiple frames
+ok 4 - frames preserve Unicode through partial prefixes, payload and multiple frames
+  ---
+  duration_ms: 2.9662
+  type: 'test'
+  ...
+# Subtest: malformed, truncated, oversized and invalid UTF8 frames fail
+ok 5 - malformed, truncated, oversized and invalid UTF8 frames fail
+  ---
+  duration_ms: 12.8355
+  type: 'test'
+  ...
+# Subtest: authenticated private IPC acknowledges and deduplicates concurrent requests
+ok 6 - authenticated private IPC acknowledges and deduplicates concurrent requests
+  ---
+  duration_ms: 29.3058
+  type: 'test'
+  ...
+# Subtest: schema, operations, credentials, URLs, fields and request ids are rejected before callback
+ok 7 - schema, operations, credentials, URLs, fields and request ids are rejected before callback
+  ---
+  duration_ms: 15.9715
+  type: 'test'
+  ...
+# Subtest: v2 payload permits explicit direct/HLS metadata and bounded allowlisted headers
+ok 8 - v2 payload permits explicit direct/HLS metadata and bounded allowlisted headers
+  ---
+  duration_ms: 12.9791
+  type: 'test'
+  ...
+# Subtest: dedupe compares entire canonical payload, cloned headers and redacted acknowledgment
+ok 9 - dedupe compares entire canonical payload, cloned headers and redacted acknowledgment
+  ---
+  duration_ms: 12.5596
+  type: 'test'
+  ...
+# Subtest: host bundle validates inputs and creates an executable isolated native host
+ok 10 - host bundle validates inputs and creates an executable isolated native host
+  ---
+  duration_ms: 86.1544
+  type: 'test'
+  ...
+# Subtest: host handles invalid requests, malformed/truncated frames and message flood without echoing credentials
+ok 11 - host handles invalid requests, malformed/truncated frames and message flood without echoing credentials
+  ---
+  duration_ms: 11.2947
+  type: 'test'
+  ...
+# Subtest: installer CLI preserves legacy interface and rejects unsafe paths
+ok 12 - installer CLI preserves legacy interface and rejects unsafe paths
+  ---
+  duration_ms: 90.6553
+  type: 'test'
+  ...
+# Subtest: callback errors and deadlines return bounded safe errors
+ok 13 - callback errors and deadlines return bounded safe errors
+  ---
+  duration_ms: 48.337
+  type: 'test'
+  ...
+# Subtest: invalid callback results and absent configuration fail safely
+ok 14 - invalid callback results and absent configuration fail safely
+  ---
+  duration_ms: 17.6186
+  type: 'test'
+  ...
+# Subtest: native host subprocess uses framed stdout with Unicode and absent desktop error
+ok 15 - native host subprocess uses framed stdout with Unicode and absent desktop error
+  ---
+  duration_ms: 107.0103
+  type: 'test'
+  ...
+# Subtest: native rebind operations validate exact origin, task binding and allowlisted bounded headers
+ok 16 - native rebind operations validate exact origin, task binding and allowlisted bounded headers
+  ---
+  duration_ms: 14.1273
+  type: 'test'
+  ...
+# Subtest: private bridge prepares and commits same task, redacts replies and keys replay cache by operation
+ok 17 - private bridge prepares and commits same task, redacts replies and keys replay cache by operation
+  ---
+  duration_ms: 142.1121
+  type: 'test'
+  ...
+# Subtest: bridge deadline aborts preflight and never binds headers after returning timeout
+ok 18 - bridge deadline aborts preflight and never binds headers after returning timeout
+  ---
+  duration_ms: 280.8289
+  type: 'test'
+  ...
+# Subtest: native client disconnect aborts outstanding preparation and clears the desktop nonce
+ok 19 - native client disconnect aborts outstanding preparation and clears the desktop nonce
+  ---
+  duration_ms: 291.6441
+  type: 'test'
+  ...
+# Subtest: capture pauses, waits for matching native acknowledgement then cancels
+ok 20 - capture pauses, waits for matching native acknowledgement then cancels
+  ---
+  duration_ms: 5.9168
+  type: 'test'
+  ...
+# Subtest: capture resumes on error without cancellation
+ok 21 - capture resumes on error without cancellation
+  ---
+  duration_ms: 1.5129
+  type: 'test'
+  ...
+# Subtest: capture resumes on wrong without cancellation
+ok 22 - capture resumes on wrong without cancellation
+  ---
+  duration_ms: 1.8604
+  type: 'test'
+  ...
+# Subtest: capture resumes on timeout without cancellation
+ok 23 - capture resumes on timeout without cancellation
+  ---
+  duration_ms: 20.596
+  type: 'test'
+  ...
+# Subtest: completed browser download or failed pause never hands off
+ok 24 - completed browser download or failed pause never hands off
+  ---
+  duration_ms: 0.6397
+  type: 'test'
+  ...
+# Subtest: unsafe, incognito, disabled downloads are left alone
+ok 25 - unsafe, incognito, disabled downloads are left alone
+  ---
+  duration_ms: 0.5304
+  type: 'test'
+  ...
+# Subtest: duplicate onCreated events cannot hand off twice
+ok 26 - duplicate onCreated events cannot hand off twice
+  ---
+  duration_ms: 0.797
+  type: 'test'
+  ...
+# Subtest: browser completing during ack is never canceled
+ok 27 - browser completing during ack is never canceled
+  ---
+  duration_ms: 2.1642
+  type: 'test'
+  ...
+# Subtest: POST downloads never transfer ownership and headers require per-origin consent
+ok 28 - POST downloads never transfer ownership and headers require per-origin consent
+  ---
+  duration_ms: 1.2418
+  type: 'test'
+  ...
+# Subtest: missing durable task id is not accepted
+ok 29 - missing durable task id is not accepted
+  ---
+  duration_ms: 1.7004
+  type: 'test'
+  ...
+# Subtest: credential headers are collected only after origin consent and revoked immediately
+ok 30 - credential headers are collected only after origin consent and revoked immediately
+  ---
+  duration_ms: 1.7647
+  type: 'test'
+  ...
+# Subtest: authenticated browser downloads without consent stay entirely in browser
+ok 31 - authenticated browser downloads without consent stay entirely in browser
+  ---
+  duration_ms: 0.2558
+  type: 'test'
+  ...
+# Subtest: auto capture uses the filename available after pause
+ok 32 - auto capture uses the filename available after pause
+  ---
+  duration_ms: 0.4297
+  type: 'test'
+  ...
+# Subtest: explicit handoff can obtain consented cookies without page reload
+ok 33 - explicit handoff can obtain consented cookies without page reload
+  ---
+  duration_ms: 0.8268
+  type: 'test'
+  ...
+# Subtest: cookie optional permission denial and revocation during lookup never leak cookies
+ok 34 - cookie optional permission denial and revocation during lookup never leak cookies
+  ---
+  duration_ms: 0.4303
+  type: 'test'
+  ...
+# Subtest: revoke then re-enable during cookie lookup aborts the old handoff
+ok 35 - revoke then re-enable during cookie lookup aborts the old handoff
+  ---
+  duration_ms: 1.5127
+  type: 'test'
+  ...
+# Subtest: permission removal during cookie lookup resumes automatic browser download without native send
+ok 36 - permission removal during cookie lookup resumes automatic browser download without native send
+  ---
+  duration_ms: 0.5422
+  type: 'test'
+  ...
+# Subtest: automatic capture retries a transient onCreated pause error after filename assignment
+ok 37 - automatic capture retries a transient onCreated pause error after filename assignment
+  ---
+  duration_ms: 10.5169
+  type: 'test'
+  ...
+# Subtest: pause retry stops if browser completes, and a failed first event does not poison its id
+ok 38 - pause retry stops if browser completes, and a failed first event does not poison its id
+  ---
+  duration_ms: 0.7083
+  type: 'test'
+  ...
+# Subtest: consented handoff derives only User-Agent and preserves actually observed Referer
+ok 39 - consented handoff derives only User-Agent and preserves actually observed Referer
+  ---
+  duration_ms: 0.5463
+  type: 'test'
+  ...
+# Subtest: cross-origin page query secrets never become an invented Referer
+ok 40 - cross-origin page query secrets never become an invented Referer
+  ---
+  duration_ms: 0.2605
+  type: 'test'
+  ...
+# Subtest: DASH and YouTube handoffs infer their external type and omit all browser-derived headers even with consent
+ok 41 - DASH and YouTube handoffs infer their external type and omit all browser-derived headers even with consent
+  ---
+  duration_ms: 0.4976
+  type: 'test'
+  ...
+# Subtest: automatic capture leaves MPD manifests in the browser
+ok 42 - automatic capture leaves MPD manifests in the browser
+  ---
+  duration_ms: 0.2022
+  type: 'test'
+  ...
+# Subtest: content detector reports dynamic media, deduplicates overlay and offers a real click download
+ok 43 - content detector reports dynamic media, deduplicates overlay and offers a real click download
+  ---
+  duration_ms: 12.0629
+  type: 'test'
+  ...
+# Subtest: media classification detects HLS, direct video/audio and DASH
+ok 44 - media classification detects HLS, direct video/audio and DASH
+  ---
+  duration_ms: 1.5181
+  type: 'test'
+  ...
+# Subtest: YouTube page URLs are canonicalized and lookalikes or non-video pages are rejected
+ok 45 - YouTube page URLs are canonicalized and lookalikes or non-video pages are rejected
+  ---
+  duration_ms: 1.0476
+  type: 'test'
+  ...
+# Subtest: media store accepts only canonical explicit YouTube pages
+ok 46 - media store accepts only canonical explicit YouTube pages
+  ---
+  duration_ms: 1.5554
+  type: 'test'
+  ...
+# Subtest: media deduplicates normalized URLs without stripping signed query and expires bounded state
+ok 47 - media deduplicates normalized URLs without stripping signed query and expires bounded state
+  ---
+  duration_ms: 0.4707
+  type: 'test'
+  ...
+# Subtest: media state snapshots survive worker restart with bounded timestamps
+ok 48 - media state snapshots survive worker restart with bounded timestamps
+  ---
+  duration_ms: 0.6663
+  type: 'test'
+  ...
+# Subtest: media rejects malformed, credential, browser URLs and unrelated responses
+ok 49 - media rejects malformed, credential, browser URLs and unrelated responses
+  ---
+  duration_ms: 1.7689
+  type: 'test'
+  ...
+# Subtest: popup shows selectable DASH and persists capture and credential settings
+ok 50 - popup shows selectable DASH and persists capture and credential settings
+  ---
+  duration_ms: 5.6308
+  type: 'test'
+  ...
+# Subtest: popup honors optional permission denial and reports handoff failure
+ok 51 - popup honors optional permission denial and reports handoff failure
+  ---
+  duration_ms: 3.6226
+  type: 'test'
+  ...
+# Subtest: popup handles unsupported pages, empty detection and connection failure
+ok 52 - popup handles unsupported pages, empty detection and connection failure
+  ---
+  duration_ms: 1.8673
+  type: 'test'
+  ...
+# Subtest: popup can explicitly choose a detected media origin for credential consent
+ok 53 - popup can explicitly choose a detected media origin for credential consent
+  ---
+  duration_ms: 2.1281
+  type: 'test'
+  ...
+# Subtest: popup exposes a persistent connection choice for video handoffs
+ok 54 - popup exposes a persistent connection choice for video handoffs
+  ---
+  duration_ms: 1.4142
+  type: 'test'
+  ...
+# Subtest: connection preference is trusted, bounded and included in native handoff
+ok 55 - connection preference is trusted, bounded and included in native handoff
+  ---
+  duration_ms: 15.7663
+  type: 'test'
+  ...
+# Subtest: context menu sends explicit valid URL and ignores blob URLs
+ok 56 - context menu sends explicit valid URL and ignores blob URLs
+  ---
+  duration_ms: 3.1852
+  type: 'test'
+  ...
+# Subtest: settings are persistent and content scripts cannot change capture or credential consent
+ok 57 - settings are persistent and content scripts cannot change capture or credential consent
+  ---
+  duration_ms: 7.8501
+  type: 'test'
+  ...
+# Subtest: network and dynamic content media are listed per tab, deduplicated and cleared on navigation
+ok 58 - network and dynamic content media are listed per tab, deduplicated and cleared on navigation
+  ---
+  duration_ms: 2.8977
+  type: 'test'
+  ...
+# Subtest: bundle helper writes only requested destination and exact extension origin
+ok 59 - bundle helper writes only requested destination and exact extension origin
+  ---
+  duration_ms: 27.5821
+  type: 'test'
+  ...
+# Subtest: background excludes incognito media, accepts explicit DASH and removes tab state
+ok 60 - background excludes incognito media, accepts explicit DASH and removes tab state
+  ---
+  duration_ms: 2.4663
+  type: 'test'
+  ...
+# Subtest: content may add only its own canonical YouTube watch page and a user action can hand it off
+ok 61 - content may add only its own canonical YouTube watch page and a user action can hand it off
+  ---
+  duration_ms: 2.5744
+  type: 'test'
+  ...
+# Subtest: trusted popup derives only the current public YouTube page when no media element was detected
+ok 62 - trusted popup derives only the current public YouTube page when no media element was detected
+  ---
+  duration_ms: 2.2088
+  type: 'test'
+  ...
+# Subtest: trusted popup reconciles YouTube rows after SPA navigation and rejects a stale selection
+ok 63 - trusted popup reconciles YouTube rows after SPA navigation and rejects a stale selection
+  ---
+  duration_ms: 2.3278
+  type: 'test'
+  ...
+# Subtest: own extension popup tab is trusted while content tab cannot alter settings
+ok 64 - own extension popup tab is trusted while content tab cannot alter settings
+  ---
+  duration_ms: 1.8877
+  type: 'test'
+  ...
+# Subtest: permission removal event invalidates pending cookies even after immediate regrant
+ok 65 - permission removal event invalidates pending cookies even after immediate regrant
+  ---
+  duration_ms: 3.2035
+  type: 'test'
+  ...
+# Subtest: handoff never invents a Referer from page context
+ok 66 - handoff never invents a Referer from page context
+  ---
+  duration_ms: 2.7612
+  type: 'test'
+  ...
+# Subtest: browser ownership ACK requires an accessible non-login response before queueing
+ok 67 - browser ownership ACK requires an accessible non-login response before queueing
+  ---
+  duration_ms: 111.2854
+  type: 'test'
+  ...
+# Subtest: only desktop initiation exposes bounded same-origin requests, clones DTOs and supersedes old nonce
+ok 68 - only desktop initiation exposes bounded same-origin requests, clones DTOs and supersedes old nonce
+  ---
+  duration_ms: 135.4841
+  type: 'test'
+  ...
+# Subtest: prepare never authorizes resume, commit consumes exact binding and leaves the job paused
+ok 69 - prepare never authorizes resume, commit consumes exact binding and leaves the job paused
+  ---
+  duration_ms: 98.5513
+  type: 'test'
+  ...
+# Subtest: wrong task or origin, expired nonce and changed source cannot install credentials
+ok 70 - wrong task or origin, expired nonce and changed source cannot install credentials
+  ---
+  duration_ms: 69.0215
+  type: 'test'
+  ...
+# Subtest: cancel and application shutdown discard prepared headers and reject late commits
+ok 71 - cancel and application shutdown discard prepared headers and reject late commits
+  ---
+  duration_ms: 54.8944
+  type: 'test'
+  ...
+# Subtest: aborted preflight and failed commit journal never create late credential binding
+ok 72 - aborted preflight and failed commit journal never create late credential binding
+  ---
+  duration_ms: 43.7627
+  type: 'test'
+  ...
+# Subtest: consented rebind lists bounded challenges and prepares then commits fresh exact-origin headers without resuming
+ok 73 - consented rebind lists bounded challenges and prepares then commits fresh exact-origin headers without resuming
+  ---
+  duration_ms: 14.1814
+  type: 'test'
+  ...
+# Subtest: missing consent, cross-origin challenge and absent current authentication never send credentials
+ok 74 - missing consent, cross-origin challenge and absent current authentication never send credentials
+  ---
+  duration_ms: 1.102
+  type: 'test'
+  ...
+# Subtest: revoking then regranting during cookie lookup aborts the old rebind before any credential send
+ok 75 - revoking then regranting during cookie lookup aborts the old rebind before any credential send
+  ---
+  duration_ms: 0.7051
+  type: 'test'
+  ...
+# Subtest: consent changing while desktop prepares cancels without commit
+ok 76 - consent changing while desktop prepares cancels without commit
+  ---
+  duration_ms: 1.015
+  type: 'test'
+  ...
+# Subtest: permission changing while desktop prepares cancels without commit
+ok 77 - permission changing while desktop prepares cancels without commit
+  ---
+  duration_ms: 1.9832
+  type: 'test'
+  ...
+# Subtest: navigation changing while desktop prepares cancels without commit
+ok 78 - navigation changing while desktop prepares cancels without commit
+  ---
+  duration_ms: 0.6916
+  type: 'test'
+  ...
+# Subtest: wrong prepare acknowledgement and native timeout cancel instead of committing
+ok 79 - wrong prepare acknowledgement and native timeout cancel instead of committing
+  ---
+  duration_ms: 14.9748
+  type: 'test'
+  ...
+# Subtest: malformed desktop lists and context changes during list retrieval never expose usable challenges
+ok 80 - malformed desktop lists and context changes during list retrieval never expose usable challenges
+  ---
+  duration_ms: 3.0107
+  type: 'test'
+  ...
+# Subtest: failed prepare returns promptly even when its best-effort cancel receives no acknowledgement
+ok 81 - failed prepare returns promptly even when its best-effort cancel receives no acknowledgement
+  ---
+  duration_ms: 1002.6251
+  type: 'test'
+  ...
+# Subtest: only trusted current-tab popup may list and submit a cached desktop challenge once
+ok 82 - only trusted current-tab popup may list and submit a cached desktop challenge once
+  ---
+  duration_ms: 12.956
+  type: 'test'
+  ...
+# Subtest: tab navigation and incognito invalidate cached challenges without a native prepare
+ok 83 - tab navigation and incognito invalidate cached challenges without a native prepare
+  ---
+  duration_ms: 4.7161
+  type: 'test'
+  ...
+# Subtest: popup explicitly finds pending desktop requests and submits only the selected binding
+ok 84 - popup explicitly finds pending desktop requests and submits only the selected binding
+  ---
+  duration_ms: 3.319
+  type: 'test'
+  ...
+# Subtest: popup rebind control requires consent for the active page origin, not another detected media origin
+ok 85 - popup rebind control requires consent for the active page origin, not another detected media origin
+  ---
+  duration_ms: 2.0055
+  type: 'test'
+  ...
+# Subtest: Firefox background combines Promise browser APIs with callback native messaging and preloaded scripts
+ok 86 - Firefox background combines Promise browser APIs with callback native messaging and preloaded scripts
+  ---
+  duration_ms: 10.2764
+  type: 'test'
+  ...
+# Subtest: Firefox automatic transfer keeps the browser running until durable ACK and verifies cancellation
+ok 87 - Firefox automatic transfer keeps the browser running until durable ACK and verifies cancellation
+  ---
+  duration_ms: 2.5123
+  type: 'test'
+  ...
+# Subtest: Firefox error leaves the original download entirely untouched
+ok 88 - Firefox error leaves the original download entirely untouched
+  ---
+  duration_ms: 0.8158
+  type: 'test'
+  ...
+# Subtest: Firefox timeout leaves the original download entirely untouched
+ok 89 - Firefox timeout leaves the original download entirely untouched
+  ---
+  duration_ms: 15.3886
+  type: 'test'
+  ...
+# Subtest: Firefox unsafe and already-paused downloads remain in the browser
+ok 90 - Firefox unsafe and already-paused downloads remain in the browser
+  ---
+  duration_ms: 0.5971
+  type: 'test'
+  ...
+# Subtest: Firefox does not cancel after ACK when complete changes
+ok 91 - Firefox does not cancel after ACK when complete changes
+  ---
+  duration_ms: 0.5915
+  type: 'test'
+  ...
+# Subtest: Firefox does not cancel after ACK when unsafe changes
+ok 92 - Firefox does not cancel after ACK when unsafe changes
+  ---
+  duration_ms: 0.3876
+  type: 'test'
+  ...
+# Subtest: Firefox does not cancel after ACK when paused changes
+ok 93 - Firefox does not cancel after ACK when paused changes
+  ---
+  duration_ms: 0.5805
+  type: 'test'
+  ...
+# Subtest: Firefox does not cancel after ACK when source changes
+ok 94 - Firefox does not cancel after ACK when source changes
+  ---
+  duration_ms: 0.3682
+  type: 'test'
+  ...
+# Subtest: Firefox does not cancel after ACK when autoCapture changes
+ok 95 - Firefox does not cancel after ACK when autoCapture changes
+  ---
+  duration_ms: 0.3667
+  type: 'test'
+  ...
+# Subtest: Firefox does not cancel after ACK when permission changes
+ok 96 - Firefox does not cancel after ACK when permission changes
+  ---
+  duration_ms: 0.4429
+  type: 'test'
+  ...
+# Subtest: Firefox checks the browser state instead of trusting a no-op cancel callback
+ok 97 - Firefox checks the browser state instead of trusting a no-op cancel callback
+  ---
+  duration_ms: 0.4377
+  type: 'test'
+  ...
+# Subtest: lost browser credentials rebind and resize live HTTP connections without replaying retained byte ranges
+ok 98 - lost browser credentials rebind and resize live HTTP connections without replaying retained byte ranges
+  ---
+  duration_ms: 781.5625
+  type: 'test'
+  ...
+# Subtest: prepared credentials remain unusable until commit and cannot commit after task source/state changes
+ok 99 - prepared credentials remain unusable until commit and cannot commit after task source/state changes
+  ---
+  duration_ms: 105.4589
+  type: 'test'
+  ...
+# Subtest: rebind rejects login HTML, changed identity, unsupported headers and cross-origin redirects while preserving bytes
+ok 100 - rebind rejects login HTML, changed identity, unsupported headers and cross-origin redirects while preserving bytes
+  ---
+  duration_ms: 274.4399
+  type: 'test'
+  ...
+# Subtest: abort never installs staged credentials or discards HTTP bytes
+ok 101 - abort never installs staged credentials or discards HTTP bytes
+  ---
+  duration_ms: 111.2643
+  type: 'test'
+  ...
+# Subtest: zero-byte browser jobs refuse login HTML and invalid or adapter-blocked header envelopes
+ok 102 - zero-byte browser jobs refuse login HTML and invalid or adapter-blocked header envelopes
+  ---
+  duration_ms: 40.1253
+  type: 'test'
+  ...
+# Subtest: HLS browser rebind resumes retained resources after restart without fetching completed fragments again
+ok 103 - HLS browser rebind resumes retained resources after restart without fetching completed fragments again
+  ---
+  duration_ms: 478.6017
+  type: 'test'
+  ...
+# Subtest: Firefox registration targets only per-user Mozilla locations
+ok 104 - Firefox registration targets only per-user Mozilla locations
+  ---
+  duration_ms: 1.324
+  type: 'test'
+  ...
+# Subtest: Firefox host grants one exact Gecko ID without Chromium origins
+ok 105 - Firefox host grants one exact Gecko ID without Chromium origins
+  ---
+  duration_ms: 19.0333
+  type: 'test'
+  ...
+# Subtest: Firefox registry override touches only the preferred 32-bit view and restores the prior value
+ok 106 - Firefox registry override touches only the preferred 32-bit view and restores the prior value
+  ---
+  duration_ms: 1.2075
+  type: 'test'
+  ...
+# Subtest: Firefox export is separate and restores its prior registration without replacing Chromium
+ok 107 - Firefox export is separate and restores its prior registration without replacing Chromium
+  ---
+  duration_ms: 143.1776
+  type: 'test'
+  ...
+# Subtest: Firefox existing external registration changes are never overwritten on disconnect
+ok 108 - Firefox existing external registration changes are never overwritten on disconnect
+  ---
+  duration_ms: 81.8657
+  type: 'test'
+  ...
+# Subtest: page link collector canonicalizes unique HTTP anchors while retaining query and Unicode filenames
+ok 109 - page link collector canonicalizes unique HTTP anchors while retaining query and Unicode filenames
+  ---
+  duration_ms: 3.7764
+  type: 'test'
+  ...
+# Subtest: page link collector bounds rows and payload without reading unbounded anchors
+ok 110 - page link collector bounds rows and payload without reading unbounded anchors
+  ---
+  duration_ms: 21.5243
+  type: 'test'
+  ...
+# Subtest: explicit extension page collection and selected subset stage one native preview, never add jobs or headers
+ok 111 - explicit extension page collection and selected subset stage one native preview, never add jobs or headers
+  ---
+  duration_ms: 10.5206
+  type: 'test'
+  ...
+# Subtest: web content, incognito, inactive tab, uncached URLs and navigation cannot stage native preview
+ok 112 - web content, incognito, inactive tab, uncached URLs and navigation cannot stage native preview
+  ---
+  duration_ms: 2.612
+  type: 'test'
+  ...
+# Subtest: navigation while collecting and wrong native acknowledgements leave no usable preview
+ok 113 - navigation while collecting and wrong native acknowledgements leave no usable preview
+  ---
+  duration_ms: 9.935
+  type: 'test'
+  ...
+# Subtest: content page collection is read-only and popup exposes an unchecked preview flow
+ok 114 - content page collection is read-only and popup exposes an unchecked preview flow
+  ---
+  duration_ms: 2.8722
+  type: 'test'
+  ...
+# Subtest: collection follows the rendered document base URL without evaluating code
+ok 115 - collection follows the rendered document base URL without evaluating code
+  ---
+  duration_ms: 0.3165
+  type: 'test'
+  ...
+# Subtest: popup requires trusted collection, starts unchecked and sends only filtered user selection to desktop preview
+ok 116 - popup requires trusted collection, starts unchecked and sends only filtered user selection to desktop preview
+  ---
+  duration_ms: 3.4867
+  type: 'test'
+  ...
+# Subtest: linux registration preserves exact previous manifest in a private Unicode home
+ok 117 - linux registration preserves exact previous manifest in a private Unicode home
+  ---
+  duration_ms: 81.8593
+  type: 'test'
+  ...
+# Subtest: darwin registration preserves exact previous manifest in a private Unicode home
+ok 118 - darwin registration preserves exact previous manifest in a private Unicode home
+  ---
+  duration_ms: 55.1205
+  type: 'test'
+  ...
+# Subtest: native POSIX host wrapper executes through Unicode, spaces and apostrophes with private modes
+ok 119 - native POSIX host wrapper executes through Unicode, spaces and apostrophes with private modes
+  ---
+  duration_ms: 65.3968
+  type: 'test'
+  ...
+# Subtest: setup exports a stable extension, validates inputs and restores prior registration
+ok 120 - setup exports a stable extension, validates inputs and restores prior registration
+  ---
+  duration_ms: 237.1839
+  type: 'test'
+  ...
+# Subtest: registration targets are scoped to named per-user native hosts
+ok 121 - registration targets are scoped to named per-user native hosts
+  ---
+  duration_ms: 1.422
+  type: 'test'
+  ...
+# Subtest: POSIX registration restores byte-exact contents and removes only its own file
+ok 122 - POSIX registration restores byte-exact contents and removes only its own file
+  ---
+  duration_ms: 9.9695
+  type: 'test'
+  ...
+# Subtest: host runtime is verified and Windows copy survives portable extraction cleanup
+ok 123 - host runtime is verified and Windows copy survives portable extraction cleanup
+  ---
+  duration_ms: 48.4588
+  type: 'test'
+  ...
+# Subtest: write-ahead setup intent preserves previous ownership when registration mutates then throws
+ok 124 - write-ahead setup intent preserves previous ownership when registration mutates then throws
+  ---
+  duration_ms: 66.7371
+  type: 'test'
+  ...
+# Subtest: recovers pending before/after/disconnect states and preserves unrelated external changes
+ok 125 - recovers pending before/after/disconnect states and preserves unrelated external changes
+  ---
+  duration_ms: 34.3166
+  type: 'test'
+  ...
+# Subtest: batch parser canonicalizes, deduplicates fragments and preserves meaningful query and Unicode
+ok 126 - batch parser canonicalizes, deduplicates fragments and preserves meaningful query and Unicode
+  ---
+  duration_ms: 2.1902
+  type: 'test'
+  ...
+# Subtest: batch parser reports line errors without echoing unsafe URLs or embedded credentials
+ok 127 - batch parser reports line errors without echoing unsafe URLs or embedded credentials
+  ---
+  duration_ms: 2.4062
+  type: 'test'
+  ...
+# Subtest: batch parser rejects oversized inputs, too many nonempty lines, invalid type and overlong URL
+ok 128 - batch parser rejects oversized inputs, too many nonempty lines, invalid type and overlong URL
+  ---
+  duration_ms: 15.6947
+  type: 'test'
+  ...
+# Subtest: batch parser bounds canonical encoded aggregate as well as raw UTF8 bytes
+ok 129 - batch parser bounds canonical encoded aggregate as well as raw UTF8 bytes
+  ---
+  duration_ms: 6.5225
+  type: 'test'
+  ...
+# Subtest: batch parser refuses embedded controls instead of silently changing the URL
+ok 130 - batch parser refuses embedded controls instead of silently changing the URL
+  ---
+  duration_ms: 0.5893
+  type: 'test'
+  ...
+# Subtest: preview validates and deduplicates without creating downloads
+ok 131 - preview validates and deduplicates without creating downloads
+  ---
+  duration_ms: 2.6899
+  type: 'test'
+  ...
+# Subtest: submit creates only selected unique jobs in requested queue/directory and reports individual failures
+ok 132 - submit creates only selected unique jobs in requested queue/directory and reports individual failures
+  ---
+  duration_ms: 1.0355
+  type: 'test'
+  ...
+# Subtest: rejects whole invalid batch before creating any job and bounds concurrent submits
+ok 133 - rejects whole invalid batch before creating any job and bounds concurrent submits
+  ---
+  duration_ms: 6.4921
+  type: 'test'
+  ...
+# Subtest: grab streams dedup preview, cancellation stops crawler and retains existing jobs
+ok 134 - grab streams dedup preview, cancellation stops crawler and retains existing jobs
+  ---
+  duration_ms: 12.821
+  type: 'test'
+  ...
+# Subtest: invalid settings and crawler failure are explicit, no task side effects
+ok 135 - invalid settings and crawler failure are explicit, no task side effects
+  ---
+  duration_ms: 10.53
+  type: 'test'
+  ...
+# Subtest: categories resolve MIME conflicts conservatively and preserve explicit directory
+ok 136 - categories resolve MIME conflicts conservatively and preserve explicit directory
+  ---
+  duration_ms: 2.5848
+  type: 'test'
+  ...
+# Subtest: categories cannot traverse roots and disabled policy leaves destination unchanged
+ok 137 - categories cannot traverse roots and disabled policy leaves destination unchanged
+  ---
+  duration_ms: 0.9659
+  type: 'test'
+  ...
+# Subtest: duplicates preserve meaningful queries and exact format selection
+ok 138 - duplicates preserve meaningful queries and exact format selection
+  ---
+  duration_ms: 3.1814
+  type: 'test'
+  ...
+# Subtest: clipboard offers only valid URLs without leaking tokens in display or auto download
+ok 139 - clipboard offers only valid URLs without leaking tokens in display or auto download
+  ---
+  duration_ms: 0.6539
+  type: 'test'
+  ...
+# Subtest: clipboard watcher is opt-in, keeps no text history and suppresses unchanged clipboard
+ok 140 - clipboard watcher is opt-in, keeps no text history and suppresses unchanged clipboard
+  ---
+  duration_ms: 0.9214
+  type: 'test'
+  ...
+# Subtest: duplicate keys support FTP and infer HLS while clipboard remains HTTP-only
+ok 141 - duplicate keys support FTP and infer HLS while clipboard remains HTTP-only
+  ---
+  duration_ms: 0.3024
+  type: 'test'
+  ...
+# Subtest: clipboard banner never exposes path-carried tokens
+ok 142 - clipboard banner never exposes path-carried tokens
+  ---
+  duration_ms: 0.3287
+  type: 'test'
+  ...
+# Subtest: schema8 journal stores queues atomically and requires queue metadata
+ok 143 - schema8 journal stores queues atomically and requires queue metadata
+  ---
+  duration_ms: 24.1598
+  type: 'test'
+  ...
+# Subtest: journal disk-full write and failed sync preserve prior journal and clean own temporary
+ok 144 - journal disk-full write and failed sync preserve prior journal and clean own temporary
+  ---
+  duration_ms: 18.7256
+  type: 'test'
+  ...
+# Subtest: owned child termination at publication and journal commit boundaries preserves valid committed state
+    # Subtest: after-data-sync
+    ok 1 - after-data-sync
+      ---
+      duration_ms: 87.3373
+      type: 'test'
+      ...
+    # Subtest: before-publication
+    ok 2 - before-publication
+      ---
+      duration_ms: 70.7712
+      type: 'test'
+      ...
+    # Subtest: after-publication
+    ok 3 - after-publication
+      ---
+      duration_ms: 56.8167
+      type: 'test'
+      ...
+    # Subtest: before-journal-replace
+    ok 4 - before-journal-replace
+      ---
+      duration_ms: 53.8826
+      type: 'test'
+      ...
+    # Subtest: after-journal-replace
+    ok 5 - after-journal-replace
+      ---
+      duration_ms: 56.9582
+      type: 'test'
+      ...
+    1..5
+ok 145 - owned child termination at publication and journal commit boundaries preserves valid committed state
+  ---
+  duration_ms: 327.4431
+  type: 'test'
+  ...
+# Subtest: contradictory crash journal byte counters are refused without modifying retained state
+ok 146 - contradictory crash journal byte counters are refused without modifying retained state
+  ---
+  duration_ms: 45.7628
+  type: 'test'
+  ...
+# Subtest: Windows transient journal replacement locks retry the same synced temporary without losing prior state
+ok 147 - Windows transient journal replacement locks retry the same synced temporary without losing prior state # SKIP
+  ---
+  duration_ms: 0.1879
+  type: 'test'
+  ...
+# Subtest: Windows permanent journal replacement denial exhausts bounded attempts and preserves old journal
+ok 148 - Windows permanent journal replacement denial exhausts bounded attempts and preserves old journal # SKIP
+  ---
+  duration_ms: 0.0602
+  type: 'test'
+  ...
+# Subtest: downloads parallel ranges with exact content, hash and detached snapshots
+ok 149 - downloads parallel ranges with exact content, hash and detached snapshots
+  ---
+  duration_ms: 201.6792
+  type: 'test'
+  ...
+# Subtest: falls back for ignored ranges and unknown length chunked responses
+ok 150 - falls back for ignored ranges and unknown length chunked responses
+  ---
+  duration_ms: 145.4111
+  type: 'test'
+  ...
+# Subtest: rejects unsafe inputs and avoids overwriting files in selected directory
+ok 151 - rejects unsafe inputs and avoids overwriting files in selected directory
+  ---
+  duration_ms: 152.6401
+  type: 'test'
+  ...
+# Subtest: detects malformed Content-Range and enforces configured size ceiling
+ok 152 - detects malformed Content-Range and enforces configured size ceiling
+  ---
+  duration_ms: 66.5671
+  type: 'test'
+  ...
+# Subtest: journals without secret headers and restores scheduled tasks safely
+ok 153 - journals without secret headers and restores scheduled tasks safely
+  ---
+  duration_ms: 33.5019
+  type: 'test'
+  ...
+# Subtest: resumes sparse parallel progress when later ranges have not received any bytes
+ok 154 - resumes sparse parallel progress when later ranges have not received any bytes
+  ---
+  duration_ms: 419.789
+  type: 'test'
+  ...
+# Subtest: pauses active transfer, resumes ranges and survives manager restart
+ok 155 - pauses active transfer, resumes ranges and survives manager restart
+  ---
+  duration_ms: 585.4208
+  type: 'test'
+  ...
+# Subtest: refuses changed resume validator and allows retry after server recovers
+ok 156 - refuses changed resume validator and allows retry after server recovers
+  ---
+  duration_ms: 1092.1347
+  type: 'test'
+  ...
+# Subtest: preserves partial without validator and rate limits a separately requested fresh transfer
+ok 157 - preserves partial without validator and rate limits a separately requested fresh transfer
+  ---
+  duration_ms: 633.9178
+  type: 'test'
+  ...
+# Subtest: bounds active download queue and starts scheduled jobs only when due
+ok 158 - bounds active download queue and starts scheduled jobs only when due
+  ---
+  duration_ms: 445.7054
+  type: 'test'
+  ...
+# Subtest: cancel interrupts limiter waits; close is idempotent; invalid controls fail
+ok 159 - cancel interrupts limiter waits; close is idempotent; invalid controls fail
+  ---
+  duration_ms: 27.6387
+  type: 'test'
+  ...
+# Subtest: retries transient probe errors but stops permanent HTTP failure
+ok 160 - retries transient probe errors but stops permanent HTTP failure
+  ---
+  duration_ms: 511.1247
+  type: 'test'
+  ...
+# Subtest: strips credentials across redirects and bounds redirect loops
+ok 161 - strips credentials across redirects and bounds redirect loops
+  ---
+  duration_ms: 166.3064
+  type: 'test'
+  ...
+# Subtest: rejects truncated, oversized, encoded and changed range responses
+ok 162 - rejects truncated, oversized, encoded and changed range responses
+  ---
+  duration_ms: 191.9835
+  type: 'test'
+  ...
+# Subtest: restored header-dependent downloads require user to supply headers again
+ok 163 - restored header-dependent downloads require user to supply headers again
+  ---
+  duration_ms: 24.2091
+  type: 'test'
+  ...
+# Subtest: shutdown checkpoints running download and init is idempotent
+ok 164 - shutdown checkpoints running download and init is idempotent
+  ---
+  duration_ms: 18.9528
+  type: 'test'
+  ...
+# Subtest: refuses a server abandoning Range after probe without restarting the download
+ok 165 - refuses a server abandoning Range after probe without restarting the download
+  ---
+  duration_ms: 41.555
+  type: 'test'
+  ...
+# Subtest: supports empty files and refuses missing or shortened checkpoints without restarting
+ok 166 - supports empty files and refuses missing or shortened checkpoints without restarting
+  ---
+  duration_ms: 349.1683
+  type: 'test'
+  ...
+# Subtest: does not split range responses without a strong validator
+ok 167 - does not split range responses without a strong validator
+  ---
+  duration_ms: 105.4425
+  type: 'test'
+  ...
+# Subtest: staging publication is exclusive, complete and cleans temporary entries on failure
+ok 168 - staging publication is exclusive, complete and cleans temporary entries on failure
+  ---
+  duration_ms: 12.7121
+  type: 'test'
+  ...
+# Subtest: policy rejects reserved headers and filenames; journal corruption fails visibly
+ok 169 - policy rejects reserved headers and filenames; journal corruption fails visibly
+  ---
+  duration_ms: 22.0182
+  type: 'test'
+  ...
+# Subtest: retries an interrupted validated segment from its committed byte offset
+ok 170 - retries an interrupted validated segment from its committed byte offset
+  ---
+  duration_ms: 234.7994
+  type: 'test'
+  ...
+# Subtest: per-host queue cap applies independently from global download cap
+ok 171 - per-host queue cap applies independently from global download cap
+  ---
+  duration_ms: 833.2375
+  type: 'test'
+  ...
+# Subtest: disk-full publication failure leaves no partial final name and preserves source
+ok 172 - disk-full publication failure leaves no partial final name and preserves source
+  ---
+  duration_ms: 8.44
+  type: 'test'
+  ...
+# Subtest: Last-Modified same-second changes refuse continuation and retain original bytes
+ok 173 - Last-Modified same-second changes refuse continuation and retain original bytes
+  ---
+  duration_ms: 87.0689
+  type: 'test'
+  ...
+# Subtest: recognizes fully published crash checkpoints without network using persisted digest
+ok 174 - recognizes fully published crash checkpoints without network using persisted digest
+  ---
+  duration_ms: 63.7296
+  type: 'test'
+  ...
+# Subtest: does not recover an unrelated final file or malformed stored digest as complete
+ok 175 - does not recover an unrelated final file or malformed stored digest as complete
+  ---
+  duration_ms: 47.9392
+  type: 'test'
+  ...
+# Subtest: preflights unsupported destination filesystems before any network body transfer
+ok 176 - preflights unsupported destination filesystems before any network body transfer
+  ---
+  duration_ms: 26.8834
+  type: 'test'
+  ...
+# Subtest: resume recovers a published final appearing after init without contacting offline source
+ok 177 - resume recovers a published final appearing after init without contacting offline source
+  ---
+  duration_ms: 40.001
+  type: 'test'
+  ...
+# Subtest: published recovery rejects size mismatches and non-file destinations
+ok 178 - published recovery rejects size mismatches and non-file destinations
+  ---
+  duration_ms: 7.3811
+  type: 'test'
+  ...
+# Subtest: migrates version 1 direct queued and paused tasks unchanged into version 8 journal
+ok 179 - migrates version 1 direct queued and paused tasks unchanged into version 8 journal
+  ---
+  duration_ms: 58.5956
+  type: 'test'
+  ...
+# Subtest: new downloads wait for initial durable journal and rejected adds cannot start later
+ok 180 - new downloads wait for initial durable journal and rejected adds cannot start later
+  ---
+  duration_ms: 175.442
+  type: 'test'
+  ...
+# Subtest: changes live HTTP connections 1 to 4 to 1, preserves committed ranges across pause and relaunch
+ok 181 - changes live HTTP connections 1 to 4 to 1, preserves committed ranges across pause and relaunch
+  ---
+  duration_ms: 942.11
+  type: 'test'
+  ...
+# Subtest: idle HTTP workers split the slow unfinished range and preserve exact file coverage
+ok 182 - idle HTTP workers split the slow unfinished range and preserve exact file coverage
+  ---
+  duration_ms: 805.6333
+  type: 'test'
+  ...
+# Subtest: invalid counts cannot mutate downloads; queued media accepts a connection cap
+ok 183 - invalid counts cannot mutate downloads; queued media accepts a connection cap
+  ---
+  duration_ms: 35.15
+  type: 'test'
+  ...
+# Subtest: live resizing retains the aggregate speed budget rather than resetting it per worker
+ok 184 - live resizing retains the aggregate speed budget rather than resetting it per worker
+  ---
+  duration_ms: 2236.8722
+  type: 'test'
+  ...
+# Subtest: tests/core/dynamic-download.test.cjs
+not ok 23 - tests/core/dynamic-download.test.cjs
+  ---
+  duration_ms: 138154.325518
+  type: 'test'
+  location: '/home/flowdm/task9/source/tests/core/dynamic-download.test.cjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: ~
+  signal: 'SIGTERM'
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: DASH uses a checkpoint task, journal v8, hashing and atomic publication
+ok 186 - DASH uses a checkpoint task, journal v8, hashing and atomic publication
+  ---
+  duration_ms: 94.3188
+  type: 'test'
+  ...
+# Subtest: external pause/reopen preserves progress and uses the same owned checkpoint, then cleans it on success
+ok 187 - external pause/reopen preserves progress and uses the same owned checkpoint, then cleans it on success
+  ---
+  duration_ms: 112.2557
+  type: 'test'
+  ...
+# Subtest: cancel removes only the task media checkpoint
+ok 188 - cancel removes only the task media checkpoint
+  ---
+  duration_ms: 45.5564
+  type: 'test'
+  ...
+# Subtest: an emptied checkpoint cannot silently restart a paused media task
+ok 189 - an emptied checkpoint cannot silently restart a paused media task
+  ---
+  duration_ms: 57.8778
+  type: 'test'
+  ...
+# Subtest: external failures never publish and sensitive external headers are rejected before queueing
+ok 190 - external failures never publish and sensitive external headers are rejected before queueing
+  ---
+  duration_ms: 44.6777
+  type: 'test'
+  ...
+# Subtest: FTP passive Unicode listing, SIZE/MDTM and actual download preserve exact bytes
+ok 191 - FTP passive Unicode listing, SIZE/MDTM and actual download preserve exact bytes
+  ---
+  duration_ms: 177.6188
+  type: 'test'
+  ...
+# Subtest: FTP pause retains bytes and REST resumes only the committed local offset
+ok 192 - FTP pause retains bytes and REST resumes only the committed local offset
+  ---
+  duration_ms: 192.0081
+  type: 'test'
+  ...
+# Subtest: FTP changed or missing resume identity is refused without modifying partial bytes
+ok 193 - FTP changed or missing resume identity is refused without modifying partial bytes
+  ---
+  duration_ms: 20.9729
+  type: 'test'
+  ...
+# Subtest: explicit FTPS validates certificate on control and passive data channels
+ok 194 - explicit FTPS validates certificate on control and passive data channels
+  ---
+  duration_ms: 316.1943
+  type: 'test'
+  ...
+# Subtest: FTP validates boundaries before network, credentials stay RAM and errors are redacted
+ok 195 - FTP validates boundaries before network, credentials stay RAM and errors are redacted
+  ---
+  duration_ms: 8.8876
+  type: 'test'
+  ...
+# Subtest: FTP size limits and existing destination/offset mismatches preserve local data
+ok 196 - FTP size limits and existing destination/offset mismatches preserve local data
+  ---
+  duration_ms: 14.163
+  type: 'test'
+  ...
+# Subtest: FTP speed cap applies to actual persisted bytes and abort stops capped transfer
+ok 197 - FTP speed cap applies to actual persisted bytes and abort stops capped transfer
+  ---
+  duration_ms: 2065.893
+  type: 'test'
+  ...
+# Subtest: FTP reconnect resumes an owned zero-byte partial after cancellation before data
+ok 198 - FTP reconnect resumes an owned zero-byte partial after cancellation before data
+  ---
+  duration_ms: 91.7794
+  type: 'test'
+  ...
+# Subtest: FTP refuses publication when SIZE or MDTM changes during the transfer
+ok 199 - FTP refuses publication when SIZE or MDTM changes during the transfer
+  ---
+  duration_ms: 94.7626
+  type: 'test'
+  ...
+# Subtest: FTP falls back to PASV and FTPS rejects an untrusted passive data certificate
+ok 200 - FTP falls back to PASV and FTPS rejects an untrusted passive data certificate
+  ---
+  duration_ms: 1244.7899
+  type: 'test'
+  ...
+# Subtest: FTP resume refuses a different principal with same path SIZE and MDTM
+ok 201 - FTP resume refuses a different principal with same path SIZE and MDTM
+  ---
+  duration_ms: 25.3624
+  type: 'test'
+  ...
+# Subtest: manager downloads anonymous FTP with SHA and preserves canonical URL in schema8
+ok 202 - manager downloads anonymous FTP with SHA and preserves canonical URL in schema8
+  ---
+  duration_ms: 196.1667
+  type: 'test'
+  ...
+# Subtest: manager pauses, closes and resumes FTP from the same committed REST byte after relaunch
+ok 203 - manager pauses, closes and resumes FTP from the same committed REST byte after relaunch
+  ---
+  duration_ms: 761.6525
+  type: 'test'
+  ...
+# Subtest: manager requires RAM-only FTP credentials to be rebound after app restart
+ok 204 - manager requires RAM-only FTP credentials to be rebound after app restart
+  ---
+  duration_ms: 742.9159
+  type: 'test'
+  ...
+# Subtest: manager refuses changed FTP MDTM on resume without altering partial bytes or publishing
+ok 205 - manager refuses changed FTP MDTM on resume without altering partial bytes or publishing
+  ---
+  duration_ms: 66.9292
+  type: 'test'
+  ...
+# Subtest: manager configured proxy refuses FTP before contacting its origin
+ok 206 - manager configured proxy refuses FTP before contacting its origin
+  ---
+  duration_ms: 29.3621
+  type: 'test'
+  ...
+# Subtest: HLS auto detection downloads exact TS concatenation through queue and SHA-256 publication
+ok 207 - HLS auto detection downloads exact TS concatenation through queue and SHA-256 publication
+  ---
+  duration_ms: 156.0672
+  type: 'test'
+  ...
+# Subtest: HLS master selects highest bandwidth and fMP4 initialization precedes fragments
+ok 208 - HLS master selects highest bandwidth and fMP4 initialization precedes fragments
+  ---
+  duration_ms: 139.3951
+  type: 'test'
+  ...
+# Subtest: HLS pause and manager restart reuse the first completed segment
+ok 209 - HLS pause and manager restart reuse the first completed segment
+  ---
+  duration_ms: 504.2673
+  type: 'test'
+  ...
+# Subtest: HLS unsafe manifests and segment errors never publish a completed file
+ok 210 - HLS unsafe manifests and segment errors never publish a completed file
+  ---
+  duration_ms: 248.105
+  type: 'test'
+  ...
+# Subtest: HLS strips credential context for cross-origin variants and redirects
+ok 211 - HLS strips credential context for cross-origin variants and redirects
+  ---
+  duration_ms: 75.4787
+  type: 'test'
+  ...
+# Subtest: validates media type, bounded URL and explicit direct override
+ok 212 - validates media type, bounded URL and explicit direct override
+  ---
+  duration_ms: 46.1846
+  type: 'test'
+  ...
+# Subtest: HLS refuses HTTP 200 HTML, packed AAC, invalid initialization and fragment boxes
+ok 213 - HLS refuses HTTP 200 HTML, packed AAC, invalid initialization and fragment boxes
+  ---
+  duration_ms: 294.6902
+  type: 'test'
+  ...
+# Subtest: HLS live 1 to 4 to 1 keeps every resource exactly once and drains before decrease commit
+ok 214 - HLS live 1 to 4 to 1 keeps every resource exactly once and drains before decrease commit
+  ---
+  duration_ms: 1613.5061
+  type: 'test'
+  ...
+# Subtest: HLS live resize keeps one aggregate rate epoch
+ok 215 - HLS live resize keeps one aggregate rate epoch
+  ---
+  duration_ms: 1021.054
+  type: 'test'
+  ...
+# Subtest: HLS failed increase and decrease commits restore worker cap without replay
+ok 216 - HLS failed increase and decrease commits restore worker cap without replay
+  ---
+  duration_ms: 504.2416
+  type: 'test'
+  ...
+# Subtest: HLS abort while decreasing rejects resize and preserves completed checkpoint
+ok 217 - HLS abort while decreasing rejects resize and preserves completed checkpoint
+  ---
+  duration_ms: 118.1245
+  type: 'test'
+  ...
+# Subtest: HLS live control rejects invalid N without affecting transfer
+ok 218 - HLS live control rejects invalid N without affecting transfer
+  ---
+  duration_ms: 1730.9532
+  type: 'test'
+  ...
+# Subtest: HLS workers honor requested concurrency and append out-of-order TS files deterministically
+ok 219 - HLS workers honor requested concurrency and append out-of-order TS files deterministically
+  ---
+  duration_ms: 68.4135
+  type: 'test'
+  ...
+# Subtest: N=1 has exactly one active worker and fMP4 keeps init before out-of-order fragments
+ok 220 - N=1 has exactly one active worker and fMP4 keeps init before out-of-order fragments
+  ---
+  duration_ms: 51.7053
+  type: 'test'
+  ...
+# Subtest: parallel failure aborts peers, cleans scratch, and rejects combined size overflow
+ok 221 - parallel failure aborts peers, cleans scratch, and rejects combined size overflow
+  ---
+  duration_ms: 81.644
+  type: 'test'
+  ...
+# Subtest: parallel aggregate speed cap applies to all workers
+ok 222 - parallel aggregate speed cap applies to all workers
+  ---
+  duration_ms: 763.8807
+  type: 'test'
+  ...
+# Subtest: abort waits for active parallel workers and removes owned scratch
+ok 223 - abort waits for active parallel workers and removes owned scratch
+  ---
+  duration_ms: 40.1899
+  type: 'test'
+  ...
+# Subtest: stalled first HLS resource gates scheduling to N and preserves a later root error
+ok 224 - stalled first HLS resource gates scheduling to N and preserves a later root error
+  ---
+  duration_ms: 27.8778
+  type: 'test'
+  ...
+# Subtest: HLS pause/reopen reuses durable resources without repeat requests and reconstructs full output
+ok 225 - HLS pause/reopen reuses durable resources without repeat requests and reconstructs full output
+  ---
+  duration_ms: 97.859
+  type: 'test'
+  ...
+# Subtest: HLS changed playlist or tampered/missing cache refuses continuation before network requests
+ok 226 - HLS changed playlist or tampered/missing cache refuses continuation before network requests
+  ---
+  duration_ms: 297.8114
+  type: 'test'
+  ...
+# Subtest: HLS completed out-of-order resource survives earlier resource abort
+ok 227 - HLS completed out-of-order resource survives earlier resource abort
+  ---
+  duration_ms: 107.5846
+  type: 'test'
+  ...
+# Subtest: HLS in-flight partial restarts while completed fragments remain reusable and unthrottled
+ok 228 - HLS in-flight partial restarts while completed fragments remain reusable and unthrottled
+  ---
+  duration_ms: 88.6569
+  type: 'test'
+  ...
+# Subtest: HLS rejects invalid checkpoint JSON and metadata indexes without using stored paths
+ok 229 - HLS rejects invalid checkpoint JSON and metadata indexes without using stored paths
+  ---
+  duration_ms: 237.1283
+  type: 'test'
+  ...
+# Subtest: HLS fMP4 cached init and media fragments reconstruct in order on reopen
+ok 230 - HLS fMP4 cached init and media fragments reconstruct in order on reopen
+  ---
+  duration_ms: 56.767
+  type: 'test'
+  ...
+# Subtest: HLS refuses stable resources absent from metadata after an interrupted checkpoint commit
+ok 231 - HLS refuses stable resources absent from metadata after an interrupted checkpoint commit
+  ---
+  duration_ms: 62.9134
+  type: 'test'
+  ...
+# Subtest: HLS atomically retries transient checkpoint sharing violations without removing old metadata
+ok 232 - HLS atomically retries transient checkpoint sharing violations without removing old metadata
+  ---
+  duration_ms: 150.246
+  type: 'test'
+  ...
+# Subtest: HLS checkpoint rename retries are bounded and retain the last durable metadata on permanent denial
+ok 233 - HLS checkpoint rename retries are bounded and retain the last durable metadata on permanent denial
+  ---
+  duration_ms: 431.061
+  type: 'test'
+  ...
+# Subtest: HLS refuses changed EXTINF or media sequence even with identical resource URLs
+ok 234 - HLS refuses changed EXTINF or media sequence even with identical resource URLs
+  ---
+  duration_ms: 48.172
+  type: 'test'
+  ...
+# Subtest: HLS pure playlist callers pin explicit semantic fields and reject malformed manifest identities
+ok 235 - HLS pure playlist callers pin explicit semantic fields and reject malformed manifest identities
+  ---
+  duration_ms: 76.2933
+  type: 'test'
+  ...
+# Subtest: HTTP resume requires the same strong validator, size, range and representation
+ok 236 - HTTP resume requires the same strong validator, size, range and representation
+  ---
+  duration_ms: 2.2384
+  type: 'test'
+  ...
+# Subtest: saved metadata must meet the same contract; legacy identity encoding is supported
+ok 237 - saved metadata must meet the same contract; legacy identity encoding is supported
+  ---
+  duration_ms: 0.3788
+  type: 'test'
+  ...
+# Subtest: probe reads the one-byte range and returns representation metadata
+ok 238 - probe reads the one-byte range and returns representation metadata
+  ---
+  duration_ms: 24.8305
+  type: 'test'
+  ...
+# Subtest: probe refuses malformed ranges, lengths, truncation, encodings and error statuses
+ok 239 - probe refuses malformed ranges, lengths, truncation, encodings and error statuses
+  ---
+  duration_ms: 21.6955
+  type: 'test'
+  ...
+# Subtest: weak or malformed ETags never become strong validators
+ok 240 - weak or malformed ETags never become strong validators
+  ---
+  duration_ms: 3.396
+  type: 'test'
+  ...
+# Subtest: probe rejects a socket closing before the declared range byte arrives
+ok 241 - probe rejects a socket closing before the declared range byte arrives
+  ---
+  duration_ms: 3.4592
+  type: 'test'
+  ...
+# Subtest: Content-Length parser rejects non-decimal syntax
+ok 242 - Content-Length parser rejects non-decimal syntax
+  ---
+  duration_ms: 0.2865
+  type: 'test'
+  ...
+# Subtest: journal v4 migration preserves an exact private backup before writing v8
+ok 243 - journal v4 migration preserves an exact private backup before writing v8
+  ---
+  duration_ms: 42.4691
+  type: 'test'
+  ...
+# Subtest: backup failure blocks migration without changing the original journal
+ok 244 - backup failure blocks migration without changing the original journal
+  ---
+  duration_ms: 20.7082
+  type: 'test'
+  ...
+# Subtest: v5 rejects a segment plan whose tail does not cover the declared total
+ok 245 - v5 rejects a segment plan whose tail does not cover the declared total
+  ---
+  duration_ms: 21.2662
+  type: 'test'
+  ...
+# Subtest: v5 preserves a completed unknown-length single-stream download
+ok 246 - v5 preserves a completed unknown-length single-stream download
+  ---
+  duration_ms: 62.5893
+  type: 'test'
+  ...
+# Subtest: inspection work is bounded and shutdown settles every pending extraction
+ok 247 - inspection work is bounded and shutdown settles every pending extraction
+  ---
+  duration_ms: 9.1597
+  type: 'test'
+  ...
+# Subtest: inspection cache is bounded, expiry checked and returned copies cannot rewrite trusted formats
+ok 248 - inspection cache is bounded, expiry checked and returned copies cannot rewrite trusted formats
+  ---
+  duration_ms: 4.673
+  type: 'test'
+  ...
+# Subtest: playlist filenames use safe bounded portable names instead of title paths
+ok 249 - playlist filenames use safe bounded portable names instead of title paths
+  ---
+  duration_ms: 2.2898
+  type: 'test'
+  ...
+# Subtest: HLS manager changes live1 to4 to1 and retains completed resources through relaunch
+ok 250 - HLS manager changes live1 to4 to1 and retains completed resources through relaunch
+  ---
+  duration_ms: 1716.9887
+  type: 'test'
+  ...
+# Subtest: closing app interrupts a pending HLS decrease rather than waiting for held resources
+ok 251 - closing app interrupts a pending HLS decrease rather than waiting for held resources
+  ---
+  duration_ms: 78.7343
+  type: 'test'
+  ...
+# Subtest: inspects media without queuing and pins a selected audio container through relaunch
+ok 252 - inspects media without queuing and pins a selected audio container through relaunch
+  ---
+  duration_ms: 67.8906
+  type: 'test'
+  ...
+# Subtest: selected subtitles choose one MKV output and never persist extracted URLs
+ok 253 - selected subtitles choose one MKV output and never persist extracted URLs
+  ---
+  duration_ms: 37.0266
+  type: 'test'
+  ...
+# Subtest: uninspected, mismatched, malicious or unavailable selections cannot create tasks
+ok 254 - uninspected, mismatched, malicious or unavailable selections cannot create tasks
+  ---
+  duration_ms: 13.9963
+  type: 'test'
+  ...
+# Subtest: playlist preview binds chosen IDs, caps input and isolates per-entry download failure
+ok 255 - playlist preview binds chosen IDs, caps input and isolates per-entry download failure
+  ---
+  duration_ms: 39.6543
+  type: 'test'
+  ...
+# Subtest: closing the manager aborts and settles media inspection before shutdown
+ok 256 - closing the manager aborts and settles media inspection before shutdown
+  ---
+  duration_ms: 21.9285
+  type: 'test'
+  ...
+# Subtest: power waits a full monotonic minute and consumes each intent only once
+ok 257 - power waits a full monotonic minute and consumes each intent only once
+  ---
+  duration_ms: 3.3984
+  type: 'test'
+  ...
+# Subtest: new intent replaces the single countdown and snapshots are detached
+ok 258 - new intent replaces the single countdown and snapshots are detached
+  ---
+  duration_ms: 0.3991
+  type: 'test'
+  ...
+# Subtest: cancellation, close and disposal prevent delayed dispatch
+ok 259 - cancellation, close and disposal prevent delayed dispatch
+  ---
+  duration_ms: 0.9722
+  type: 'test'
+  ...
+# Subtest: beforeDispatch false, thrown error and adapter rejection never escape tick
+ok 260 - beforeDispatch false, thrown error and adapter rejection never escape tick
+  ---
+  duration_ms: 1.7414
+  type: 'test'
+  ...
+# Subtest: cancel during asynchronous final validation prevents a late OS dispatch
+ok 261 - cancel during asynchronous final validation prevents a late OS dispatch
+  ---
+  duration_ms: 0.7021
+  type: 'test'
+  ...
+# Subtest: notify is immediate, none is inert, invalid actions fail closed
+ok 262 - notify is immediate, none is inert, invalid actions fail closed
+  ---
+  duration_ms: 1.0457
+  type: 'test'
+  ...
+# Subtest: a new controller never restores another instance countdown
+ok 263 - a new controller never restores another instance countdown
+  ---
+  duration_ms: 0.4251
+  type: 'test'
+  ...
+# Subtest: invalid intents and countdown configuration cannot arm power actions
+ok 264 - invalid intents and countdown configuration cannot arm power actions
+  ---
+  duration_ms: 1.7743
+  type: 'test'
+  ...
+# Subtest: automatic notification rejection is recorded without an unhandled rejection
+ok 265 - automatic notification rejection is recorded without an unhandled rejection
+  ---
+  duration_ms: 12.0665
+  type: 'test'
+  ...
+# Subtest: adapter uses fixed absolute commands, no shell, and never interpolates queue names
+ok 266 - adapter uses fixed absolute commands, no shell, and never interpolates queue names
+  ---
+  duration_ms: 1.0209
+  type: 'test'
+  ...
+# Subtest: Windows sleep uses supported .NET suspend API and checks its result
+ok 267 - Windows sleep uses supported .NET suspend API and checks its result
+  ---
+  duration_ms: 0.508
+  type: 'test'
+  ...
+# Subtest: adapter rejects unsafe root, unsupported OS/actions and OS errors; notification is injected
+ok 268 - adapter rejects unsafe root, unsupported OS/actions and OS errors; notification is injected
+  ---
+  duration_ms: 0.8092
+  type: 'test'
+  ...
+# Subtest: http proxy routes actual HTTP HLS and DASH without upstream auth at origin
+ok 269 - http proxy routes actual HTTP HLS and DASH without upstream auth at origin
+  ---
+  duration_ms: 3482.8636
+  type: 'test'
+  ...
+# Subtest: socks5 proxy routes actual HTTP HLS and DASH without upstream auth at origin
+ok 270 - socks5 proxy routes actual HTTP HLS and DASH without upstream auth at origin
+  ---
+  duration_ms: 3305.546
+  type: 'test'
+  ...
+# Subtest: strict proxy configuration keeps credentials out of safe public info
+ok 271 - strict proxy configuration keeps credentials out of safe public info
+  ---
+  duration_ms: 15.6631
+  type: 'test'
+  ...
+# Subtest: HTTP authenticated upstream carries actual byte-exact HTTP without leaking proxy auth to origin
+ok 272 - HTTP authenticated upstream carries actual byte-exact HTTP without leaking proxy auth to origin
+  ---
+  duration_ms: 22.1425
+  type: 'test'
+  ...
+# Subtest: SOCKS5 authenticated upstream carries actual byte-exact HTTP without leaking proxy auth to origin
+ok 273 - SOCKS5 authenticated upstream carries actual byte-exact HTTP without leaking proxy auth to origin
+  ---
+  duration_ms: 10.4347
+  type: 'test'
+  ...
+# Subtest: HTTP rejects bad upstream credentials with redacted errors and no origin request
+ok 274 - HTTP rejects bad upstream credentials with redacted errors and no origin request
+  ---
+  duration_ms: 6.0485
+  type: 'test'
+  ...
+# Subtest: SOCKS5 rejects bad upstream credentials with redacted errors and no origin request
+ok 275 - SOCKS5 rejects bad upstream credentials with redacted errors and no origin request
+  ---
+  duration_ms: 4.9552
+  type: 'test'
+  ...
+# Subtest: SOCKS sends domain names to upstream DNS and reports DNS refusal without direct fallback
+ok 276 - SOCKS sends domain names to upstream DNS and reports DNS refusal without direct fallback
+  ---
+  duration_ms: 5.7897
+  type: 'test'
+  ...
+# Subtest: loopback gateway rejects unauthenticated requests and unsupported scheme/method
+ok 277 - loopback gateway rejects unauthenticated requests and unsupported scheme/method
+  ---
+  duration_ms: 7.1143
+  type: 'test'
+  ...
+# Subtest: ALS isolates concurrent proxy choices and cancelled requests close sockets
+ok 278 - ALS isolates concurrent proxy choices and cancelled requests close sockets
+  ---
+  duration_ms: 38.7149
+  type: 'test'
+  ...
+# Subtest: HTTP CONNECT TLS tunnel validates destination certificate and allows explicitly trusted test CA only
+ok 279 - HTTP CONNECT TLS tunnel validates destination certificate and allows explicitly trusted test CA only
+  ---
+  duration_ms: 376.9195
+  type: 'test'
+  ...
+# Subtest: SOCKS5 TLS tunnel validates destination certificate and allows explicitly trusted test CA only
+ok 280 - SOCKS5 TLS tunnel validates destination certificate and allows explicitly trusted test CA only
+  ---
+  duration_ms: 455.1694
+  type: 'test'
+  ...
+# Subtest: closing gateway aborts active connections without an upstream-to-origin fallback
+ok 281 - closing gateway aborts active connections without an upstream-to-origin fallback
+  ---
+  duration_ms: 22.5245
+  type: 'test'
+  ...
+# Subtest: CONNECT preserves explicit port 80 instead of normalizing it to HTTPS default
+ok 282 - CONNECT preserves explicit port 80 instead of normalizing it to HTTPS default
+  ---
+  duration_ms: 3.8433
+  type: 'test'
+  ...
+# Subtest: SOCKS username/password credentials enforce protocol nonempty password bounds
+ok 283 - SOCKS username/password credentials enforce protocol nonempty password bounds
+  ---
+  duration_ms: 0.308
+  type: 'test'
+  ...
+# Subtest: SOCKS IPv6 literals use the protocol IPv6 address type without local DNS
+ok 284 - SOCKS IPv6 literals use the protocol IPv6 address type without local DNS
+  ---
+  duration_ms: 4.0178
+  type: 'test'
+  ...
+# Subtest: silent SOCKS tunnel terminates at the real ten second handshake deadline
+ok 285 - silent SOCKS tunnel terminates at the real ten second handshake deadline
+  ---
+  duration_ms: 10003.6998
+  type: 'test'
+  ...
+# Subtest: HTTP direct local relay routing requires explicit private registration and gateway capability
+ok 286 - HTTP direct local relay routing requires explicit private registration and gateway capability
+  ---
+  duration_ms: 7.8363
+  type: 'test'
+  ...
+# Subtest: SOCKS direct local relay routing requires explicit private registration and gateway capability
+ok 287 - SOCKS direct local relay routing requires explicit private registration and gateway capability
+  ---
+  duration_ms: 8.1655
+  type: 'test'
+  ...
+# Subtest: bounded gateway supports one hundred authenticated nested relay legs without socket-cap failures
+ok 288 - bounded gateway supports one hundred authenticated nested relay legs without socket-cap failures
+  ---
+  duration_ms: 478.6323
+  type: 'test'
+  ...
+# Subtest: HTTP strips private URL fragments on the wire without mutating caller URL objects
+ok 289 - HTTP strips private URL fragments on the wire without mutating caller URL objects
+  ---
+  duration_ms: 4.6793
+  type: 'test'
+  ...
+# Subtest: SOCKS5 strips private URL fragments on the wire without mutating caller URL objects
+ok 290 - SOCKS5 strips private URL fragments on the wire without mutating caller URL objects
+  ---
+  duration_ms: 5.3731
+  type: 'test'
+  ...
+# Subtest: proxy fixture handles abrupt peer reset during SOCKS negotiation as local teardown
+ok 291 - proxy fixture handles abrupt peer reset during SOCKS negotiation as local teardown
+  ---
+  duration_ms: 102.2251
+  type: 'test'
+  ...
+# Subtest: capabilities refuse unsupported FAT/exFAT and FAT32 oversized files explicitly
+ok 292 - capabilities refuse unsupported FAT/exFAT and FAT32 oversized files explicitly
+  ---
+  duration_ms: 11.7178
+  type: 'test'
+  ...
+# Subtest: publication flushes and commits exact Unicode path without overwriting existing data
+ok 293 - publication flushes and commits exact Unicode path without overwriting existing data
+  ---
+  duration_ms: 20.7032
+  type: 'test'
+  ...
+# Subtest: publication preserves partial and cleans staging after disk-full and permission failures
+ok 294 - publication preserves partial and cleans staging after disk-full and permission failures
+  ---
+  duration_ms: 7.1589
+  type: 'test'
+  ...
+# Subtest: destination creation race never overwrites the racing entry or drops partial
+ok 295 - destination creation race never overwrites the racing entry or drops partial
+  ---
+  duration_ms: 11.9609
+  type: 'test'
+  ...
+# Subtest: preflight refuses missing hard-link capability and leaves no probe files
+ok 296 - preflight refuses missing hard-link capability and leaves no probe files
+  ---
+  duration_ms: 5.6882
+  type: 'test'
+  ...
+# Subtest: legacy load assigns default queue in durable task order without reviving paused tasks
+ok 297 - legacy load assigns default queue in durable task order without reviving paused tasks
+  ---
+  duration_ms: 2.2624
+  type: 'test'
+  ...
+# Subtest: v7 rejects unknown queues and ambiguous ownership
+ok 298 - v7 rejects unknown queues and ambiguous ownership
+  ---
+  duration_ms: 0.6354
+  type: 'test'
+  ...
+# Subtest: create/reorder/move persist order and refuse live transfer moves
+ok 299 - create/reorder/move persist order and refuse live transfer moves
+  ---
+  duration_ms: 1.6239
+  type: 'test'
+  ...
+# Subtest: failed persistence rolls back configuration and releases admission block
+ok 300 - failed persistence rolls back configuration and releases admission block
+  ---
+  duration_ms: 0.8047
+  type: 'test'
+  ...
+# Subtest: scheduler enforces global queue host bounds and skips pending or unavailable credentials
+ok 301 - scheduler enforces global queue host bounds and skips pending or unavailable credentials
+  ---
+  duration_ms: 3.2465
+  type: 'test'
+  ...
+# Subtest: reconcile releases only queue-held paused work preserving one-shot time
+ok 302 - reconcile releases only queue-held paused work preserving one-shot time
+  ---
+  duration_ms: 0.6644
+  type: 'test'
+  ...
+# Subtest: stop window pauses running work with queue provenance
+ok 303 - stop window pauses running work with queue provenance
+  ---
+  duration_ms: 0.8537
+  type: 'test'
+  ...
+# Subtest: completion deduplicates after durable key; incomplete or active other work blocks destructive actions
+ok 304 - completion deduplicates after durable key; incomplete or active other work blocks destructive actions
+  ---
+  duration_ms: 1.0103
+  type: 'test'
+  ...
+# Subtest: failed move restores task ownership and exact order without deleting task data
+ok 305 - failed move restores task ownership and exact order without deleting task data
+  ---
+  duration_ms: 0.742
+  type: 'test'
+  ...
+# Subtest: v7 requires every stored task to have an explicit owner
+ok 306 - v7 requires every stored task to have an explicit owner
+  ---
+  duration_ms: 0.3895
+  type: 'test'
+  ...
+# Subtest: running queue limits are immutable while enabled changes remain available
+ok 307 - running queue limits are immutable while enabled changes remain available
+  ---
+  duration_ms: 0.5251
+  type: 'test'
+  ...
+# Subtest: failed schedule release remains held and does not synchronously retry pumping
+ok 308 - failed schedule release remains held and does not synchronously retry pumping
+  ---
+  duration_ms: 0.2346
+  type: 'test'
+  ...
+# Subtest: notification allows unrelated work and changing settings cancels a pending destructive intent
+ok 309 - notification allows unrelated work and changing settings cancels a pending destructive intent
+  ---
+  duration_ms: 0.5064
+  type: 'test'
+  ...
+# Subtest: v7 roundtrip preserves explicit ownership, held state and completion receipt
+ok 310 - v7 roundtrip preserves explicit ownership, held state and completion receipt
+  ---
+  duration_ms: 0.201
+  type: 'test'
+  ...
+# Subtest: exact reorder, insertion move and empty deletion reject invalid inputs
+ok 311 - exact reorder, insertion move and empty deletion reject invalid inputs
+  ---
+  duration_ms: 0.533
+  type: 'test'
+  ...
+# Subtest: resume queue releases held workers but invalid completion events cannot arm power
+ok 312 - resume queue releases held workers but invalid completion events cannot arm power
+  ---
+  duration_ms: 0.3919
+  type: 'test'
+  ...
+# Subtest: manual queue pause wins a late publication completion callback and final power check
+ok 313 - manual queue pause wins a late publication completion callback and final power check
+  ---
+  duration_ms: 0.9662
+  type: 'test'
+  ...
+# Subtest: durable destructive receipt waits in RAM for other queues to finish and arms once
+ok 314 - durable destructive receipt waits in RAM for other queues to finish and arms once
+  ---
+  duration_ms: 1.3368
+  type: 'test'
+  ...
+# Subtest: pending destructive completion is canceled by new work and never restored from journal
+ok 315 - pending destructive completion is canceled by new work and never restored from journal
+  ---
+  duration_ms: 0.6452
+  type: 'test'
+  ...
+# Subtest: transient completion receipt write retries in reconcile without replaying startup history
+ok 316 - transient completion receipt write retries in reconcile without replaying startup history
+  ---
+  duration_ms: 0.4506
+  type: 'test'
+  ...
+# Subtest: new work cancels both pending destructive intent and undurable receipt retry
+ok 317 - new work cancels both pending destructive intent and undurable receipt retry
+  ---
+  duration_ms: 0.5771
+  type: 'test'
+  ...
+# Subtest: first destructive completion wins when several queues become idle together
+ok 318 - first destructive completion wins when several queues become idle together
+  ---
+  duration_ms: 0.5362
+  type: 'test'
+  ...
+# Subtest: synchronous cancellation invalidates a receipt continuation already awaiting persistence
+ok 319 - synchronous cancellation invalidates a receipt continuation already awaiting persistence
+  ---
+  duration_ms: 0.5641
+  type: 'test'
+  ...
+# Subtest: cancellation during a failed receipt write prevents later reconciliation retry
+ok 320 - cancellation during a failed receipt write prevents later reconciliation retry
+  ---
+  duration_ms: 0.4146
+  type: 'test'
+  ...
+# Subtest: scheduler exports its pure interface
+ok 321 - scheduler exports its pure interface
+  ---
+  duration_ms: 1.0631
+  type: 'test'
+  ...
+# Subtest: canonical validation rejects malformed queues
+ok 322 - canonical validation rejects malformed queues
+  ---
+  duration_ms: 27.4934
+  type: 'test'
+  ...
+# Subtest: fair selection skips blocked hosts and respects global and queue caps
+ok 323 - fair selection skips blocked hosts and respects global and queue caps
+  ---
+  duration_ms: 1.5905
+  type: 'test'
+  ...
+# Subtest: manual pauses, headers, completed tasks and one shots remain intact
+ok 324 - manual pauses, headers, completed tasks and one shots remain intact
+  ---
+  duration_ms: 0.7358
+  type: 'test'
+  ...
+# Subtest: half open windows pause running work and calculate wake boundaries
+ok 325 - half open windows pause running work and calculate wake boundaries
+  ---
+  duration_ms: 10.5607
+  type: 'test'
+  ...
+# Subtest: overnight weekdays refer to start day
+ok 326 - overnight weekdays refer to start day
+  ---
+  duration_ms: 1.3618
+  type: 'test'
+  ...
+# Subtest: closed watermark prevents reopening after arbitrary clock rollback
+ok 327 - closed watermark prevents reopening after arbitrary clock rollback
+  ---
+  duration_ms: 7.761
+  type: 'test'
+  ...
+# Subtest: DST gap advances boundary while fold closes at first stop
+ok 328 - DST gap advances boundary while fold closes at first stop
+  ---
+  duration_ms: 24.2176
+  type: 'test'
+  ...
+# Subtest: disabled queues pause work and tiny byte caps reduce slots
+ok 329 - disabled queues pause work and tiny byte caps reduce slots
+  ---
+  duration_ms: 0.7256
+  type: 'test'
+  ...
+# Subtest: new tasks join active occurrence without redundant durable transitions
+ok 330 - new tasks join active occurrence without redundant durable transitions
+  ---
+  duration_ms: 0.6061
+  type: 'test'
+  ...
+# Subtest: outside window future one shot wakes at the next allowed window
+ok 331 - outside window future one shot wakes at the next allowed window
+  ---
+  duration_ms: 0.3412
+  type: 'test'
+  ...
+# Subtest: IANA timezone contract rejects fixed offset timezone strings
+ok 332 - IANA timezone contract rejects fixed offset timezone strings
+  ---
+  duration_ms: 0.1802
+  type: 'test'
+  ...
+# Subtest: numeric one shot times wait until due and retain original timestamps
+ok 333 - numeric one shot times wait until due and retain original timestamps
+  ---
+  duration_ms: 0.1875
+  type: 'test'
+  ...
+# Subtest: queues preserve move/order/caps across app restart and finish exact data
+ok 334 - queues preserve move/order/caps across app restart and finish exact data
+  ---
+  duration_ms: 695.033
+  type: 'test'
+  ...
+# Subtest: schema6 migrates to a default queue with exact backup before schema8 write
+ok 335 - schema6 migrates to a default queue with exact backup before schema8 write
+  ---
+  duration_ms: 25.8603
+  type: 'test'
+  ...
+# Subtest: scheduled holds survive stop and clock rollback; manual pause stays manual next window
+ok 336 - scheduled holds survive stop and clock rollback; manual pause stays manual next window
+  ---
+  duration_ms: 241.2774
+  type: 'test'
+  ...
+# Subtest: queue bandwidth reservations cap aggregate sustained transfer and preserve task rate settings
+ok 337 - queue bandwidth reservations cap aggregate sustained transfer and preserve task rate settings
+  ---
+  duration_ms: 2066.4969
+  type: 'test'
+  ...
+# Subtest: public mutations cancel power immediately while final validation is blocked
+    # Subtest: add
+    ok 1 - add
+      ---
+      duration_ms: 18.4304
+      type: 'test'
+      ...
+    # Subtest: resume
+    ok 2 - resume
+      ---
+      duration_ms: 21.148
+      type: 'test'
+      ...
+    # Subtest: createQueue
+    ok 3 - createQueue
+      ---
+      duration_ms: 19.8316
+      type: 'test'
+      ...
+    # Subtest: updateQueue
+    ok 4 - updateQueue
+      ---
+      duration_ms: 17.683
+      type: 'test'
+      ...
+    # Subtest: deleteQueue
+    ok 5 - deleteQueue
+      ---
+      duration_ms: 18.079
+      type: 'test'
+      ...
+    # Subtest: reorderQueue
+    ok 6 - reorderQueue
+      ---
+      duration_ms: 13.3138
+      type: 'test'
+      ...
+    # Subtest: moveTask
+    ok 7 - moveTask
+      ---
+      duration_ms: 11.5907
+      type: 'test'
+      ...
+    # Subtest: pauseQueue
+    ok 8 - pauseQueue
+      ---
+      duration_ms: 12.5435
+      type: 'test'
+      ...
+    # Subtest: resumeQueue
+    ok 9 - resumeQueue
+      ---
+      duration_ms: 16.471
+      type: 'test'
+      ...
+    # Subtest: remove
+    ok 10 - remove
+      ---
+      duration_ms: 13.4539
+      type: 'test'
+      ...
+    1..10
+ok 338 - public mutations cancel power immediately while final validation is blocked
+  ---
+  duration_ms: 164.7708
+  type: 'test'
+  ...
+# Subtest: scheduled running downloads keep automatic provenance across close or interrupted journal restore
+    # Subtest: close-inside
+    ok 1 - close-inside
+      ---
+      duration_ms: 340.4571
+      type: 'test'
+      ...
+    # Subtest: close-outside
+    ok 2 - close-outside
+      ---
+      duration_ms: 423.5956
+      type: 'test'
+      ...
+    # Subtest: interrupted
+    ok 3 - interrupted
+      ---
+      duration_ms: 332.2499
+      type: 'test'
+      ...
+    1..3
+ok 339 - scheduled running downloads keep automatic provenance across close or interrupted journal restore
+  ---
+  duration_ms: 1097.0314
+  type: 'test'
+  ...
+# Subtest: split divides only the uncommitted suffix without mutating its range
+ok 340 - split divides only the uncommitted suffix without mutating its range
+  ---
+  duration_ms: 1.827
+  type: 'test'
+  ...
+# Subtest: inclusive odd and threshold ranges keep both pending portions large enough
+ok 341 - inclusive odd and threshold ranges keep both pending portions large enough
+  ---
+  duration_ms: 0.3652
+  type: 'test'
+  ...
+# Subtest: unknown, empty, complete and tiny ranges do not split
+ok 342 - unknown, empty, complete and tiny ranges do not split
+  ---
+  duration_ms: 0.1684
+  type: 'test'
+  ...
+# Subtest: large safe offsets and limits never overflow or lose bytes
+ok 343 - large safe offsets and limits never overflow or lose bytes
+  ---
+  duration_ms: 0.2604
+  type: 'test'
+  ...
+# Subtest: repeated splits have disjoint exact coverage and preserve committed progress
+ok 344 - repeated splits have disjoint exact coverage and preserve committed progress
+  ---
+  duration_ms: 2.4054
+  type: 'test'
+  ...
+# Subtest: invalid range values and split limits fail clearly
+ok 345 - invalid range values and split limits fail clearly
+  ---
+  duration_ms: 2.6091
+  type: 'test'
+  ...
+# Subtest: crawler discovers bounded same-origin anchors, deduplicates loops and does not execute scripts or fetch files
+ok 346 - crawler discovers bounded same-origin anchors, deduplicates loops and does not execute scripts or fetch files
+  ---
+  duration_ms: 31.8277
+  type: 'test'
+  ...
+# Subtest: HTML lexical extraction handles base, quote delimiters, numeric entities and raw-text contexts safely
+ok 347 - HTML lexical extraction handles base, quote delimiters, numeric entities and raw-text contexts safely
+  ---
+  duration_ms: 6.3318
+  type: 'test'
+  ...
+# Subtest: crawler checks redirect origin before following
+ok 348 - crawler checks redirect origin before following
+  ---
+  duration_ms: 3.1989
+  type: 'test'
+  ...
+# Subtest: same-origin redirects consume request budget and redirect cycles terminate
+ok 349 - same-origin redirects consume request budget and redirect cycles terminate
+  ---
+  duration_ms: 9.8615
+  type: 'test'
+  ...
+# Subtest: crawler reports protected pages, login forms, non-HTML and encoded responses without consuming bodies
+ok 350 - crawler reports protected pages, login forms, non-HTML and encoded responses without consuming bodies
+  ---
+  duration_ms: 8.221
+  type: 'test'
+  ...
+# Subtest: crawler refuses unsupported settings and bounds pages, link count, text and total result bytes
+ok 351 - crawler refuses unsupported settings and bounds pages, link count, text and total result bytes
+  ---
+  duration_ms: 26.2783
+  type: 'test'
+  ...
+# Subtest: crawler rejects oversized HTML and cancellation destroys live requests without further discovery
+ok 352 - crawler rejects oversized HTML and cancellation destroys live requests without further discovery
+  ---
+  duration_ms: 44.863
+  type: 'test'
+  ...
+# Subtest: crawler maxDepth two and maxPages bound an infinite same-origin navigation chain
+ok 353 - crawler maxDepth two and maxPages bound an infinite same-origin navigation chain
+  ---
+  duration_ms: 7.6461
+  type: 'test'
+  ...
+# Subtest: same-origin redirect resolves final-page links while external base cannot rewrite candidates onto the seed
+ok 354 - same-origin redirect resolves final-page links while external base cannot rewrite candidates onto the seed
+  ---
+  duration_ms: 5.4574
+  type: 'test'
+  ...
+# Subtest: crawler bounds unknown-length HTML streams and aggregate canonical URL bytes
+ok 355 - crawler bounds unknown-length HTML streams and aggregate canonical URL bytes
+  ---
+  duration_ms: 43.6957
+  type: 'test'
+  ...
+# Subtest: crawler handles missing redirects, bad settings and unsupported seeds without exposing credentials
+ok 356 - crawler handles missing redirects, bad settings and unsupported seeds without exposing credentials
+  ---
+  duration_ms: 3.4775
+  type: 'test'
+  ...
+# Subtest: crawler terminates a silent page at its real ten second deadline
+ok 357 - crawler terminates a silent page at its real ten second deadline
+  ---
+  duration_ms: 10003.6417
+  type: 'test'
+  ...
+# Subtest: HTML anchor extraction preserves bare query ampersands and ambiguous entity-like parameter names
+ok 358 - HTML anchor extraction preserves bare query ampersands and ambiguous entity-like parameter names
+  ---
+  duration_ms: 2.5121
+  type: 'test'
+  ...
+# Subtest: crawler refuses unsupported charset or invalid UTF8 instead of returning altered URL bytes
+ok 359 - crawler refuses unsupported charset or invalid UTF8 instead of returning altered URL bytes
+  ---
+  duration_ms: 2.36
+  type: 'test'
+  ...
+# Subtest: crawler follows common dynamic HTML page extensions while leaving binary and unknown extensions for preview
+ok 360 - crawler follows common dynamic HTML page extensions while leaving binary and unknown extensions for preview
+  ---
+  duration_ms: 8.2764
+  type: 'test'
+  ...
+# Subtest: refreshes expired direct URL, retains ID and bytes across relaunch, requests only remaining ranges
+ok 361 - refreshes expired direct URL, retains ID and bytes across relaunch, requests only remaining ranges
+  ---
+  duration_ms: 917.4073
+  type: 'test'
+  ...
+# Subtest: rejects changed identity or invalid refresh input without changing source/cache
+ok 362 - rejects changed identity or invalid refresh input without changing source/cache
+  ---
+  duration_ms: 45.7804
+  type: 'test'
+  ...
+# Subtest: refuses missing validator on resume and refresh while preserving HTTP partial
+ok 363 - refuses missing validator on resume and refresh while preserving HTTP partial
+  ---
+  duration_ms: 65.3217
+  type: 'test'
+  ...
+# Subtest: HLS refresh accepts exact manifest/resource identity and keeps complete resource cache
+ok 364 - HLS refresh accepts exact manifest/resource identity and keeps complete resource cache
+  ---
+  duration_ms: 527.1051
+  type: 'test'
+  ...
+# Subtest: refresh refuses running tasks and sensitive headers across origins
+ok 365 - refresh refuses running tasks and sensitive headers across origins
+  ---
+  duration_ms: 19.8239
+  type: 'test'
+  ...
+# Subtest: a failed journal update rolls back refreshed source and keeps existing partial
+ok 366 - a failed journal update rolls back refreshed source and keeps existing partial
+  ---
+  duration_ms: 52.867
+  type: 'test'
+  ...
+# Subtest: Range 200 or 416 after a resumed probe does not truncate the committed prefix
+ok 367 - Range 200 or 416 after a resumed probe does not truncate the committed prefix
+  ---
+  duration_ms: 134.1012
+  type: 'test'
+  ...
+# Subtest: resume refuses a partial with extra trailing bytes beyond the declared resource size
+ok 368 - resume refuses a partial with extra trailing bytes beyond the declared resource size
+  ---
+  duration_ms: 58.5419
+  type: 'test'
+  ...
+# Subtest: category settings apply only before transfer and persist without changing existing destinations
+ok 369 - category settings apply only before transfer and persist without changing existing destinations
+  ---
+  duration_ms: 121.1162
+  type: 'test'
+  ...
+# Subtest: post-publication scanner failure keeps completed file and separate scan status
+ok 370 - post-publication scanner failure keeps completed file and separate scan status
+  ---
+  duration_ms: 85.9757
+  type: 'test'
+  ...
+# Subtest: manual duplicate guard preserves query and allows explicit second copy
+ok 371 - manual duplicate guard preserves query and allows explicit second copy
+  ---
+  duration_ms: 25.2235
+  type: 'test'
+  ...
+# Subtest: duplicate guard preserves an explicit direct interpretation of manifest URLs
+ok 372 - duplicate guard preserves an explicit direct interpretation of manifest URLs
+  ---
+  duration_ms: 22.4831
+  type: 'test'
+  ...
+# Subtest: scan intent is durable before publication and interrupted published file can be rescanned
+ok 373 - scan intent is durable before publication and interrupted published file can be rescanned
+  ---
+  duration_ms: 111.785
+  type: 'test'
+  ...
+# Subtest: successful explicit rescan reconsiders completion and changed file cannot pass
+ok 374 - successful explicit rescan reconsiders completion and changed file cannot pass
+  ---
+  duration_ms: 144.2722
+  type: 'test'
+  ...
+# Subtest: strict schema loading rejects legacy FTP and mismatched protocol/type
+ok 375 - strict schema loading rejects legacy FTP and mismatched protocol/type
+  ---
+  duration_ms: 11.9805
+  type: 'test'
+  ...
+# Subtest: duplicate policy also covers batch imports and browser admission without losing selected jobs
+ok 376 - duplicate policy also covers batch imports and browser admission without losing selected jobs
+  ---
+  duration_ms: 38.5379
+  type: 'test'
+  ...
+# Subtest: catalog exposes codecs and 4K without raw URLs or credentials
+ok 377 - catalog exposes codecs and 4K without raw URLs or credentials
+  ---
+  duration_ms: 2.1214
+  type: 'test'
+  ...
+# Subtest: selection pins exact IDs and codec compatible containers
+ok 378 - selection pins exact IDs and codec compatible containers
+  ---
+  duration_ms: 1.1909
+  type: 'test'
+  ...
+# Subtest: selection rejects absent or incompatible format combinations
+ok 379 - selection rejects absent or incompatible format combinations
+  ---
+  duration_ms: 3.0229
+  type: 'test'
+  ...
+# Subtest: selection rejects selector syntax, unknown keys and excessive subtitles
+ok 380 - selection rejects selector syntax, unknown keys and excessive subtitles
+  ---
+  duration_ms: 0.8152
+  type: 'test'
+  ...
+# Subtest: playlist canonicalizes public YouTube IDs, drops credentials and nested entries, dedupes and caps 100
+ok 381 - playlist canonicalizes public YouTube IDs, drops credentials and nested entries, dedupes and caps 100
+  ---
+  duration_ms: 0.982
+  type: 'test'
+  ...
+# Subtest: normalization is bounded, deterministic and drops malformed or DRM formats
+ok 382 - normalization is bounded, deterministic and drops malformed or DRM formats
+  ---
+  duration_ms: 0.2669
+  type: 'test'
+  ...
+# Subtest: subtitles force a single embedded MKV and are refused for audio only
+ok 383 - subtitles force a single embedded MKV and are refused for audio only
+  ---
+  duration_ms: 0.4356
+  type: 'test'
+  ...
+# Subtest: exact format IDs refuse every yt-dlp selector alias and ambiguous leading characters
+ok 384 - exact format IDs refuse every yt-dlp selector alias and ambiguous leading characters
+  ---
+  duration_ms: 0.739
+  type: 'test'
+  ...
+# Subtest: TS validator checks every packet sync and alignment across arbitrary chunks
+ok 385 - TS validator checks every packet sync and alignment across arbitrary chunks
+  ---
+  duration_ms: 1.8737
+  type: 'test'
+  ...
+# Subtest: BMFF validator checks bounded box headers and required initialization or fragment boxes
+ok 386 - BMFF validator checks bounded box headers and required initialization or fragment boxes
+  ---
+  duration_ms: 1.1679
+  type: 'test'
+  ...
+# Subtest: native resize waits for valid durable journal and never mutates resources
+ok 387 - native resize waits for valid durable journal and never mutates resources
+  ---
+  duration_ms: 13.1434
+  type: 'test'
+  ...
+# Subtest: stable format gate rejects all unsafe HTTP video/audio phases
+ok 388 - stable format gate rejects all unsafe HTTP video/audio phases
+  ---
+  duration_ms: 1.8002
+  type: 'test'
+  ...
+# Subtest: native MP4 plus HTTP M4A permits audio only after completed video
+ok 389 - native MP4 plus HTTP M4A permits audio only after completed video
+  ---
+  duration_ms: 3.6264
+  type: 'test'
+  ...
+# Subtest: entire operation deadline aborts slow subtitle body without publication and preserves checkpoint
+ok 390 - entire operation deadline aborts slow subtitle body without publication and preserves checkpoint
+  ---
+  duration_ms: 945.3756
+  type: 'test'
+  ...
+# Subtest: user abort during subtitle retains AbortError and checkpoint
+ok 391 - user abort during subtitle retains AbortError and checkpoint
+  ---
+  duration_ms: 183.5031
+  type: 'test'
+  ...
+# Subtest: YouTube refresh validates canonical identity without changing cache or deleting HTTP bytes
+ok 392 - YouTube refresh validates canonical identity without changing cache or deleting HTTP bytes
+  ---
+  duration_ms: 111.7307
+  type: 'test'
+  ...
+# Subtest: refresh rejects different canonical video and metadata drift while preserving every file
+ok 393 - refresh rejects different canonical video and metadata drift while preserving every file
+  ---
+  duration_ms: 44.3651
+  type: 'test'
+  ...
+# Subtest: refresh does not create a missing checkpoint directory
+ok 394 - refresh does not create a missing checkpoint directory
+  ---
+  duration_ms: 7.3909
+  type: 'test'
+  ...
+# Subtest: DASH refresh refuses unchanged relative manifest moved to another resource base
+ok 395 - DASH refresh refuses unchanged relative manifest moved to another resource base
+  ---
+  duration_ms: 40.6409
+  type: 'test'
+  ...
+# Subtest: legacy DASH checkpoint without a recorded resource base refuses source refresh
+ok 396 - legacy DASH checkpoint without a recorded resource base refuses source refresh
+  ---
+  duration_ms: 23.9134
+  type: 'test'
+  ...
+# Subtest: legacy DASH continuation refuses retained files before extraction and preserves cache across redirect
+ok 397 - legacy DASH continuation refuses retained files before extraction and preserves cache across redirect
+  ---
+  duration_ms: 31.512
+  type: 'test'
+  ...
+# Subtest: empty legacy DASH state may establish its first resource base
+ok 398 - empty legacy DASH state may establish its first resource base
+  ---
+  duration_ms: 41.0929
+  type: 'test'
+  ...
+# Subtest: native checkpoint reconciliation trims append bytes past committed index without refetch
+ok 399 - native checkpoint reconciliation trims append bytes past committed index without refetch
+  ---
+  duration_ms: 36.0355
+  type: 'test'
+  ...
+# Subtest: checkpoint refuses missing state, missing files, changed source and unsafe entries
+ok 400 - checkpoint refuses missing state, missing files, changed source and unsafe entries
+  ---
+  duration_ms: 9.4559
+  type: 'test'
+  ...
+# Subtest: unfinished unvalidated HTTP resource restarts alone while completed native video remains
+ok 401 - unfinished unvalidated HTTP resource restarts alone while completed native video remains
+  ---
+  duration_ms: 3.1221
+  type: 'test'
+  ...
+# Subtest: unvalidated HTTP video partial is retained and continuation is refused
+ok 402 - unvalidated HTTP video partial is retained and continuation is refused
+  ---
+  duration_ms: 7.944
+  type: 'test'
+  ...
+# Subtest: unfinished HTTP audio without completed video is retained and continuation is refused
+ok 403 - unfinished HTTP audio without completed video is retained and continuation is refused
+  ---
+  duration_ms: 3.8258
+  type: 'test'
+  ...
+# Subtest: external identity pins format selection and manifest but contains no signed URL
+ok 404 - external identity pins format selection and manifest but contains no signed URL
+  ---
+  duration_ms: 0.7108
+  type: 'test'
+  ...
+# Subtest: YouTube HLS identity ignores refreshed signatures but pins fragment boundaries and order
+ok 405 - YouTube HLS identity ignores refreshed signatures but pins fragment boundaries and order
+  ---
+  duration_ms: 1.3264
+  type: 'test'
+  ...
+# Subtest: YouTube identity preflight bounds manifests and does not forward credential headers
+ok 406 - YouTube identity preflight bounds manifests and does not forward credential headers
+  ---
+  duration_ms: 25.2102
+  type: 'test'
+  ...
+# Subtest: checkpoint rejects invalid native journal and aggregate oversized cache
+ok 407 - checkpoint rejects invalid native journal and aggregate oversized cache
+  ---
+  duration_ms: 7.8254
+  type: 'test'
+  ...
+# Subtest: checkpoint refuses hard-linked cached files and metadata
+ok 408 - checkpoint refuses hard-linked cached files and metadata
+  ---
+  duration_ms: 10.0465
+  type: 'test'
+  ...
+# Subtest: aborting from initial cached-progress notification never starts a transfer child
+ok 409 - aborting from initial cached-progress notification never starts a transfer child
+  ---
+  duration_ms: 49.4915
+  type: 'test'
+  ...
+# Subtest: native tool DASH resumes retained fragments after child exit and a fresh invocation
+ok 410 - native tool DASH resumes retained fragments after child exit and a fresh invocation
+  ---
+  duration_ms: 10095.3319
+  type: 'test'
+  ...
+# Subtest: explicit selection pins identity without changing legacy identity
+ok 411 - explicit selection pins identity without changing legacy identity
+  ---
+  duration_ms: 1.6444
+  type: 'test'
+  ...
+# Subtest: DASH inspection exposes safe 4K DTO and exact selected download
+ok 412 - DASH inspection exposes safe 4K DTO and exact selected download
+  ---
+  duration_ms: 155.5579
+  type: 'test'
+  ...
+# Subtest: audio-only selection preserves exact audio ID and output validation mode
+ok 413 - audio-only selection preserves exact audio ID and output validation mode
+  ---
+  duration_ms: 85.3425
+  type: 'test'
+  ...
+# Subtest: selected container drift is refused before transfer
+ok 414 - selected container drift is refused before transfer
+  ---
+  duration_ms: 41.4755
+  type: 'test'
+  ...
+# Subtest: native tool DASH inspection and selected video/audio plus audio-only fully decode
+ok 415 - native tool DASH inspection and selected video/audio plus audio-only fully decode
+  ---
+  duration_ms: 7530.0602
+  type: 'test'
+  ...
+# Subtest: subtitle extension is parsed by its fixed demuxer and cannot act as a local concat playlist
+ok 416 - subtitle extension is parsed by its fixed demuxer and cannot act as a local concat playlist
+  ---
+  duration_ms: 121.8458
+  type: 'test'
+  ...
+# Subtest: invalid YouTube URLs create no scratch workspace
+ok 417 - invalid YouTube URLs create no scratch workspace
+  ---
+  duration_ms: 11.577
+  type: 'test'
+  ...
+# Subtest: DASH preflight accepts static HTTP-only MPD and rejects DRM, live, XML entities and non-HTTP references
+ok 418 - DASH preflight accepts static HTTP-only MPD and rejects DRM, live, XML entities and non-HTTP references
+  ---
+  duration_ms: 32.8471
+  type: 'test'
+  ...
+# Subtest: YouTube URLs are canonicalized and arbitrary extractor URLs are rejected
+ok 419 - YouTube URLs are canonicalized and arbitrary extractor URLs are rejected
+  ---
+  duration_ms: 0.8386
+  type: 'test'
+  ...
+# Subtest: extension and download core accept the same canonical YouTube host forms
+ok 420 - extension and download core accept the same canonical YouTube host forms
+  ---
+  duration_ms: 0.8382
+  type: 'test'
+  ...
+# Subtest: media child environment is a minimal executable environment without inherited application secrets
+ok 421 - media child environment is a minimal executable environment without inherited application secrets
+  ---
+  duration_ms: 1.7385
+  type: 'test'
+  ...
+# Subtest: external downloader only accepts one through sixteen connections
+ok 422 - external downloader only accepts one through sixteen connections
+  ---
+  duration_ms: 4.0055
+  type: 'test'
+  ...
+# Subtest: external downloader accepts each supported connection boundary
+ok 423 - external downloader accepts each supported connection boundary
+  ---
+  duration_ms: 224.1223
+  type: 'test'
+  ...
+# Subtest: external DASH uses native fragments and YouTube HTTP uses bounded aria2c connections
+ok 424 - external DASH uses native fragments and YouTube HTTP uses bounded aria2c connections
+  ---
+  duration_ms: 188.7997
+  type: 'test'
+  ...
+# Subtest: YouTube requires aria2c while DASH does not
+ok 425 - YouTube requires aria2c while DASH does not
+  ---
+  duration_ms: 2.1475
+  type: 'test'
+  ...
+# Subtest: native tool aria2c accepts FlowDM arguments and bounds direct HTTP concurrency
+ok 426 - native tool aria2c accepts FlowDM arguments and bounds direct HTTP concurrency
+  ---
+  duration_ms: 1584.9808
+  type: 'test'
+  ...
+# Subtest: DASH relay enforces one shared resource budget across concurrent responses
+ok 427 - DASH relay enforces one shared resource budget across concurrent responses
+  ---
+  duration_ms: 8.0959
+  type: 'test'
+  ...
+# Subtest: native tool yt-dlp downloads DASH fragments at the requested native concurrency
+ok 428 - native tool yt-dlp downloads DASH fragments at the requested native concurrency
+  ---
+  duration_ms: 4109.9241
+  type: 'test'
+  ...
+# Subtest: external downloader only publishes finished mux output, reports bytes and never accepts credential headers
+ok 429 - external downloader only publishes finished mux output, reports bytes and never accepts credential headers
+  ---
+  duration_ms: 38.8516
+  type: 'test'
+  ...
+# Subtest: external downloader abort kills a slow child and leaves no published partial
+ok 430 - external downloader abort kills a slow child and leaves no published partial
+  ---
+  duration_ms: 54.9205
+  type: 'test'
+  ...
+# Subtest: external downloader rejects oversized scratch output before publication
+ok 431 - external downloader rejects oversized scratch output before publication
+  ---
+  duration_ms: 39.6836
+  type: 'test'
+  ...
+# Subtest: DASH tool receives a loopback relay bound to the preflighted manifest bytes
+ok 432 - DASH tool receives a loopback relay bound to the preflighted manifest bytes
+  ---
+  duration_ms: 47.0137
+  type: 'test'
+  ...
+# Subtest: FFmpeg validation rejects non-media output before it can be published
+ok 433 - FFmpeg validation rejects non-media output before it can be published
+  ---
+  duration_ms: 59.2961
+  type: 'test'
+  ...
+# Subtest: parses VOD ordered relative segments and chooses highest muxed master
+ok 434 - parses VOD ordered relative segments and chooses highest muxed master
+  ---
+  duration_ms: 3.147
+  type: 'test'
+  ...
+# Subtest: fMP4 prepends one initialization map and identifies output format
+ok 435 - fMP4 prepends one initialization map and identifies output format
+  ---
+  duration_ms: 0.4475
+  type: 'test'
+  ...
+# Subtest: rejects unsupported or malformed playlists explicitly and enforces limits
+ok 436 - rejects unsupported or malformed playlists explicitly and enforces limits
+  ---
+  duration_ms: 1.798
+  type: 'test'
+  ...
+# Subtest: bounds master variants and resolves duplicate tags at their actual line positions
+ok 437 - bounds master variants and resolves duplicate tags at their actual line positions
+  ---
+  duration_ms: 42.273
+  type: 'test'
+  ...
+# Subtest: rejects invalid or raised public parser limits
+ok 438 - rejects invalid or raised public parser limits
+  ---
+  duration_ms: 0.4336
+  type: 'test'
+  ...
+# Subtest: pins exact selected media manifest bytes including duration and sequence changes
+ok 439 - pins exact selected media manifest bytes including duration and sequence changes
+  ---
+  duration_ms: 33.3744
+  type: 'test'
+  ...
+# Subtest: extractor cannot substitute another actual format while retaining the requested ID in its catalog
+ok 440 - extractor cannot substitute another actual format while retaining the requested ID in its catalog
+  ---
+  duration_ms: 49.8471
+  type: 'test'
+  ...
+# Subtest: media tools prefer packaged/source binaries and validate explicit configuration
+ok 441 - media tools prefer packaged/source binaries and validate explicit configuration
+  ---
+  duration_ms: 27.5176
+  type: 'test'
+  ...
+# Subtest: native runner refuses a target that differs from the real execution OS
+ok 442 - native runner refuses a target that differs from the real execution OS
+  ---
+  duration_ms: 38.4871
+  type: 'test'
+  ...
+# Subtest: native runner rejects an unknown platform before launching any desktop
+ok 443 - native runner rejects an unknown platform before launching any desktop
+  ---
+  duration_ms: 40.7068
+  type: 'test'
+  ...
+# Subtest: native evidence binds the exact executable, ASAR path and application version
+ok 444 - native evidence binds the exact executable, ASAR path and application version
+  ---
+  duration_ms: 29.1287
+  type: 'test'
+  ...
+# Subtest: verifies a standalone linux archive without requiring other platforms
+ok 445 - verifies a standalone linux archive without requiring other platforms
+  ---
+  duration_ms: 116.3174
+  type: 'test'
+  ...
+# Subtest: verifies a standalone mac-x64 archive without requiring other platforms
+ok 446 - verifies a standalone mac-x64 archive without requiring other platforms
+  ---
+  duration_ms: 96.2312
+  type: 'test'
+  ...
+# Subtest: verifies a standalone mac-arm64 archive without requiring other platforms
+ok 447 - verifies a standalone mac-arm64 archive without requiring other platforms
+  ---
+  duration_ms: 104.9523
+  type: 'test'
+  ...
+# Subtest: platform verifier refuses stale runtime bytes and missing selected archive
+ok 448 - platform verifier refuses stale runtime bytes and missing selected archive
+  ---
+  duration_ms: 145.3088
+  type: 'test'
+  ...
+# Subtest: platform verifier rejects unknown, repeated and missing platform arguments
+ok 449 - platform verifier rejects unknown, repeated and missing platform arguments
+  ---
+  duration_ms: 230.8201
+  type: 'test'
+  ...
+# Subtest: native Unix refuses an explicit non-executable media tool before admission
+ok 450 - native Unix refuses an explicit non-executable media tool before admission
+  ---
+  duration_ms: 15.8779
+  type: 'test'
+  ...
+# Subtest: native Unix PATH skips non-executable files and relative directories
+ok 451 - native Unix PATH skips non-executable files and relative directories
+  ---
+  duration_ms: 10.098
+  type: 'test'
+  ...
+# Subtest: native Unix follows executable symlinks and refuses dangling or non-executable targets
+ok 452 - native Unix follows executable symlinks and refuses dangling or non-executable targets
+  ---
+  duration_ms: 7.2038
+  type: 'test'
+  ...
+# Subtest: scanner validates executable and passes Unicode as one argv without shell
+ok 453 - scanner validates executable and passes Unicode as one argv without shell
+  ---
+  duration_ms: 9.8527
+  type: 'test'
+  ...
+# Subtest: scanner timeout, exit error, cancel preserve downloaded file; real benign child works
+ok 454 - scanner timeout, exit error, cancel preserve downloaded file; real benign child works
+  ---
+  duration_ms: 170.6385
+  type: 'test'
+  ...
+1..454
+# tests 472
+# suites 0
+# pass 469
+# fail 1
+# cancelled 0
+# skipped 2
+# todo 0
+# duration_ms 138509.924818

@@ -1,4 +1,5 @@
 'use strict';
+const { resolveTools } = require('../../src/tools/media-tools.cjs');
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
@@ -142,7 +143,7 @@ function runAria2(executable, args) {
   });
 }
 
-test('pinned aria2c accepts FlowDM arguments and bounds direct HTTP concurrency', async t => {
+test('native tool aria2c accepts FlowDM arguments and bounds direct HTTP concurrency', async t => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'flowdm-aria2-'));
   t.after(() => { assert.equal(path.dirname(root), os.tmpdir()); assert.ok(path.basename(root).startsWith('flowdm-aria2-')); return fs.rm(root, { recursive: true, force: true }); });
   const payload = Buffer.alloc(32 * 1024 * 1024, 0x5a);
@@ -157,19 +158,22 @@ test('pinned aria2c accepts FlowDM arguments and bounds direct HTTP concurrency'
     active++; peak = Math.max(peak, active);
     res.writeHead(range ? 206 : 200, { 'accept-ranges': 'bytes', 'content-length': end - start + 1, ...(range ? { 'content-range': `bytes ${start}-${end}/${payload.length}` } : {}) });
     let offset = start, timer;
-    // Count live responses, including early client cancellation. A delayed send
-    // timer can otherwise keep a closed prior request in the next run's count.
-    res.once('close', () => { active--; clearTimeout(timer); });
+    // End with the last Content-Length byte: the client can finish before a
+    // later send timer, which would otherwise count a completed body as active.
+    let released = false;
+    const release = () => { if (released) return; released = true; active--; clearTimeout(timer); };
+    res.once('close', release); res.once('finish', release);
     const send = () => {
       if (res.destroyed) return;
       if (offset > end) { res.end(); return; }
       const next = Math.min(offset + 256 * 1024, end + 1);
       res.write(payload.subarray(offset, next)); offset = next;
+      if (offset > end) { res.end(); return; }
       timer = setTimeout(send, 8); timer.unref();
     };
     send();
   });
-  const aria2c = path.resolve('vendor/media-tools/aria2c.exe');
+  const { aria2c } = await resolveTools({ packaged: false });
   for (const [connections, minPeak] of [[1, 1], [4, 2]]) {
     peak = 0;
     const filename = `payload-${connections}.bin`;
@@ -211,7 +215,7 @@ test('DASH relay enforces one shared resource budget across concurrent responses
   assert.equal(first.status === 200 && second.status === 200 && first.ended && second.ended, false);
 });
 
-test('pinned yt-dlp downloads DASH fragments at the requested native concurrency', async t => {
+test('native tool yt-dlp downloads DASH fragments at the requested native concurrency', async t => {
   const videoDir = path.resolve('tests/fixtures/video');
   const files = Object.fromEntries(await Promise.all(['init.mp4', 'fragment00.m4s', 'fragment01.m4s', 'fragment02.m4s'].map(async name => [name, await fs.readFile(path.join(videoDir, name))])));
   const mpd = '<?xml version="1.0"?><MPD type="static" mediaPresentationDuration="PT3S" minBufferTime="PT1S" profiles="urn:mpeg:dash:profile:isoff-main:2011"><Period duration="PT3S"><AdaptationSet mimeType="video/mp4" segmentAlignment="true"><Representation id="muxed" bandwidth="200000" codecs="avc1.64000a" width="320" height="240"><SegmentList timescale="1000000" duration="1000000"><Initialization sourceURL="init.mp4"/><SegmentURL media="fragment00.m4s"/><SegmentURL media="fragment01.m4s"/><SegmentURL media="fragment02.m4s"/></SegmentList></Representation></AdaptationSet></Period></MPD>';
@@ -224,7 +228,7 @@ test('pinned yt-dlp downloads DASH fragments at the requested native concurrency
     active++; peak = Math.max(peak, active);
     setTimeout(() => { res.end(files[name]); active--; }, 150).unref();
   });
-  const tools = { ytDlp: path.resolve('vendor/media-tools/yt-dlp.exe'), ffmpeg: path.resolve('vendor/media-tools/ffmpeg.exe'), jsRuntime: process.execPath };
+  const tools = await resolveTools({ packaged: false });
   for (const [connections, expectedPeak] of [[1, 1], [4, 2]]) {
     peak = 0;
     const output = path.join(fixture.root, `dash-${connections}.mp4`);

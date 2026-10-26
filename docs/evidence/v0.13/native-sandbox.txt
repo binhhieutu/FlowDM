@@ -1,0 +1,17 @@
+TAP version 13
+# Subtest: native desktop platform, media executables and sandbox remain enabled
+ok 1 - native desktop platform, media executables and sandbox remain enabled
+  ---
+  duration_ms: 3458.321613
+  type: 'test'
+  ...
+# {"at":"2026-10-26T07:45:05.422Z","os":{"platform":"linux","arch":"x64","release":"6.18.54.1-microsoft-standard-WSL2","wsl2":true},"packaged":true,"platform":"linux","arch":"x64","version":"0.13.0","electron":"45.0.0","executable":"/home/flowdm/task9/source/dist/linux-unpacked/flowdm","appPath":"/home/flowdm/task9/source/dist/linux-unpacked/resources/app.asar","noSandbox":false,"disableSetuidSandbox":false,"sandbox":true,"contextIsolation":true,"nodeIntegration":false,"asarSha256":"6c962eafd8d22e27df7e9c2fd15259a30929e9c3745446fb9c5d3c539bf92ede","tools":{"ytDlp":{"version":"2026.10.21","sha256":"d8bd33fca9d5b23bd5b9952b3fca36db5c46331933fda9f598a3da14ce2c243f"},"ffmpeg":{"version":"ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers","sha256":"ed16af623947494a72e284b6eb8ff225f2da22b38b5d5069c2fd4b4ba3384e41"},"aria2c":{"version":"aria2 version 1.37.0","sha256":"86d88cbee95351235729d6884bb4ecda465b9ab8b10fe59cc53cbd3d6e412c29"}}}
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3864.840799

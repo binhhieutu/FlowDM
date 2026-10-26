@@ -1,0 +1,44 @@
+{
+  "at": "2026-10-26T07:45:26.616Z",
+  "rows": [
+    {
+      "mediaType": "hls",
+      "pausedBytes": 15416,
+      "restoredBytes": 15416,
+      "reusedResources": 1,
+      "firstCompletedResource": "/video/segment00.ts",
+      "firstResourceRequests": 1,
+      "resourceRequests": [
+        "/video/segment00.ts",
+        "/video/segment01.ts",
+        "/video/segment01.ts",
+        "/video/segment02.ts"
+      ],
+      "bytes": 47188,
+      "sha256": "8fd49049fe73583d0e179541f59b57090178a412cd8676250cabbcb6f0bfbc4e",
+      "wholeFileDecoded": true
+    },
+    {
+      "mediaType": "dash",
+      "pausedBytes": 9722,
+      "restoredBytes": 9722,
+      "reusedResources": 2,
+      "firstCompletedResource": "/dash/init-stream0.m4s",
+      "firstResourceRequests": 1,
+      "resourceRequests": [
+        "/dash/init-stream0.m4s",
+        "/dash/chunk-stream0-00001.m4s",
+        "/dash/chunk-stream0-00002.m4s",
+        "/dash/chunk-stream0-00002.m4s",
+        "/dash/chunk-stream0-00003.m4s",
+        "/dash/init-stream1.m4s",
+        "/dash/chunk-stream1-00001.m4s",
+        "/dash/chunk-stream1-00002.m4s",
+        "/dash/chunk-stream1-00003.m4s"
+      ],
+      "bytes": 41891,
+      "sha256": "be8f4d81de0a41ba4645cd45a2465d58e5531d8784a4a30426eb73c3c3b9fc70",
+      "wholeFileDecoded": true
+    }
+  ]
+}

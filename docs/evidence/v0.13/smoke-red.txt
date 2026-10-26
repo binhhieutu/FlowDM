@@ -1,0 +1,33 @@
+TAP version 13
+# Downloading Electron binary...
+# Subtest: native desktop platform, media executables and sandbox remain enabled
+not ok 1 - native desktop platform, media executables and sandbox remain enabled
+  ---
+  duration_ms: 4431.281636
+  type: 'test'
+  location: '/home/flowdm/task9/source/tests/e2e/platform-smoke.test.cjs:12:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Harness must not disable Chromium sandbox
+
+    true !== false
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/home/flowdm/task9/source/tests/e2e/platform-smoke.test.cjs:28:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4850.579413

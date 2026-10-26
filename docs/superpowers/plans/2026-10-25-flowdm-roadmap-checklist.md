@@ -4,7 +4,7 @@
 
 **Ngày:** 2026-10-25. **Trạng thái:** kế hoạch; chưa triển khai các mục chưa đánh dấu.
 
-**Tiến độ 2026-10-26:** Task 1–2 hoàn tất ở 0.6.0, Task 3 hoàn tất ở 0.7.0. Task 4 và đổi N khi tải media hoàn tất ở 0.8.0, Task 5 hoàn tất ở 0.9.0, Task 6 hoàn tất ở 0.10.0, Task 7 hoàn tất ở 0.11.0. Task 8a/8b/8d/8f/8g hoàn tất ở0.12;8c còn YouTubeproxyfullfile bịHTTP401,8eFAT/exFATchưa hỗ trợ. Task9–10 chưa triển khai. Xem [VERIFICATION_V12](../../VERIFICATION_V12.md). Xem [VERIFICATION_V11.md](../../VERIFICATION_V11.md) và [review Task7](../../batch-v11-review.md). Xem [VERIFICATION_V10.md](../../VERIFICATION_V10.md) và [review Task 6](../../queues-v10-review.md). Xem [VERIFICATION_V9.md](../../VERIFICATION_V9.md) và [review Task5](../../browser-rebind-v9-review.md). Xem [VERIFICATION_V8.md](../../VERIFICATION_V8.md) và [review 0.8](../../media-selection-v8-review.md). Xem [VERIFICATION_V7.md](../../VERIFICATION_V7.md) và [review Task 3](../../dynamic-ranges-v7-review.md). Xem [VERIFICATION_V6.md](../../VERIFICATION_V6.md) và [review](../../source-refresh-v6-review.md). External HTTP fallback thiếu validator vẫn bị từ chối; legacy DASH thiếu base hash được giữ nguyên nhưng không resume an toàn.
+**Tiến độ 2026-10-26:** Task 1–2 hoàn tất ở 0.6.0, Task 3 hoàn tất ở 0.7.0. Task 4 và đổi N khi tải media hoàn tất ở 0.8.0, Task 5 hoàn tất ở 0.9.0, Task 6 hoàn tất ở 0.10.0, Task 7 hoàn tất ở 0.11.0. Task 8a/8b/8d/8f/8g hoàn tất ở0.12;8c còn YouTubeproxyfullfile bịHTTP401,8eFAT/exFATchưa hỗ trợ. Task 9 đã đạt Linux x64/WSL2 trong 0.13, macOS chưa có host/chưa kiểm thử; Task 10 chưa triển khai. Xem [VERIFICATION_V12](../../VERIFICATION_V12.md). Xem [VERIFICATION_V11.md](../../VERIFICATION_V11.md) và [review Task7](../../batch-v11-review.md). Xem [VERIFICATION_V10.md](../../VERIFICATION_V10.md) và [review Task 6](../../queues-v10-review.md). Xem [VERIFICATION_V9.md](../../VERIFICATION_V9.md) và [review Task5](../../browser-rebind-v9-review.md). Xem [VERIFICATION_V8.md](../../VERIFICATION_V8.md) và [review 0.8](../../media-selection-v8-review.md). Xem [VERIFICATION_V7.md](../../VERIFICATION_V7.md) và [review Task 3](../../dynamic-ranges-v7-review.md). Xem [VERIFICATION_V6.md](../../VERIFICATION_V6.md) và [review](../../source-refresh-v6-review.md). External HTTP fallback thiếu validator vẫn bị từ chối; legacy DASH thiếu base hash được giữ nguyên nhưng không resume an toàn.
 
 **Goal:** Hoàn thiện những khả năng tải xuống còn thiếu theo hướng sử dụng tương tự IDM, giữ được dữ liệu tải dở và kiểm chứng thực tế trên Windows/Linux/macOS.
 
@@ -188,11 +188,17 @@ Tách thành các deliverable nhỏ để không chặn toàn roadmap:
 
 **Files:** tạo `tests/e2e/platform-smoke.test.cjs`, `docs/PLATFORM_VERIFICATION.md`; sửa `src/tools/media-tools.cjs`, `src/browser/registration.cjs`, `scripts/verify-package.cjs`, package build config nếu kết quả host test yêu cầu.
 
-- [ ] RED/GREEN: unit cho tool lookup/permissions, paths có space/Unicode và registration trên từng OS; không suy kết quả Windows thành Linux/macOS.
-- [ ] Chạy Linux native: mở GUI → HTTP/HLS/DASH → pause/đóng/mở/resume → SHA/decode; browser capture, native registration và cleanup bằng profile riêng. Kiểm tra sandbox không bị vô hiệu hóa để né lỗi.
+- [x] RED/GREEN: unit cho tool lookup/permissions, paths có space/Unicode và matrix registration Linux/macOS. Quyền execute/launcher đã chạy thật trên Linux WSL2; macOS native còn ở mục chưa kiểm thử bên dưới.
+- [x] Chạy Linux native (Ubuntu x64 trên WSL2/WSLg): mở GUI → HTTP/HLS/DASH → pause/đóng/mở/resume → SHA/decode; browser capture, native registration và cleanup bằng profile riêng. Kiểm tra sandbox không bị vô hiệu hóa để né lỗi.
 - [ ] Build/chạy macOS trên host macOS: x64 và arm64 có bằng chứng riêng; cùng flow như Linux, thêm Gatekeeper và quyền executable. Máy/runner chưa có thì ghi BLOCKED kèm điều kiện, không giả lập thành PASS.
-- [ ] Kiểm tra thiếu yt-dlp/FFmpeg/aria2, pin/hash và hướng dẫn cài; đóng gói tools theo platform hoặc phát hiện PATH theo chính sách được công bố.
-- [ ] Review rồi commit `test: verify native desktop download flows across platforms`.
+- [x] Kiểm tra thiếu yt-dlp/FFmpeg/aria2, pin/hash và hướng dẫn cài; đóng gói tools theo platform hoặc phát hiện PATH theo chính sách được công bố.
+- [x] Review rồi commit `test: verify native Linux download flows on WSL2`.
+
+**Kết quả 0.13:** [PLATFORM_VERIFICATION](../../PLATFORM_VERIFICATION.md), [review](../../task9-platform-review.md), [summary](../../evidence/v0.13/summary.json). Linux 473 pass/0 fail/2 Windows-only skip; 6 nhóm native gate đạt trên bản giải nén tar (4 GUI tests pass, 1 YouTube opt-in skip). HTTP giữ 114.688 byte qua mở lại, HLS/DASH reuse + SHA/full decode, Chromium capture và native registration restoration; sandbox bật. HTTPS Internet 502.941 byte đúng SHA. Windows 471 pass/0 fail/4 Unix-only skip, coverage 93.18/85.95/87.24, audit 0; portable HTTP/tools pass.
+
+- [x] Linux x64 trên WSL2: build và chạy lại chính gói tar sau giải nén, 71 payload files/68 runtime + 16 dependency files khớp.
+- [ ] macOS x64/arm64/Gatekeeper: **CHƯA KIỂM THỬ — không có host Mac**. Test đường dẫn/verifier giả lập không thay bằng chứng native.
+- [ ] Linux desktop độc lập ngoài WSL2 và Linux ARM64: chưa kiểm thử.
 
 ## Task 10 — Cổng phát hành và cập nhật ứng dụng
 
@@ -219,4 +225,4 @@ Tách thành các deliverable nhỏ để không chặn toàn roadmap:
 
 ## Điểm bắt đầu thực thi
 
-Task 1–7 đã có implementation và báo cáo nghiệm thu theo từng phiên bản. Bản hiện tại 0.12.0 hoàn tất các mục 8a, 8b, 8d, 8f, 8g. Mục 8c đã đạt HTTP CONNECT/SOCKS5 và HTTP/HLS/DASH/browser, còn tải YouTube qua proxy bị HTTP 401; mục 8e chưa hỗ trợ FAT/exFAT. Hai mục này tiếp tục để mở. Task 9–10 chưa triển khai. Journal hiện tại schema 8, đọc schema 1–8 và backup dữ liệu cũ trước migration; xem VERIFICATION_V12 để biết giới hạn và bằng chứng của artifact cuối.
+Task 1–7 đã có implementation và báo cáo nghiệm thu theo từng phiên bản. Bản hiện tại 0.12.0 hoàn tất các mục 8a, 8b, 8d, 8f, 8g. Mục 8c đã đạt HTTP CONNECT/SOCKS5 và HTTP/HLS/DASH/browser, còn tải YouTube qua proxy bị HTTP 401; mục 8e chưa hỗ trợ FAT/exFAT. Hai mục này tiếp tục để mở. Task 9 đã đạt Linux x64/WSL2 trong 0.13, macOS chưa có host/chưa kiểm thử; Task 10 chưa triển khai. Journal hiện tại schema 8, đọc schema 1–8 và backup dữ liệu cũ trước migration; xem VERIFICATION_V12 để biết giới hạn và bằng chứng của artifact cuối.
