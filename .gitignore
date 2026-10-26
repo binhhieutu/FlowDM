@@ -10,3 +10,8 @@ test-results/
 vendor/
 /youtube-probe-v3.json
 downloads/
+.env
+.env.*
+!.env.example
+/profile-backups/
+/state/

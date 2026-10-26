@@ -51,7 +51,7 @@ test('owned app crash during post-download scan preserves completed file and req
   const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !['ELECTRON_RUN_AS_NODE', 'FLOWDM_FFMPEG', 'FLOWDM_YTDLP', 'FLOWDM_ARIA2C'].includes(key.toUpperCase())));
   const launch = async () => {
     const executablePath = process.env.FLOWDM_EXECUTABLE;
-    app = await _electron.launch({ ...(executablePath ? { executablePath } : {}), args: executablePath ? [] : [path.resolve('.')], env: { ...env, FLOWDM_DATA_DIR: state, FLOWDM_DOWNLOAD_DIR: output } });
+    app = await _electron.launch({ chromiumSandbox: true, ...(executablePath ? { executablePath } : {}), args: executablePath ? [] : [path.resolve('.')], env: { ...env, FLOWDM_DATA_DIR: state, FLOWDM_DOWNLOAD_DIR: output } });
     page = await app.firstWindow(); await page.getByRole('button', { name: 'Thêm liên kết', exact: true }).waitFor();
   };
   await launch();

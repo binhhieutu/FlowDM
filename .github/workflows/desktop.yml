@@ -1,14 +1,18 @@
-name: Native desktop verification
-on: [push, pull_request, workflow_dispatch]
+name: Manual native verification
+on:
+  workflow_dispatch:
+    inputs:
+      os:
+        description: Explicitly select a verification host; no jobs run on push
+        type: choice
+        default: ubuntu-latest
+        options: [ubuntu-latest, windows-latest, macos-latest]
 permissions:
   contents: read
 jobs:
   desktop:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ inputs.os }}
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -16,24 +20,39 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - if: runner.os == 'Windows'
-        run: |
-          npx playwright install chromium
-          choco install ffmpeg --no-progress -y
-          curl.exe -L --fail https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-full.7z -o ffmpeg-build.7z
-          & 'C:\Program Files\7-Zip\7z.exe' x ffmpeg-build.7z -o.tmp/ffmpeg-build -y
-          $pinned = Get-ChildItem .tmp/ffmpeg-build -Recurse -Filter ffmpeg.exe | Select-Object -First 1
-          node scripts/prepare-media-tools.cjs $pinned.FullName
       - if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y yt-dlp ffmpeg aria2
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg aria2
       - if: runner.os == 'macOS'
-        run: brew install yt-dlp ffmpeg aria2
+        run: brew install ffmpeg aria2
+      - if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          set -euo pipefail
+          tool=yt-dlp_linux
+          if [ "$RUNNER_OS" = macOS ]; then tool=yt-dlp_macos; fi
+          mkdir -p .tmp/tools
+          cd .tmp/tools
+          curl -fL --retry 2 https://github.com/yt-dlp/yt-dlp/releases/download/2026.10.21/SHA2-256SUMS -o SHA2-256SUMS
+          curl -fL --retry 2 "https://github.com/yt-dlp/yt-dlp/releases/download/2026.10.21/$tool" -o "$tool"
+          if [ "$RUNNER_OS" = macOS ]; then grep "  $tool$" SHA2-256SUMS | shasum -a 256 -c -; else grep "  $tool$" SHA2-256SUMS | sha256sum -c -; fi
+          install -m 755 "$tool" yt-dlp
+          echo "$PWD" >> "$GITHUB_PATH"
       - if: runner.os == 'Windows'
-        run: node --test tests/e2e/browser.test.cjs
-      - if: runner.os != 'Linux'
-        run: npm run test:coverage
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force .tmp/ffmpeg | Out-Null
+          Invoke-WebRequest https://github.com/GyanD/codexffmpeg/releases/download/8.1/ffmpeg-8.1-full_build.7z -OutFile .tmp/ffmpeg.7z
+          & 'C:\Program Files\7-Zip\7z.exe' x .tmp/ffmpeg.7z '-o.tmp/ffmpeg' '*\bin\ffmpeg.exe' '*\bin\ffprobe.exe' -r -y
+          if ($LASTEXITCODE -ne 0) { throw 'FFmpeg extraction failed' }
+          $pinned = Get-ChildItem .tmp/ffmpeg -Recurse -Filter ffmpeg.exe | Select-Object -First 1
+          node scripts/prepare-media-tools.cjs $pinned.FullName
+          if ($LASTEXITCODE -ne 0) { throw 'Pinned media tool preparation failed' }
+          $pinned.Directory.FullName >> $env:GITHUB_PATH
+      - run: npx playwright install --with-deps chromium
       - if: runner.os == 'Linux'
         run: xvfb-run --auto-servernum npm run test:coverage
+      - if: runner.os != 'Linux'
+        run: npm run test:coverage
       - run: npm audit --audit-level=moderate
       - if: runner.os == 'Windows'
         run: npm run dist:win
@@ -41,12 +60,12 @@ jobs:
         run: npm run dist:linux
       - if: runner.os == 'macOS'
         run: npm run dist:mac
+      - if: runner.os == 'Linux'
+        run: xvfb-run --auto-servernum env FLOWDM_EXECUTABLE="$PWD/dist/linux-unpacked/flowdm" npm run test:native -- --platform linux
+      # No media binary upload until the public source-distribution gate is satisfied.
       - uses: actions/upload-artifact@v4
         with:
-          name: flowdm-${{ runner.os }}
+          name: verification-${{ runner.os }}
           path: |
-            dist/*.exe
-            dist/*.tar.gz
-            dist/*.zip
             test-results/*.png
             coverage/lcov.info

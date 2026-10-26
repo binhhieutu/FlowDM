@@ -170,4 +170,7 @@ $('add-form').addEventListener('submit', async event => {
   finally { delete $('add-form').dataset.busy; $('submit-download').disabled = false; }
 });
 window.flow.onChange(next => { tasks = next; if (!selected && tasks.length) selected = tasks[0].id; render(); });
+$('update-button').addEventListener('click', async () => { try { const result = await window.flow.updateInfo(); if (!result.ok) throw Error(result.error); $('update-message').textContent = `Phiên bản hiện tại: ${result.data.currentVersion}. ${result.data.message}`; $('update-dialog').showModal(); } catch (error) { toast(error.message); } });
+$('update-close').addEventListener('click', () => $('update-dialog').close());
+$('update-github').addEventListener('click', async () => { try { const result = await window.flow.openReleasePage(); if (!result.ok) throw Error(result.error); } catch (error) { toast(error.message); } });
 (async () => { const info = await window.flow.info(); if (info.ok) { defaultDirectory = info.data.downloadDir; $('app-version').textContent = `v${info.data.version} · ${info.data.platform}`; $('bridge-status').textContent = info.data.bridgeAvailable ? 'Sẵn sàng nhận liên kết từ trình duyệt' : 'Tích hợp trình duyệt chưa sẵn sàng'; if (info.data.mediaTools && !info.data.mediaTools.ready) $('media-type-hint').textContent = `HLS/DASH/YouTube chưa sẵn sàng: ${info.data.mediaTools.error || 'thiếu công cụ media'}`; } await refresh(); })().catch(error => toast(error.message));

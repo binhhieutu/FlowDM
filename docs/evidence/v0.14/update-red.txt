@@ -1,0 +1,111 @@
+✖ manual updates disclose no authenticated endpoint and never install automatically (1.3268ms)
+  AssertionError [ERR_ASSERTION]: Update trust policy is required
+      at api (I:\dich_nguoc\FlowDM\tests\tools\update-manifest.test.cjs:5:85)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\update-manifest.test.cjs:13:16)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.start (node:internal/test_runner/test:829:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:297:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }
+
+✖ future update policy accepts only signed newer payload for the exact OS and architecture (0.2167ms)
+  AssertionError [ERR_ASSERTION]: Update trust policy is required
+      at api (I:\dich_nguoc\FlowDM\tests\tools\update-manifest.test.cjs:5:85)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\update-manifest.test.cjs:17:59)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }
+
+✖ future updater refuses downgrade, tampering, unknown keys and untrusted release URLs (0.2202ms)
+  AssertionError [ERR_ASSERTION]: Update trust policy is required
+      at api (I:\dich_nguoc\FlowDM\tests\tools\update-manifest.test.cjs:5:85)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\update-manifest.test.cjs:25:38)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }
+
+ℹ tests 3
+ℹ suites 0
+ℹ pass 0
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 70.1924
+
+✖ failing tests:
+
+test at tests\tools\update-manifest.test.cjs:12:1
+✖ manual updates disclose no authenticated endpoint and never install automatically (1.3268ms)
+  AssertionError [ERR_ASSERTION]: Update trust policy is required
+      at api (I:\dich_nguoc\FlowDM\tests\tools\update-manifest.test.cjs:5:85)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\update-manifest.test.cjs:13:16)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.start (node:internal/test_runner/test:829:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:297:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }
+
+test at tests\tools\update-manifest.test.cjs:16:1
+✖ future update policy accepts only signed newer payload for the exact OS and architecture (0.2167ms)
+  AssertionError [ERR_ASSERTION]: Update trust policy is required
+      at api (I:\dich_nguoc\FlowDM\tests\tools\update-manifest.test.cjs:5:85)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\update-manifest.test.cjs:17:59)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }
+
+test at tests\tools\update-manifest.test.cjs:24:1
+✖ future updater refuses downgrade, tampering, unknown keys and untrusted release URLs (0.2202ms)
+  AssertionError [ERR_ASSERTION]: Update trust policy is required
+      at api (I:\dich_nguoc\FlowDM\tests\tools\update-manifest.test.cjs:5:85)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\update-manifest.test.cjs:25:38)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }

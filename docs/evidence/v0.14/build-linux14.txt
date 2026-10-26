@@ -1,0 +1,37 @@
+
+> flowdm@0.14.0 dist:linux
+> electron-builder --linux tar.gz --x64 --publish=never
+
+  • electron-builder  version=26.15.3 os=6.18.54.1-microsoft-standard-WSL2
+  • loaded configuration  file=package.json ("build" field)
+  • executing @electron/rebuild  electronVersion=45.0.0 arch=x64 buildFromSource=false workspaceRoot=/home/flowdm/task9/source projectDir=./ appDir=./
+  • installing native dependencies  arch=x64
+  • completed installing native dependencies
+  • packaging       platform=linux arch=x64 electron=45.0.0 appOutDir=dist/linux-unpacked
+  • downloaded      label=electron progress=100%
+  • downloaded electron zip extracted successfully  output=/home/flowdm/task9/source/dist/linux-unpacked
+  • searching for node modules  pm=npm searchDir=/home/flowdm/task9/source
+  • building        target=tar.gz arch=x64 file=dist/flowdm-0.14.0.tar.gz
+Verified executable modes in flowdm-0.14.0.tar.gz
+integrity: PASS (0 passed, 0 skipped)
+platform-unit: PASS (15 passed, 0 skipped)
+sandbox: PASS (1 passed, 0 skipped)
+http-resume: PASS (1 passed, 0 skipped)
+media-resume: PASS (1 passed, 1 skipped)
+browser-capture: PASS (1 passed, 0 skipped)
+TAP version 13
+# Subtest: real previous binary upgrades paused data, manual updates stay fixed, snapshot rollback resumes exact bytes
+ok 1 - real previous binary upgrades paused data, manual updates stay fixed, snapshot rollback resumes exact bytes
+  ---
+  duration_ms: 4131.578874
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4423.070374

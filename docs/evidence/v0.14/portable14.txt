@@ -1,0 +1,6 @@
+portable-stage: launch first GUI
+portable-stage: close paused HTTP
+portable-stage: relaunch paused HTTP
+portable-stage: HTTP resumed and verified
+{"status":"passed","artifact":"FlowDM 0.14.0.exe","bytes":2097152,"sha256":"d074da9cd5dcef9a57c6a864d5c73eb70a0b65219f27b293c2fa37356dd7f328","pauseRestartResume":true,"mediaToolsVerified":true,"youtube":null,"at":"2026-10-26T08:56:29.530Z"}
+portable-stage: close verified portable

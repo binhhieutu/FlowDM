@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-26T08:56:38.285Z",
+  "platform": "win32",
+  "browsers": [
+    "chrome",
+    "testing",
+    "chromium"
+  ],
+  "restored": true
+}

@@ -1,0 +1,80 @@
+{
+  "at": "2026-10-26T08:54:39.051Z",
+  "version": "0.14.0",
+  "platform": "linux",
+  "arch": "x64",
+  "release": "6.18.54.1-microsoft-standard-WSL2",
+  "wsl2": true,
+  "status": "passed",
+  "cases": [
+    {
+      "name": "integrity",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 345,
+      "pass": 0,
+      "skipped": 0,
+      "status": "passed"
+    },
+    {
+      "name": "platform-unit",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 1442,
+      "pass": 15,
+      "skipped": 0,
+      "status": "passed"
+    },
+    {
+      "name": "sandbox",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 2704,
+      "pass": 1,
+      "skipped": 0,
+      "status": "passed"
+    },
+    {
+      "name": "http-resume",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 6033,
+      "pass": 1,
+      "skipped": 0,
+      "status": "passed"
+    },
+    {
+      "name": "media-resume",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 14219,
+      "pass": 1,
+      "skipped": 1,
+      "status": "passed"
+    },
+    {
+      "name": "browser-capture",
+      "exitCode": 0,
+      "signal": null,
+      "elapsedMs": 20870,
+      "pass": 1,
+      "skipped": 0,
+      "status": "passed"
+    }
+  ],
+  "package": [
+    {
+      "platform": "linux-unpacked",
+      "filesVerified": 70,
+      "ftpDependency": {
+        "version": "6.2.3",
+        "filesVerified": 16,
+        "license": "MIT"
+      },
+      "asarSha256": "352480074faef281bc1a34021fb8f38e808b141f91e9bb22761916fbab28a515"
+    }
+  ],
+  "finishedAt": "2026-10-26T08:55:24.676Z",
+  "executableSha256": "b36c3ce9b423098a7854f4912f730b0654b41ae183818f887b8f1cd0a90725eb",
+  "asarSha256": "352480074faef281bc1a34021fb8f38e808b141f91e9bb22761916fbab28a515"
+}

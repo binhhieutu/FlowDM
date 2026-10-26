@@ -26,7 +26,7 @@ async function removeTestRoot(root, prefix) {
 test('queue controls create, edit and persist a scheduled queue in real Electron', { timeout: 90000 }, async t => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'flowdm-queues-')); let app;
   const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => key.toUpperCase() !== 'ELECTRON_RUN_AS_NODE'));
-  const launch = () => _electron.launch({ executablePath: process.env.FLOWDM_EXECUTABLE || require('electron'), args: process.env.FLOWDM_EXECUTABLE ? [] : ['.'], env: { ...env, FLOWDM_DATA_DIR: path.join(root, 'state'), FLOWDM_DOWNLOAD_DIR: path.join(root, 'files') } });
+  const launch = () => _electron.launch({ chromiumSandbox: true, executablePath: process.env.FLOWDM_EXECUTABLE || require('electron'), args: process.env.FLOWDM_EXECUTABLE ? [] : ['.'], env: { ...env, FLOWDM_DATA_DIR: path.join(root, 'state'), FLOWDM_DOWNLOAD_DIR: path.join(root, 'files') } });
   t.after(async () => { if (app) await app.close(); await removeTestRoot(root, 'flowdm-queues-'); });
   app = await launch(); let page = await app.firstWindow();
   await page.locator('#queue-create').click({ timeout: 5000 });
@@ -74,7 +74,7 @@ test('real queue ordering, movement, HTTP/HLS integrity, rate budget and safe po
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   t.after(async () => { if (app) await app.close(); server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); await removeTestRoot(root, 'flowdm-queue-transfers-'); });
   const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => key.toUpperCase() !== 'ELECTRON_RUN_AS_NODE'));
-  const launch = () => _electron.launch({ executablePath: process.env.FLOWDM_EXECUTABLE || require('electron'), args: process.env.FLOWDM_EXECUTABLE ? [] : ['.'], env: { ...env, FLOWDM_DATA_DIR: path.join(root, 'state'), FLOWDM_DOWNLOAD_DIR: path.join(root, 'files') } });
+  const launch = () => _electron.launch({ chromiumSandbox: true, executablePath: process.env.FLOWDM_EXECUTABLE || require('electron'), args: process.env.FLOWDM_EXECUTABLE ? [] : ['.'], env: { ...env, FLOWDM_DATA_DIR: path.join(root, 'state'), FLOWDM_DOWNLOAD_DIR: path.join(root, 'files') } });
   app = await launch(); let page = await app.firstWindow();
   // Mock only the OS adapter boundary in this Electron process. No production test hook.
   const fakePower = () => app.evaluate(({ app }) => {

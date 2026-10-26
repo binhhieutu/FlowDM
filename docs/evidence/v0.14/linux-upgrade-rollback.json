@@ -1,0 +1,25 @@
+{
+  "at": "2026-10-26T08:55:29.340Z",
+  "platform": "linux",
+  "oldVersion": "0.13.0",
+  "currentVersion": "0.14.0",
+  "journalVersion": 8,
+  "oldPausedBytes": 98304,
+  "newPausedBytes": 196608,
+  "restoredBytes": 98304,
+  "finalBytes": 2097152,
+  "sha256": "b2b319a671a9a8f6cdbd7d47594f67859f5c8c83c51ea3edb672835cc4de7d6a",
+  "newProfilePreserved": true,
+  "incompatibleSchemaRefused": true,
+  "manualUpdateOnly": true,
+  "requestsAfterRollback": [
+    {
+      "start": 0,
+      "end": 0
+    },
+    {
+      "start": 98304,
+      "end": 2097151
+    }
+  ]
+}

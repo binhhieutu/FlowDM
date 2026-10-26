@@ -1,0 +1,91 @@
+✖ source and extension ZIPs contain only tracked allowlisted source and match every byte (125.5239ms)
+  AssertionError [ERR_ASSERTION]: Release bundle allowlist/verifier is required
+      at api (I:\dich_nguoc\FlowDM\tests\tools\release-package.test.cjs:8:83)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\release-package.test.cjs:19:86)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }
+
+✖ bundle verification refuses altered bytes, extra entries and traversal before extraction (100.8775ms)
+  AssertionError [ERR_ASSERTION]: Release bundle allowlist/verifier is required
+      at api (I:\dich_nguoc\FlowDM\tests\tools\release-package.test.cjs:8:83)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\release-package.test.cjs:30:86)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }
+
+✖ bundle creation refuses extension version drift and missing required source (104.2398ms)
+  AssertionError [ERR_ASSERTION]: Release bundle allowlist/verifier is required
+      at api (I:\dich_nguoc\FlowDM\tests\tools\release-package.test.cjs:8:83)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\release-package.test.cjs:37:64)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }
+
+ℹ tests 3
+ℹ suites 0
+ℹ pass 0
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 399.932
+
+✖ failing tests:
+
+test at tests\tools\release-package.test.cjs:18:1
+✖ source and extension ZIPs contain only tracked allowlisted source and match every byte (125.5239ms)
+  AssertionError [ERR_ASSERTION]: Release bundle allowlist/verifier is required
+      at api (I:\dich_nguoc\FlowDM\tests\tools\release-package.test.cjs:8:83)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\release-package.test.cjs:19:86)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }
+
+test at tests\tools\release-package.test.cjs:29:1
+✖ bundle verification refuses altered bytes, extra entries and traversal before extraction (100.8775ms)
+  AssertionError [ERR_ASSERTION]: Release bundle allowlist/verifier is required
+      at api (I:\dich_nguoc\FlowDM\tests\tools\release-package.test.cjs:8:83)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\release-package.test.cjs:30:86)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }
+
+test at tests\tools\release-package.test.cjs:36:1
+✖ bundle creation refuses extension version drift and missing required source (104.2398ms)
+  AssertionError [ERR_ASSERTION]: Release bundle allowlist/verifier is required
+      at api (I:\dich_nguoc\FlowDM\tests\tools\release-package.test.cjs:8:83)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\release-package.test.cjs:37:64)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }

@@ -1,0 +1,62 @@
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs/promises');
+const path = require('node:path');
+const os = require('node:os');
+const http = require('node:http');
+const crypto = require('node:crypto');
+const { _electron } = require('playwright');
+const { createProfileSnapshot, restoreProfileSnapshot } = require('../../src/tools/profile-snapshot.cjs');
+async function until(check, message) { const end = Date.now() + 45000; while (Date.now() < end) { const value = await check(); if (value) return value; await new Promise(r => setTimeout(r, 30)); } throw Error('Timeout: ' + message); }
+
+test('real previous binary upgrades paused data, manual updates stay fixed, snapshot rollback resumes exact bytes', { skip: !process.env.FLOWDM_OLD_EXECUTABLE || !process.env.FLOWDM_EXECUTABLE, timeout: 180000 }, async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'flowdm-upgrade-'));
+  const state = path.join(root, 'original', 'state'), output = path.join(root, 'downloads'), backup = path.join(root, 'snapshot'), restoredState = path.join(root, 'restored-state');
+  const body = Buffer.alloc(2 * 1024 ** 2, 37), requests = []; let app, page;
+  const server = http.createServer((req, res) => {
+    const match = /^bytes=(\d+)-(\d*)$/.exec(req.headers.range || ''); const start = match ? +match[1] : 0, end = match && match[2] ? +match[2] : body.length - 1;
+    requests.push({ start, end }); res.writeHead(match ? 206 : 200, { 'Content-Length': end - start + 1, 'Accept-Ranges': 'bytes', ETag: '"upgrade-fixture"', ...(match ? { 'Content-Range': `bytes ${start}-${end}/${body.length}` } : {}) });
+    if (end === 0) return res.end(body.subarray(0, 1));
+    let at = start; const timer = setInterval(() => { const next = Math.min(at + 8192, end + 1); res.write(body.subarray(at, next)); at = next; if (at > end) { clearInterval(timer); res.end(); } }, 8); res.once('close', () => clearInterval(timer));
+  });
+  await new Promise(r => server.listen(0, '127.0.0.1', r));
+  t.after(async () => { await app?.close().catch(() => {}); server.closeAllConnections(); await new Promise(r => server.close(r)); await fs.rm(root, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 }); });
+  const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => key.toUpperCase() !== 'ELECTRON_RUN_AS_NODE'));
+  async function launch(executablePath, dataDir) { app = await _electron.launch({ chromiumSandbox: true, executablePath, args: [], env: { ...env, FLOWDM_DATA_DIR: dataDir, FLOWDM_DOWNLOAD_DIR: output } }); page = await app.firstWindow(); await page.getByRole('button', { name: 'Thêm liên kết', exact: true }).waitFor(); return (await page.evaluate(() => window.flow.info())).data.version; }
+  const task = async id => (await page.evaluate(() => window.flow.list())).data.find(item => item.id === id);
+  const oldVersion = await launch(process.env.FLOWDM_OLD_EXECUTABLE, state);
+  assert.notEqual(oldVersion, require('../../package.json').version);
+  const added = await page.evaluate(url => window.flow.add({ url, filename: 'giữ dữ liệu.bin', connections: 1 }), `http://127.0.0.1:${server.address().port}/data`);
+  assert.equal(added.ok, true, added.error); const id = added.data.id;
+  await until(async () => (await task(id)).downloadedBytes >= 65536, 'old committed bytes');
+  assert.equal((await page.evaluate(id => window.flow.action(id, 'pause'), id)).ok, true);
+  const paused = await task(id);
+  await assert.rejects(createProfileSnapshot({ source: state, destination: backup, appVersion: oldVersion }), /close/i);
+  await app.close(); app = null;
+  const snapshot = await createProfileSnapshot({ source: state, destination: backup, appVersion: oldVersion });
+  assert.equal(snapshot.journalVersion, 8);
+  const currentVersion = await launch(process.env.FLOWDM_EXECUTABLE, state);
+  assert.equal(currentVersion, require('../../package.json').version);
+  assert.equal((await task(id)).downloadedBytes, paused.downloadedBytes);
+  await app.evaluate(({ shell }) => { globalThis.releaseOpened = []; shell.openExternal = async url => { globalThis.releaseOpened.push(url); }; });
+  await page.getByRole('button', { name: 'Cập nhật ứng dụng', exact: true }).click();
+  await page.locator('#update-message').filter({ hasText: 'Cập nhật thủ công' }).waitFor();
+  await page.getByRole('button', { name: 'Mở trang phát hành GitHub', exact: true }).click();
+  assert.deepEqual(await app.evaluate(() => globalThis.releaseOpened), ['https://github.com/binhhieutu/FlowDM/releases']);
+  await page.getByRole('button', { name: 'Đóng thông tin cập nhật', exact: true }).click();
+  await page.evaluate(id => window.flow.action(id, 'resume'), id);
+  await until(async () => (await task(id)).downloadedBytes > paused.downloadedBytes + 65536, 'new binary continued bytes');
+  await page.evaluate(id => window.flow.action(id, 'pause'), id); const newer = await task(id); await app.close(); app = null;
+  const originalPartial = await fs.readFile(path.join(state, id + '.part'));
+  await assert.rejects(restoreProfileSnapshot({ snapshot: backup, destination: path.join(root, 'incompatible'), compatibleSchemas: [1, 2, 3, 4] }), /compatible/i);
+  await restoreProfileSnapshot({ snapshot: backup, destination: restoredState, compatibleSchemas: [8] });
+  assert.equal(await launch(process.env.FLOWDM_OLD_EXECUTABLE, restoredState), oldVersion);
+  assert.equal((await task(id)).downloadedBytes, paused.downloadedBytes);
+  const mark = requests.length; await page.evaluate(id => window.flow.action(id, 'resume'), id);
+  const done = await until(async () => { const value = await task(id); if (value.status === 'failed') throw Error(value.error); return value.status === 'completed' ? value : false; }, 'rolled back binary completed');
+  assert.deepEqual(await fs.readFile(done.path), body); assert.equal(done.sha256, crypto.createHash('sha256').update(body).digest('hex'));
+  assert.ok(requests.slice(mark).filter(r => r.end > 0).every(r => r.start >= paused.downloadedBytes));
+  assert.deepEqual(await fs.readFile(path.join(state, id + '.part')), originalPartial, 'Rollback must preserve the newer profile');
+  await fs.mkdir('test-results', { recursive: true }); await page.screenshot({ path: 'test-results/upgrade-rollback.png' });
+  await fs.writeFile('test-results/upgrade-rollback.json', JSON.stringify({ at: new Date().toISOString(), platform: process.platform, oldVersion, currentVersion, journalVersion: snapshot.journalVersion, oldPausedBytes: paused.downloadedBytes, newPausedBytes: newer.downloadedBytes, restoredBytes: paused.downloadedBytes, finalBytes: body.length, sha256: done.sha256, newProfilePreserved: true, incompatibleSchemaRefused: true, manualUpdateOnly: true, requestsAfterRollback: requests.slice(mark) }, null, 2));
+});

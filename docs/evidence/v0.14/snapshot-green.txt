@@ -1,0 +1,14 @@
+✔ snapshot restores all partial/media bytes into a fresh directory and preserves source (69.0243ms)
+✔ snapshot refuses live, active, unsupported and nested profiles before completing (12.2256ms)
+✔ restore refuses corrupted, incomplete, extra files and incompatible journal schema (39.6696ms)
+✔ interrupted backup is unusable; interrupted restore blocks current app admission (43.4774ms)
+✔ source mutation during backup prevents its completion marker (13.7209ms)
+﹣ native POSIX snapshot rejects symbolic links instead of following external state (0.1697ms) # SKIP
+ℹ tests 6
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 241.6385

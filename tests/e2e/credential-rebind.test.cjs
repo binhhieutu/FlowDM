@@ -47,7 +47,7 @@ test('real Chromium rebinds rotated HTTP/HLS cookies after app restart and resum
   const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => key.toUpperCase() !== 'ELECTRON_RUN_AS_NODE'));
   async function launchDesktop() {
     const executablePath = process.env.FLOWDM_EXECUTABLE;
-    const app = await _electron.launch({ ...(executablePath ? { executablePath } : {}), args: executablePath ? [] : [path.resolve('.')], env: { ...env, FLOWDM_DATA_DIR: stateDir, FLOWDM_DOWNLOAD_DIR: output } });
+    const app = await _electron.launch({ chromiumSandbox: true, ...(executablePath ? { executablePath } : {}), args: executablePath ? [] : [path.resolve('.')], env: { ...env, FLOWDM_DATA_DIR: stateDir, FLOWDM_DOWNLOAD_DIR: output } });
     const window = await app.firstWindow(); window.setDefaultTimeout(15000); window.on('pageerror', error => pageErrors.push(error.message));
     await window.getByRole('button', { name: 'Thêm liên kết', exact: true }).waitFor(); return { app, page: window };
   }

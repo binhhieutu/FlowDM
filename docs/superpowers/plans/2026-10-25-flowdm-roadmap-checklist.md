@@ -4,7 +4,7 @@
 
 **Ngày:** 2026-10-25. **Trạng thái:** kế hoạch; chưa triển khai các mục chưa đánh dấu.
 
-**Tiến độ 2026-10-26:** Task 1–2 hoàn tất ở 0.6.0, Task 3 hoàn tất ở 0.7.0. Task 4 và đổi N khi tải media hoàn tất ở 0.8.0, Task 5 hoàn tất ở 0.9.0, Task 6 hoàn tất ở 0.10.0, Task 7 hoàn tất ở 0.11.0. Task 8a/8b/8d/8f/8g hoàn tất ở0.12;8c còn YouTubeproxyfullfile bịHTTP401,8eFAT/exFATchưa hỗ trợ. Task 9 đã đạt Linux x64/WSL2 trong 0.13, macOS chưa có host/chưa kiểm thử; Task 10 chưa triển khai. Xem [VERIFICATION_V12](../../VERIFICATION_V12.md). Xem [VERIFICATION_V11.md](../../VERIFICATION_V11.md) và [review Task7](../../batch-v11-review.md). Xem [VERIFICATION_V10.md](../../VERIFICATION_V10.md) và [review Task 6](../../queues-v10-review.md). Xem [VERIFICATION_V9.md](../../VERIFICATION_V9.md) và [review Task5](../../browser-rebind-v9-review.md). Xem [VERIFICATION_V8.md](../../VERIFICATION_V8.md) và [review 0.8](../../media-selection-v8-review.md). Xem [VERIFICATION_V7.md](../../VERIFICATION_V7.md) và [review Task 3](../../dynamic-ranges-v7-review.md). Xem [VERIFICATION_V6.md](../../VERIFICATION_V6.md) và [review](../../source-refresh-v6-review.md). External HTTP fallback thiếu validator vẫn bị từ chối; legacy DASH thiếu base hash được giữ nguyên nhưng không resume an toàn.
+**Tiến độ 2026-10-26:** Task 1–2 hoàn tất ở 0.6.0, Task 3 hoàn tất ở 0.7.0. Task 4 và đổi N khi tải media hoàn tất ở 0.8.0, Task 5 hoàn tất ở 0.9.0, Task 6 hoàn tất ở 0.10.0, Task 7 hoàn tất ở 0.11.0. Task 8a/8b/8d/8f/8g hoàn tất ở0.12;8c còn YouTubeproxyfullfile bịHTTP401,8eFAT/exFATchưa hỗ trợ. Task 9 đã đạt Linux x64/WSL2 trong 0.13, macOS chưa có host/chưa kiểm thử; Task 10 hoàn tất phạm vi nguồn/extension public và portable cục bộ ở 0.14; binary công khai còn gate third-party. Xem [VERIFICATION_V12](../../VERIFICATION_V12.md). Xem [VERIFICATION_V11.md](../../VERIFICATION_V11.md) và [review Task7](../../batch-v11-review.md). Xem [VERIFICATION_V10.md](../../VERIFICATION_V10.md) và [review Task 6](../../queues-v10-review.md). Xem [VERIFICATION_V9.md](../../VERIFICATION_V9.md) và [review Task5](../../browser-rebind-v9-review.md). Xem [VERIFICATION_V8.md](../../VERIFICATION_V8.md) và [review 0.8](../../media-selection-v8-review.md). Xem [VERIFICATION_V7.md](../../VERIFICATION_V7.md) và [review Task 3](../../dynamic-ranges-v7-review.md). Xem [VERIFICATION_V6.md](../../VERIFICATION_V6.md) và [review](../../source-refresh-v6-review.md). External HTTP fallback thiếu validator vẫn bị từ chối; legacy DASH thiếu base hash được giữ nguyên nhưng không resume an toàn.
 
 **Goal:** Hoàn thiện những khả năng tải xuống còn thiếu theo hướng sử dụng tương tự IDM, giữ được dữ liệu tải dở và kiểm chứng thực tế trên Windows/Linux/macOS.
 
@@ -115,7 +115,7 @@ Các task tùy chọn 7–8 không chặn bản phát hành A/B. Không mở t�
 - [x] GUI nguồn HLS/DASH 1→4→1 → pause/đóng/mở/resume: peak request 4, phần đã commit không GET lại, SHA khớp baseline và full decode.
 - [x] YouTube công khai native nguồn 1→4→1 → pause/đóng/mở/resume: giữ 6 resource/621904 byte, full decode 888.094 giây. Không có CDN request counts nên không suy thành bằng chứng không GET lại trên CDN.
 - [x] Final coverage 241/241 unit/integration + desktop 1/1 + local media-selection 1/1: lines 96.75%, branches 86.16%, functions 94.78%; audit 0. Hai nhánh public optional skip trong lượt coverage.
-- [ ] Build, ASAR/tool hash và đúng Windows artifact 0.8 cuối; packaged media-selection/live-N chưa xác nhận ở checkpoint tài liệu này.
+- [x] Gate hiện tại cho Task 4: Windows artifact 0.14 đã xác nhận ASAR/tools, packaged media-selection và live-N. Ghi chú chờ ở checkpoint 0.8 được thay bằng bằng chứng 0.14, không cấp chứng nhận hồi tố cho binary 0.8.
 
 ## Task 5 — Gắn lại phiên trình duyệt và Firefox
 
@@ -204,15 +204,22 @@ Tách thành các deliverable nhỏ để không chặn toàn roadmap:
 
 **Files:** sửa `scripts/verify-package.cjs`, `scripts/hash-release.cjs`, `scripts/smoke-portable.cjs`, README và docs hiện có; tạo báo cáo `docs/VERIFICATION_VNEXT.md`. Auto-update nếu triển khai tách `src/tools/update-manifest.cjs`, `tests/tools/update-manifest.test.cjs`.
 
-- [ ] Chọn phạm vi bản phát hành theo task đã GREEN; mọi mục hoãn còn unchecked với lý do cụ thể.
-- [ ] Chạy `npm run test:coverage`, `npm audit`; test tích hợp/E2E bị tác động. Coverage >=80% lines/branches/functions và không có lỗi security nghiêm trọng chưa xử lý.
-- [ ] Review độc lập toàn diff, security headers/native IPC/path/child process; sửa vấn đề rồi chạy lại đúng kiểm tra bị ảnh hưởng.
-- [ ] Build Windows/Linux/macOS theo host sẵn có; đối chiếu source-ASAR/tool hash, chạy đúng artifact cuối. Đổi runtime sau build bắt buộc build và xác minh lại.
-- [ ] HTTP/HLS/DASH fixture phải đúng SHA, log không yêu cầu lại vùng/resource đã commit; media decode toàn file. Video thật chứng minh chọn format, pause/relaunch/resume; thất bại mạng được báo thật, không chuyển thành fixture PASS.
-- [ ] Xuất evidence có artifact hash, OS, command, kết quả, request counts, bytes reuse và giới hạn. Không lưu secrets hoặc file video vào source ZIP.
-- [ ] Auto-update: trước hết kiểm tra manifest version/hash/signature bằng unit fixture, chống downgrade và package sai OS/arch; chưa có endpoint/ký tin cậy thì chỉ tạo thông báo cập nhật thủ công. Publish endpoint, ký/notarize và phát hành công khai cần quyền phù hợp; không tự tạo credentials.
-- [ ] Installer/update migration: test profile cũ → bản mới, backup journal và cập nhật bị ngắt; phục hồi binary cũ chỉ với snapshot schema tương thích. Uninstall cho chọn giữ dữ liệu, không tự xóa download; chưa có installer thì ghi rõ portable-only.
-- [ ] Rà soát license/corresponding source của bundled tools trước public redistribution; tạo source/extension ZIP và SHA256SUMS, kiểm tra từng file; commit release docs khi tất cả gate trong phạm vi đạt.
+- [x] Chọn phạm vi bản phát hành theo task đã GREEN; mọi mục hoãn còn unchecked với lý do cụ thể.
+- [x] Chạy `npm run test:coverage`, `npm audit`; test tích hợp/E2E bị tác động. Coverage >=80% lines/branches/functions và không có lỗi security nghiêm trọng chưa xử lý.
+- [x] Review độc lập toàn diff, security headers/native IPC/path/child process; sửa vấn đề rồi chạy lại đúng kiểm tra bị ảnh hưởng.
+- [x] Build Windows/Linux/macOS theo host sẵn có; đối chiếu source-ASAR/tool hash, chạy đúng artifact cuối. Đổi runtime sau build bắt buộc build và xác minh lại.
+- [x] HTTP/HLS/DASH fixture phải đúng SHA, log không yêu cầu lại vùng/resource đã commit; media decode toàn file. Video thật chứng minh chọn format, pause/relaunch/resume; thất bại mạng được báo thật, không chuyển thành fixture PASS.
+- [x] Xuất evidence có artifact hash, OS, command, kết quả, request counts, bytes reuse và giới hạn. Không lưu secrets hoặc file video vào source ZIP.
+- [x] Auto-update: trước hết kiểm tra manifest version/hash/signature bằng unit fixture, chống downgrade và package sai OS/arch; chưa có endpoint/ký tin cậy thì chỉ tạo thông báo cập nhật thủ công. Publish endpoint, ký/notarize và phát hành công khai cần quyền phù hợp; không tự tạo credentials.
+- [x] Installer/update migration: test profile cũ → bản mới, backup journal và cập nhật bị ngắt; phục hồi binary cũ chỉ với snapshot schema tương thích. Uninstall cho chọn giữ dữ liệu, không tự xóa download; chưa có installer thì ghi rõ portable-only.
+- [x] Rà soát license/corresponding source của bundled tools trước public redistribution; tạo source/extension ZIP và SHA256SUMS, kiểm tra từng file; commit release docs khi tất cả gate trong phạm vi đạt.
+
+**Kết quả 0.14:** [VERIFICATION_V14](../../VERIFICATION_V14.md), [runbook](../../RELEASE.md), [review](../../release-v14-review.md), [summary](../../evidence/v0.14/summary.json). Windows unit 483 pass/0 fail/6 Unix skip; Linux 487/0/2 Windows skip; coverage 93.32/85.79/87.33, audit 0. Windows packaged 24 pass/0 fail/9 skip, Firefox bổ sung 1/1; WSL2 final-tar native 6 nhóm + old/new/rollback thật pass. Portable và video W3C Internet pass. 70 runtime + 16 dependency files khớp; 72 tar payload files khớp. Scope: nguồn/extension public, binary local, portable-only, updater thủ công; không tự chạy hosted CI.
+
+- [x] Profile snapshot gồm partial/media cache, integrity/final marker, fresh restore và compatibility guard; 0.13→0.14→rollback thật trên Windows/WSL2.
+- [x] Gói source/extension allowlist, không vendor/state/cache/evidence/video; từng entry/byte được verify; SHA256SUMS cho đúng scope.
+- [ ] Public binary release: cần hoàn tất corresponding-source/build materials của media tools; lượt này chỉ nguồn/extension.
+- [ ] Installer/uninstaller và automatic updater có endpoint/khóa ký tin cậy: milestone sau, hiện portable/manual theo phương án plan cho phép.
 
 ## Checklist nghiệm thu dùng cho MỖI task
 
@@ -225,4 +232,4 @@ Tách thành các deliverable nhỏ để không chặn toàn roadmap:
 
 ## Điểm bắt đầu thực thi
 
-Task 1–7 đã có implementation và báo cáo nghiệm thu theo từng phiên bản. Bản hiện tại 0.12.0 hoàn tất các mục 8a, 8b, 8d, 8f, 8g. Mục 8c đã đạt HTTP CONNECT/SOCKS5 và HTTP/HLS/DASH/browser, còn tải YouTube qua proxy bị HTTP 401; mục 8e chưa hỗ trợ FAT/exFAT. Hai mục này tiếp tục để mở. Task 9 đã đạt Linux x64/WSL2 trong 0.13, macOS chưa có host/chưa kiểm thử; Task 10 chưa triển khai. Journal hiện tại schema 8, đọc schema 1–8 và backup dữ liệu cũ trước migration; xem VERIFICATION_V12 để biết giới hạn và bằng chứng của artifact cuối.
+Task 1–7 đã có implementation và báo cáo nghiệm thu theo từng phiên bản. Bản hiện tại 0.14.0 giữ các mục đã hoàn tất các mục 8a, 8b, 8d, 8f, 8g. Mục 8c đã đạt HTTP CONNECT/SOCKS5 và HTTP/HLS/DASH/browser, còn tải YouTube qua proxy bị HTTP 401; mục 8e chưa hỗ trợ FAT/exFAT. Hai mục này tiếp tục để mở. Task 9 đã đạt Linux x64/WSL2 trong 0.13, macOS chưa có host/chưa kiểm thử; Task 10 hoàn tất phạm vi nguồn/extension public và portable cục bộ ở 0.14; binary công khai còn gate third-party. Journal hiện tại schema 8, đọc schema 1–8 và backup dữ liệu cũ trước migration; xem VERIFICATION_V12 để biết giới hạn và bằng chứng của artifact cuối.

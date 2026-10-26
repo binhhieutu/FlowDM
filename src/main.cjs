@@ -11,6 +11,8 @@ const { SystemPowerAdapter } = require('./core/power-actions.cjs');
 const { BatchService, selectedUrls } = require('./core/batch-service.cjs');
 const { randomUUID } = require('node:crypto');
 const { ClipboardWatcher } = require('./core/clipboard-policy.cjs');
+const { assertProfileReady } = require('./tools/profile-snapshot.cjs');
+const { manualUpdateInfo } = require('./tools/update-manifest.cjs');
 
 const dataDir = process.env.FLOWDM_DATA_DIR || path.join(app.getPath('userData'), 'state');
 if (process.env.FLOWDM_DATA_DIR) app.setPath('userData', path.dirname(dataDir));
@@ -24,6 +26,7 @@ if (!app.requestSingleInstanceLock()) app.quit();
 else {
   app.on('second-instance', () => { if (win) { if (win.isMinimized()) win.restore(); win.show(); win.focus(); } });
   app.whenReady().then(async () => {
+    await assertProfileReady(dataDir);
     const powerAdapter = new SystemPowerAdapter({ notify: message => {
       if (!Notification.isSupported()) throw Error('Thông báo desktop chưa được hệ điều hành hỗ trợ.');
       new Notification(message).show();
@@ -84,6 +87,8 @@ function installHandlers() {
     catch (error) { return { ok: false, error: error.message }; }
   });
   handle('info', async () => ({ version: app.getVersion(), platform: process.platform, downloadDir, bridgeAvailable: !!bridge, bridgeError, browser: await browserSetup.info(), mediaTools: await mediaToolStatus() }));
+  handle('updateInfo', () => manualUpdateInfo(app.getVersion()));
+  handle('openReleasePage', async () => { await shell.openExternal(manualUpdateInfo(app.getVersion()).releasePage); return true; });
   handle('browserInfo', () => browserSetup.info());
   handle('browserExport', async browser => { const directory = await browserSetup.prepareExtension(browser); const error = await shell.openPath(directory); if (error) throw new Error(error); return directory; });
   handle('browserConnect', input => browserSetup.connect(input || {}));

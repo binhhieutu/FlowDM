@@ -26,7 +26,7 @@ test('batch preview creates only selected queue jobs and bounded Site Grabber ca
   }); await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   t.after(async () => { if (app) await app.close(); for (const item of [server, outside]) { item.closeAllConnections(); await new Promise(resolve => item.close(resolve)); } await removeRoot(root); });
   const origin = `http://127.0.0.1:${server.address().port}`; const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => key.toUpperCase() !== 'ELECTRON_RUN_AS_NODE'));
-  app = await _electron.launch({ executablePath: process.env.FLOWDM_EXECUTABLE || require('electron'), args: process.env.FLOWDM_EXECUTABLE ? [] : ['.'], env: { ...env, FLOWDM_DATA_DIR: path.join(root, 'state'), FLOWDM_DOWNLOAD_DIR: path.join(root, 'default-files') } });
+  app = await _electron.launch({ chromiumSandbox: true, executablePath: process.env.FLOWDM_EXECUTABLE || require('electron'), args: process.env.FLOWDM_EXECUTABLE ? [] : ['.'], env: { ...env, FLOWDM_DATA_DIR: path.join(root, 'state'), FLOWDM_DOWNLOAD_DIR: path.join(root, 'default-files') } });
   const page = await app.firstWindow(); await page.locator('#batch-button').click({ timeout: 3000 });
   assert.equal((await page.evaluate(() => window.flow.list())).data.length, 0); assert.equal(requests.length, 0, 'opening must not fetch');
   const queue = (await page.evaluate(() => window.flow.createQueue({ name: 'Batch test', enabled: false, concurrency: 2 }))).data;
@@ -64,7 +64,7 @@ test('batch preview creates only selected queue jobs and bounded Site Grabber ca
 async function raceDesktop(t) {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'flowdm-batch-v11-'));
   const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => key.toUpperCase() !== 'ELECTRON_RUN_AS_NODE'));
-  const app = await _electron.launch({ executablePath: process.env.FLOWDM_EXECUTABLE || require('electron'), args: process.env.FLOWDM_EXECUTABLE ? [] : ['.'], env: { ...env, FLOWDM_DATA_DIR: path.join(root, 'state'), FLOWDM_DOWNLOAD_DIR: path.join(root, 'files') } });
+  const app = await _electron.launch({ chromiumSandbox: true, executablePath: process.env.FLOWDM_EXECUTABLE || require('electron'), args: process.env.FLOWDM_EXECUTABLE ? [] : ['.'], env: { ...env, FLOWDM_DATA_DIR: path.join(root, 'state'), FLOWDM_DOWNLOAD_DIR: path.join(root, 'files') } });
   t.after(async () => { await app.close(); await removeRoot(root); });
   return { app, page: await app.firstWindow() };
 }

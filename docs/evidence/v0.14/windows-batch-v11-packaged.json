@@ -1,0 +1,53 @@
+{
+  "at": "2026-10-26T08:56:05.782Z",
+  "appVersion": "0.14.0",
+  "packaged": true,
+  "created": [
+    {
+      "id": "9930b694-c64b-4c00-9a3d-42bf1dbbaa87",
+      "filename": "one.bin",
+      "queueId": "b1cb62c2-0df2-4c1f-bc40-736c5c35b3fa",
+      "connections": 2,
+      "sha256": "2cded52ed904b4b16e3290a211dc5c548eb9b9cf437831d628ee0bac44661745",
+      "bytes": 65536
+    },
+    {
+      "id": "b7ec3140-c6de-43a0-b1d0-c842ae5464c7",
+      "filename": "ảnh.bin",
+      "queueId": "b1cb62c2-0df2-4c1f-bc40-736c5c35b3fa",
+      "connections": 2,
+      "sha256": "2cded52ed904b4b16e3290a211dc5c548eb9b9cf437831d628ee0bac44661745",
+      "bytes": 65536
+    }
+  ],
+  "expectedHash": "2cded52ed904b4b16e3290a211dc5c548eb9b9cf437831d628ee0bac44661745",
+  "selectedOnly": true,
+  "initialCheckboxesUnchecked": true,
+  "queueAndDestinationVerified": true,
+  "duplicateCount": 1,
+  "invalidLineCount": 1,
+  "crawl": {
+    "pages": 3,
+    "links": 6,
+    "errors": [
+      {
+        "message": "Cross-origin redirect refused"
+      }
+    ]
+  },
+  "outsideHits": 0,
+  "requests": [
+    "/one.bin",
+    "/%E1%BA%A3nh.bin",
+    "/one.bin",
+    "/one.bin",
+    "/%E1%BA%A3nh.bin",
+    "/%E1%BA%A3nh.bin",
+    "/index.html",
+    "/child.html",
+    "/redirect",
+    "/slow.html",
+    "/slow.html"
+  ],
+  "cancellationPreservedJobs": true
+}

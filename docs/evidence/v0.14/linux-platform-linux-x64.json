@@ -1,0 +1,36 @@
+{
+  "at": "2026-10-26T08:54:43.144Z",
+  "os": {
+    "platform": "linux",
+    "arch": "x64",
+    "release": "6.18.54.1-microsoft-standard-WSL2",
+    "wsl2": true
+  },
+  "packaged": true,
+  "platform": "linux",
+  "arch": "x64",
+  "version": "0.14.0",
+  "electron": "45.0.0",
+  "executable": "/home/flowdm/task9/source/dist/linux-unpacked/flowdm",
+  "appPath": "/home/flowdm/task9/source/dist/linux-unpacked/resources/app.asar",
+  "noSandbox": false,
+  "disableSetuidSandbox": false,
+  "sandbox": true,
+  "contextIsolation": true,
+  "nodeIntegration": false,
+  "asarSha256": "352480074faef281bc1a34021fb8f38e808b141f91e9bb22761916fbab28a515",
+  "tools": {
+    "ytDlp": {
+      "version": "2026.10.21",
+      "sha256": "d8bd33fca9d5b23bd5b9952b3fca36db5c46331933fda9f598a3da14ce2c243f"
+    },
+    "ffmpeg": {
+      "version": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers",
+      "sha256": "ed16af623947494a72e284b6eb8ff225f2da22b38b5d5069c2fd4b4ba3384e41"
+    },
+    "aria2c": {
+      "version": "aria2 version 1.37.0",
+      "sha256": "86d88cbee95351235729d6884bb4ecda465b9ab8b10fe59cc53cbd3d6e412c29"
+    }
+  }
+}

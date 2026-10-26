@@ -1,0 +1,23 @@
+{"at": "2026-10-26T08:54:38.501694+00:00", "archive": "flowdm-0.14.0.tar.gz", "bytes": 125719348, "sha256": "d74528c57721e4e4fef61fd677d01511436b24ec5386ce4ab43078caed71591f", "filesMatched": 72, "executableModes": {"flowdm": "0o755", "chrome-sandbox": "0o755", "chrome_crashpad_handler": "0o755"}, "asarSha256": "352480074faef281bc1a34021fb8f38e808b141f91e9bb22761916fbab28a515", "testedExtraction": true}
+integrity: PASS (0 passed, 0 skipped)
+platform-unit: PASS (15 passed, 0 skipped)
+sandbox: PASS (1 passed, 0 skipped)
+http-resume: PASS (1 passed, 0 skipped)
+media-resume: PASS (1 passed, 1 skipped)
+browser-capture: PASS (1 passed, 0 skipped)
+TAP version 13
+# Subtest: real previous binary upgrades paused data, manual updates stay fixed, snapshot rollback resumes exact bytes
+ok 1 - real previous binary upgrades paused data, manual updates stay fixed, snapshot rollback resumes exact bytes
+  ---
+  duration_ms: 4212.643181
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4500.57719

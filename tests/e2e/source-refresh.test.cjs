@@ -17,7 +17,7 @@ async function until(check, timeout = 90000) {
 async function launch(root) {
   const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => key.toUpperCase() !== 'ELECTRON_RUN_AS_NODE'));
   const executablePath = process.env.FLOWDM_EXECUTABLE || require('electron');
-  const app = await _electron.launch({ executablePath, args: process.env.FLOWDM_EXECUTABLE ? [] : [path.resolve(__dirname, '../..')], env: { ...env, FLOWDM_DATA_DIR: path.join(root, 'state'), FLOWDM_DOWNLOAD_DIR: path.join(root, 'files') } });
+  const app = await _electron.launch({ chromiumSandbox: true, executablePath, args: process.env.FLOWDM_EXECUTABLE ? [] : [path.resolve(__dirname, '../..')], env: { ...env, FLOWDM_DATA_DIR: path.join(root, 'state'), FLOWDM_DOWNLOAD_DIR: path.join(root, 'files') } });
   const page = await app.firstWindow(); page.setDefaultTimeout(15000);
   await page.waitForFunction(() => !!window.flow); return { app, page };
 }

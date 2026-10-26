@@ -1,0 +1,227 @@
+{
+  "at": "2026-10-26T09:14:51.843Z",
+  "version": "0.14.0",
+  "baseline": "53f4bc8",
+  "task": 10,
+  "status": "complete within source-public/local-portable scope",
+  "scope": {
+    "github": "binhhieutu/FlowDM",
+    "visibility": "public",
+    "sourceAndExtension": true,
+    "publicBinaryRelease": false,
+    "installer": "portable-only",
+    "updater": "manual, no configured signed endpoint"
+  },
+  "unit": {
+    "windows": {
+      "tests": 489,
+      "pass": 483,
+      "fail": 0,
+      "skip": 6
+    },
+    "linux": {
+      "tests": 489,
+      "pass": 487,
+      "fail": 0,
+      "skip": 2
+    }
+  },
+  "coverageWindows": {
+    "lines": 93.32,
+    "branches": 85.79,
+    "functions": 87.33
+  },
+  "auditVulnerabilities": 0,
+  "windowsPackaged": {
+    "tests": 33,
+    "pass": 24,
+    "fail": 0,
+    "skip": 9,
+    "firefoxSupplement": {
+      "pass": 1,
+      "fail": 0
+    }
+  },
+  "linuxNative": {
+    "at": "2026-10-26T08:54:39.051Z",
+    "version": "0.14.0",
+    "platform": "linux",
+    "arch": "x64",
+    "release": "6.18.54.1-microsoft-standard-WSL2",
+    "wsl2": true,
+    "status": "passed",
+    "cases": [
+      {
+        "name": "integrity",
+        "exitCode": 0,
+        "signal": null,
+        "elapsedMs": 345,
+        "pass": 0,
+        "skipped": 0,
+        "status": "passed"
+      },
+      {
+        "name": "platform-unit",
+        "exitCode": 0,
+        "signal": null,
+        "elapsedMs": 1442,
+        "pass": 15,
+        "skipped": 0,
+        "status": "passed"
+      },
+      {
+        "name": "sandbox",
+        "exitCode": 0,
+        "signal": null,
+        "elapsedMs": 2704,
+        "pass": 1,
+        "skipped": 0,
+        "status": "passed"
+      },
+      {
+        "name": "http-resume",
+        "exitCode": 0,
+        "signal": null,
+        "elapsedMs": 6033,
+        "pass": 1,
+        "skipped": 0,
+        "status": "passed"
+      },
+      {
+        "name": "media-resume",
+        "exitCode": 0,
+        "signal": null,
+        "elapsedMs": 14219,
+        "pass": 1,
+        "skipped": 1,
+        "status": "passed"
+      },
+      {
+        "name": "browser-capture",
+        "exitCode": 0,
+        "signal": null,
+        "elapsedMs": 20870,
+        "pass": 1,
+        "skipped": 0,
+        "status": "passed"
+      }
+    ],
+    "package": [
+      {
+        "platform": "linux-unpacked",
+        "filesVerified": 70,
+        "ftpDependency": {
+          "version": "6.2.3",
+          "filesVerified": 16,
+          "license": "MIT"
+        },
+        "asarSha256": "352480074faef281bc1a34021fb8f38e808b141f91e9bb22761916fbab28a515"
+      }
+    ],
+    "finishedAt": "2026-10-26T08:55:24.676Z",
+    "executableSha256": "b36c3ce9b423098a7854f4912f730b0654b41ae183818f887b8f1cd0a90725eb",
+    "asarSha256": "352480074faef281bc1a34021fb8f38e808b141f91e9bb22761916fbab28a515"
+  },
+  "rollback": {
+    "windows": {
+      "at": "2026-10-26T09:02:24.031Z",
+      "platform": "win32",
+      "oldVersion": "0.13.0",
+      "currentVersion": "0.14.0",
+      "journalVersion": 8,
+      "oldPausedBytes": 90112,
+      "newPausedBytes": 180224,
+      "restoredBytes": 90112,
+      "finalBytes": 2097152,
+      "sha256": "b2b319a671a9a8f6cdbd7d47594f67859f5c8c83c51ea3edb672835cc4de7d6a",
+      "newProfilePreserved": true,
+      "incompatibleSchemaRefused": true,
+      "manualUpdateOnly": true,
+      "requestsAfterRollback": [
+        {
+          "start": 0,
+          "end": 0
+        },
+        {
+          "start": 90112,
+          "end": 2097151
+        }
+      ]
+    },
+    "linux": {
+      "at": "2026-10-26T08:55:29.340Z",
+      "platform": "linux",
+      "oldVersion": "0.13.0",
+      "currentVersion": "0.14.0",
+      "journalVersion": 8,
+      "oldPausedBytes": 98304,
+      "newPausedBytes": 196608,
+      "restoredBytes": 98304,
+      "finalBytes": 2097152,
+      "sha256": "b2b319a671a9a8f6cdbd7d47594f67859f5c8c83c51ea3edb672835cc4de7d6a",
+      "newProfilePreserved": true,
+      "incompatibleSchemaRefused": true,
+      "manualUpdateOnly": true,
+      "requestsAfterRollback": [
+        {
+          "start": 0,
+          "end": 0
+        },
+        {
+          "start": 98304,
+          "end": 2097151
+        }
+      ]
+    }
+  },
+  "portable": "passed HTTP2MiB pause/relaunch/resume + pinned tools",
+  "asarSha256": "352480074faef281bc1a34021fb8f38e808b141f91e9bb22761916fbab28a515",
+  "integrity": {
+    "runtimeFiles": 70,
+    "ftpDependencyFiles": 16,
+    "linuxExtractedPayloadFiles": 72
+  },
+  "artifacts": [
+    {
+      "file": "dist/FlowDM 0.14.0.exe",
+      "bytes": 263258083,
+      "sha256": "2b296548bc57a6efebd1f879f2076412aba09168647b48443910ed551cbbc41c",
+      "publication": "local only"
+    },
+    {
+      "file": "dist/flowdm-0.14.0.tar.gz",
+      "bytes": 125719348,
+      "sha256": "d74528c57721e4e4fef61fd677d01511436b24ec5386ce4ab43078caed71591f",
+      "publication": "local only"
+    }
+  ],
+  "review": "one independent review, no important actionable findings",
+  "secretScan": {
+    "tool": "gitleaks8.30.1",
+    "baselineHistoryCommits": 21,
+    "baselineHistoryFindings": 0,
+    "finalIndexFindings": 0,
+    "postCommitScanRequiredBeforePush": true
+  },
+  "wsl": {
+    "memory": "3GB",
+    "processors": 2,
+    "swap": "1GB",
+    "previousConfigAbsent": true,
+    "ownerApplicationsStopped": false
+  },
+  "deferred": [
+    "macOS x64/arm64/Gatekeeper",
+    "independent Linux desktop and ARM64",
+    "YouTube proxy full download HTTP401 from previous test; not retried/bypassed",
+    "FAT/exFAT publication",
+    "public bundled binary corresponding-source/build-material gate",
+    "trusted automatic-update endpoint/signing and installer"
+  ],
+  "ci": {
+    "trigger": "workflow_dispatch only",
+    "hostedJobsDispatched": false,
+    "binaryUploads": false
+  },
+  "provenance": "Legacy v2-v12 report filenames retain harness names; actual version/hash/time identify0.14. No runtime edits after final build. SourceZIP excludes videos/evidence/state/vendor; cloned repo includes synthetic test videos."
+}

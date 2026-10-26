@@ -1,0 +1,4 @@
+docs/evidence/** export-ignore
+tests/fixtures/**/*.mp4 export-ignore
+tests/fixtures/**/*.m4s export-ignore
+tests/fixtures/**/*.ts export-ignore

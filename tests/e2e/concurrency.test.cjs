@@ -27,7 +27,7 @@ test('desktop connection selector causes real parallel HLS/DASH requests and ide
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   t.after(async () => { if (app) await app.close(); server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); await fs.rm(root, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 }); });
   const env = Object.fromEntries(Object.entries(process.env).filter(([name]) => name.toUpperCase() !== 'ELECTRON_RUN_AS_NODE'));
-  app = await _electron.launch({ executablePath: process.env.FLOWDM_EXECUTABLE || require('electron'), args: process.env.FLOWDM_EXECUTABLE ? [] : ['.'], env: { ...env, FLOWDM_DATA_DIR: path.join(root, 'state'), FLOWDM_DOWNLOAD_DIR: path.join(root, 'files') } });
+  app = await _electron.launch({ chromiumSandbox: true, executablePath: process.env.FLOWDM_EXECUTABLE || require('electron'), args: process.env.FLOWDM_EXECUTABLE ? [] : ['.'], env: { ...env, FLOWDM_DATA_DIR: path.join(root, 'state'), FLOWDM_DOWNLOAD_DIR: path.join(root, 'files') } });
   const page = await app.firstWindow(); await page.waitForFunction(() => !!window.flow);
   const origin = `http://127.0.0.1:${server.address().port}`; const rows = [];
   for (const [mediaType, resource] of [['hls', '/video/list.m3u8'], ['dash', '/dash/manifest.mpd']]) {
@@ -37,6 +37,7 @@ test('desktop connection selector causes real parallel HLS/DASH requests and ide
       await page.getByRole('button', { name: 'Thêm liên kết', exact: true }).click();
       await page.locator('#url').fill(origin + resource); await page.locator('#connections').selectOption(String(connections));
       await page.locator('#filename').fill(`${mediaType}-N${connections}.mp4`);
+      if (reference) await page.locator('#allow-duplicate').check();
       const started = Date.now(); await page.locator('#add-form').evaluate(form => form.requestSubmit());
       let task;
       for (let attempt = 0; attempt < 300; attempt++) {

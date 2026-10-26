@@ -20,7 +20,7 @@ async function until(check, description, timeout = 120000) {
 }
 async function launch(root) {
   const env = Object.fromEntries(Object.entries(process.env).filter(([name]) => name.toUpperCase() !== 'ELECTRON_RUN_AS_NODE'));
-  const app = await _electron.launch({ executablePath: process.env.FLOWDM_EXECUTABLE || require('electron'), args: process.env.FLOWDM_EXECUTABLE ? [] : ['.'], env: { ...env, ...(process.env.FLOWDM_COVERAGE_DIR ? { NODE_V8_COVERAGE: process.env.FLOWDM_COVERAGE_DIR } : {}), FLOWDM_DATA_DIR: path.join(root, 'state'), FLOWDM_DOWNLOAD_DIR: path.join(root, 'files') } });
+  const app = await _electron.launch({ chromiumSandbox: true, executablePath: process.env.FLOWDM_EXECUTABLE || require('electron'), args: process.env.FLOWDM_EXECUTABLE ? [] : ['.'], env: { ...env, ...(process.env.FLOWDM_COVERAGE_DIR ? { NODE_V8_COVERAGE: process.env.FLOWDM_COVERAGE_DIR } : {}), FLOWDM_DATA_DIR: path.join(root, 'state'), FLOWDM_DOWNLOAD_DIR: path.join(root, 'files') } });
   const page = await app.firstWindow(); page.setDefaultTimeout(15000);
   const errors = []; page.on('pageerror', error => errors.push(error.message));
   if (process.env.FLOWDM_COVERAGE_DIR) { await page.coverage.startJSCoverage({ resetOnNavigation: false }); await page.reload(); }

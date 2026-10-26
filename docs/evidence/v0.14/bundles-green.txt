@@ -1,0 +1,11 @@
+✔ source and extension ZIPs contain only tracked allowlisted source and match every byte (206.7867ms)
+✔ bundle verification refuses altered bytes, extra entries and traversal before extraction (209.5768ms)
+✔ bundle creation refuses extension version drift and missing required source (152.6095ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 634.9346

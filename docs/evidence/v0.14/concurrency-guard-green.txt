@@ -1,0 +1,16 @@
+TAP version 13
+# Subtest: desktop connection selector causes real parallel HLS/DASH requests and identical playable outputs
+ok 1 - desktop connection selector causes real parallel HLS/DASH requests and identical playable outputs
+  ---
+  duration_ms: 12639.0891
+  ...
+# [{"mediaType":"hls","connections":1,"peakRequests":1,"resourceRequests":3,"milliseconds":1324,"bytes":47188,"sha256":"8fd49049fe73583d0e179541f59b57090178a412cd8676250cabbcb6f0bfbc4e"},{"mediaType":"hls","connections":4,"peakRequests":3,"resourceRequests":3,"milliseconds":561,"bytes":47188,"sha256":"8fd49049fe73583d0e179541f59b57090178a412cd8676250cabbcb6f0bfbc4e"},{"mediaType":"dash","connections":1,"peakRequests":1,"resourceRequests":8,"milliseconds":6159,"bytes":41899,"sha256":"47486d3f87501c7cc371156ee296cfb3094e28768ef4ac413bc187003923717b"},{"mediaType":"dash","connections":4,"peakRequests":4,"resourceRequests":8,"milliseconds":3514,"bytes":41899,"sha256":"47486d3f87501c7cc371156ee296cfb3094e28768ef4ac413bc187003923717b"}]
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 12960.9326

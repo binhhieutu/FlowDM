@@ -1,0 +1,18 @@
+{
+  "recordedAt": "2026-10-26T08:49:03.992Z",
+  "version": "0.14.0",
+  "rows": [
+    {
+      "file": "dist/win-unpacked/resources/app.asar",
+      "bytes": 613076,
+      "sha256": "352480074faef281bc1a34021fb8f38e808b141f91e9bb22761916fbab28a515",
+      "modifiedAt": "2026-10-26T08:46:06.957Z"
+    },
+    {
+      "file": "dist/FlowDM 0.14.0.exe",
+      "bytes": 263258083,
+      "sha256": "2b296548bc57a6efebd1f879f2076412aba09168647b48443910ed551cbbc41c",
+      "modifiedAt": "2026-10-26T08:47:21.381Z"
+    }
+  ]
+}

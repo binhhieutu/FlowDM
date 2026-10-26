@@ -1,6 +1,8 @@
 const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('flow', {
   info: () => ipcRenderer.invoke('flow:info'),
+  updateInfo: () => ipcRenderer.invoke('flow:updateInfo'),
+  openReleasePage: () => ipcRenderer.invoke('flow:openReleasePage'),
   list: () => ipcRenderer.invoke('flow:list'),
   preferences: () => ipcRenderer.invoke('flow:preferences'),
   rescan: id => ipcRenderer.invoke('flow:rescan', { id }),

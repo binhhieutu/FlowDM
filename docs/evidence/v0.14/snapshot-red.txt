@@ -1,0 +1,146 @@
+✖ snapshot restores all partial/media bytes into a fresh directory and preserves source (8.8905ms)
+  AssertionError [ERR_ASSERTION]: Offline full-profile snapshot support is required
+      at api (I:\dich_nguoc\FlowDM\tests\tools\profile-snapshot.test.cjs:16:90)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\profile-snapshot.test.cjs:19:109)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }
+
+✖ snapshot refuses live, active, unsupported and nested profiles before completing (6.2319ms)
+  AssertionError [ERR_ASSERTION]: Offline full-profile snapshot support is required
+      at api (I:\dich_nguoc\FlowDM\tests\tools\profile-snapshot.test.cjs:16:90)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\profile-snapshot.test.cjs:28:65)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }
+
+✖ restore refuses corrupted, incomplete, extra files and incompatible journal schema (4.1742ms)
+  AssertionError [ERR_ASSERTION]: Offline full-profile snapshot support is required
+      at api (I:\dich_nguoc\FlowDM\tests\tools\profile-snapshot.test.cjs:16:90)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\profile-snapshot.test.cjs:39:89)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }
+
+✖ interrupted backup is unusable; interrupted restore blocks current app admission (3.8401ms)
+  AssertionError [ERR_ASSERTION]: Offline full-profile snapshot support is required
+      at api (I:\dich_nguoc\FlowDM\tests\tools\profile-snapshot.test.cjs:16:90)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\profile-snapshot.test.cjs:52:109)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }
+
+✖ source mutation during backup prevents its completion marker (4.3048ms)
+  AssertionError [ERR_ASSERTION]: Offline full-profile snapshot support is required
+      at api (I:\dich_nguoc\FlowDM\tests\tools\profile-snapshot.test.cjs:16:90)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\profile-snapshot.test.cjs:64:65)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }
+
+﹣ native POSIX snapshot rejects symbolic links instead of following external state (0.3007ms) # SKIP
+ℹ tests 6
+ℹ suites 0
+ℹ pass 0
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 87.3732
+
+✖ failing tests:
+
+test at tests\tools\profile-snapshot.test.cjs:18:1
+✖ snapshot restores all partial/media bytes into a fresh directory and preserves source (8.8905ms)
+  AssertionError [ERR_ASSERTION]: Offline full-profile snapshot support is required
+      at api (I:\dich_nguoc\FlowDM\tests\tools\profile-snapshot.test.cjs:16:90)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\profile-snapshot.test.cjs:19:109)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }
+
+test at tests\tools\profile-snapshot.test.cjs:27:1
+✖ snapshot refuses live, active, unsupported and nested profiles before completing (6.2319ms)
+  AssertionError [ERR_ASSERTION]: Offline full-profile snapshot support is required
+      at api (I:\dich_nguoc\FlowDM\tests\tools\profile-snapshot.test.cjs:16:90)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\profile-snapshot.test.cjs:28:65)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }
+
+test at tests\tools\profile-snapshot.test.cjs:38:1
+✖ restore refuses corrupted, incomplete, extra files and incompatible journal schema (4.1742ms)
+  AssertionError [ERR_ASSERTION]: Offline full-profile snapshot support is required
+      at api (I:\dich_nguoc\FlowDM\tests\tools\profile-snapshot.test.cjs:16:90)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\profile-snapshot.test.cjs:39:89)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }
+
+test at tests\tools\profile-snapshot.test.cjs:51:1
+✖ interrupted backup is unusable; interrupted restore blocks current app admission (3.8401ms)
+  AssertionError [ERR_ASSERTION]: Offline full-profile snapshot support is required
+      at api (I:\dich_nguoc\FlowDM\tests\tools\profile-snapshot.test.cjs:16:90)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\profile-snapshot.test.cjs:52:109)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }
+
+test at tests\tools\profile-snapshot.test.cjs:63:1
+✖ source mutation during backup prevents its completion marker (4.3048ms)
+  AssertionError [ERR_ASSERTION]: Offline full-profile snapshot support is required
+      at api (I:\dich_nguoc\FlowDM\tests\tools\profile-snapshot.test.cjs:16:90)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\tools\profile-snapshot.test.cjs:64:65)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }

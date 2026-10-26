@@ -10,7 +10,7 @@ test('real public YouTube downloads through desktop and contains playable video 
   await fs.mkdir(root, { recursive: true }); await fs.mkdir(output, { recursive: true });
   const executablePath = process.env.FLOWDM_EXECUTABLE || require('electron');
   const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => key.toUpperCase() !== 'ELECTRON_RUN_AS_NODE'));
-  const app = await _electron.launch({ executablePath, args: process.env.FLOWDM_EXECUTABLE ? [] : ['.'], env: { ...env, FLOWDM_DATA_DIR: path.join(root, 'state'), FLOWDM_DOWNLOAD_DIR: output } });
+  const app = await _electron.launch({ chromiumSandbox: true, executablePath, args: process.env.FLOWDM_EXECUTABLE ? [] : ['.'], env: { ...env, FLOWDM_DATA_DIR: path.join(root, 'state'), FLOWDM_DOWNLOAD_DIR: output } });
   t.after(() => app.close()); const page = await app.firstWindow(); await page.waitForFunction(() => !!window.flow);
   const info = await page.evaluate(() => window.flow.info()); assert.equal(info.data.mediaTools.ready, true, JSON.stringify(info));
   await page.getByRole('button', { name: 'Thêm liên kết', exact: true }).click();

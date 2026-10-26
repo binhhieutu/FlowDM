@@ -1,0 +1,58 @@
+TAP version 13
+# Subtest: snapshot restores all partial/media bytes into a fresh directory and preserves source
+ok 1 - snapshot restores all partial/media bytes into a fresh directory and preserves source
+  ---
+  duration_ms: 68.470669
+  type: 'test'
+  ...
+# Subtest: snapshot refuses live, active, unsupported and nested profiles before completing
+ok 2 - snapshot refuses live, active, unsupported and nested profiles before completing
+  ---
+  duration_ms: 9.879
+  type: 'test'
+  ...
+# Subtest: restore refuses corrupted, incomplete, extra files and incompatible journal schema
+ok 3 - restore refuses corrupted, incomplete, extra files and incompatible journal schema
+  ---
+  duration_ms: 30.78796
+  type: 'test'
+  ...
+# Subtest: interrupted backup is unusable; interrupted restore blocks current app admission
+ok 4 - interrupted backup is unusable; interrupted restore blocks current app admission
+  ---
+  duration_ms: 30.870764
+  type: 'test'
+  ...
+# Subtest: source mutation during backup prevents its completion marker
+ok 5 - source mutation during backup prevents its completion marker
+  ---
+  duration_ms: 12.552536
+  type: 'test'
+  ...
+# Subtest: native POSIX snapshot rejects symbolic links instead of following external state
+ok 6 - native POSIX snapshot rejects symbolic links instead of following external state
+  ---
+  duration_ms: 4.758841
+  type: 'test'
+  ...
+# Subtest: restore refuses path aliases and traversal even when the manifest checksum is valid
+ok 7 - restore refuses path aliases and traversal even when the manifest checksum is valid
+  ---
+  duration_ms: 22.556842
+  type: 'test'
+  ...
+# Subtest: native POSIX restore refuses a symlink replacing its data root
+ok 8 - native POSIX restore refuses a symlink replacing its data root
+  ---
+  duration_ms: 17.469685
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 252.563693
