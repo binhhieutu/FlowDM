@@ -24,8 +24,8 @@ test('media tools prefer packaged/source binaries and validate explicit configur
   await assert.rejects(resolveTools({ ...options, env: { FLOWDM_YTDLP: 'relative.exe' } }), /absolute/i);
   await assert.rejects(resolveTools({ ...options, env: { FLOWDM_FFMPEG: root } }), /file/i);
   const unix = { ...options, platform: 'linux', resourcesPath: undefined, env: { FLOWDM_YTDLP: path.join(bundle, 'yt-dlp'), FLOWDM_FFMPEG: path.join(bundle, 'ffmpeg'), FLOWDM_ARIA2C: path.join(bundle, 'aria2c') } };
-  await fs.writeFile(path.join(bundle, 'yt-dlp'), 'fixture'); await fs.writeFile(path.join(bundle, 'ffmpeg'), 'fixture');
-  await fs.writeFile(path.join(bundle, 'aria2c'), 'fixture');
+  await fs.writeFile(path.join(bundle, 'yt-dlp'), 'fixture', { mode: 0o700 }); await fs.writeFile(path.join(bundle, 'ffmpeg'), 'fixture', { mode: 0o700 });
+  await fs.writeFile(path.join(bundle, 'aria2c'), 'fixture', { mode: 0o700 });
   assert.equal((await resolveTools(unix)).ffmpeg, path.join(bundle, 'ffmpeg'));
   assert.equal((await resolveTools({ ...options, resourcesPath: undefined, env: { PATH: bundle } })).ffmpeg, path.join(bundle, 'ffmpeg.exe'));
   const source = path.join(root, 'vendor', 'media-tools'); await fs.mkdir(source, { recursive: true });

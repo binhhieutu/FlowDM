@@ -1,7 +1,7 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
-const { createReadStream } = require('node:fs');
+const { createReadStream, constants } = require('node:fs');
 const pinned = require('../../assets/media-tools.json');
 const verified = new Map();
 
@@ -14,7 +14,17 @@ async function resolveTools({ env = process.env, platform = process.platform, re
     const candidates = packaged && windows ? [path.join(resourcesPath, 'media-tools', name + '.exe')] : override ? [override] : directories.map(directory => path.join(directory, name + (windows ? '.exe' : '')));
     for (const filename of candidates) {
       if (!path.isAbsolute(filename)) continue;
-      try { if ((await fs.stat(filename)).isFile()) return filename; } catch (error) { if (error.code !== 'ENOENT' && error.code !== 'ENOTDIR') throw error; }
+      try {
+        if (!(await fs.stat(filename)).isFile()) continue;
+        if (!windows) await fs.access(filename, constants.X_OK);
+        return filename;
+      } catch (error) {
+        if (['EACCES', 'EPERM'].includes(error.code)) {
+          if (override) throw new Error(`${name}: configured tool does not have execute permission`);
+          continue;
+        }
+        if (error.code !== 'ENOENT' && error.code !== 'ENOTDIR') throw error;
+      }
     }
     throw new Error(`${name}: không tìm thấy executable file. Cài yt-dlp và FFmpeg hoặc dùng bản Windows có kèm công cụ media.`);
   }
