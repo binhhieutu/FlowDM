@@ -2,15 +2,33 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
-const { createReadStream, constants } = require('node:fs');
+const { createReadStream } = require('node:fs');
+const { publish, preflightPublication } = require('./publication.cjs');
 
+async function replaceJournal(temporary, filename) {
+  for (let attempt = 0; ; attempt++) {
+    try { await fs.rename(temporary, filename); return; }
+    catch (error) {
+      // Windows readers/indexers can briefly hold a destination sharing lock.
+      // Retry only the same already-synced file; never copy or truncate in place.
+      if (process.platform !== 'win32' || !['EPERM', 'EACCES', 'EBUSY'].includes(error.code) || attempt >= 5) throw error;
+      await new Promise(resolve => setTimeout(resolve, 10 * 2 ** attempt));
+    }
+  }
+}
 async function atomicJournal(filename, tasks, version = 2, metadata = {}) {
-  if (![2, 3, 4, 5, 6, 7].includes(version)) throw Error('Unsupported download journal version');
-  if (version === 7 && !Array.isArray(metadata.queues)) throw Error('Queue journal metadata is required');
+  if (![2, 3, 4, 5, 6, 7, 8].includes(version)) throw Error('Unsupported download journal version');
+  if (version >= 7 && !Array.isArray(metadata.queues)) throw Error('Queue journal metadata is required');
   const temporary = `${filename}.${crypto.randomUUID()}.tmp`;
-  const handle = await fs.open(temporary, 'wx', 0o600);
-  try { await handle.writeFile(JSON.stringify({ version, tasks, ...(version === 7 ? { queues: metadata.queues } : {}) })); await handle.sync(); } finally { await handle.close(); }
-  try { await fs.rename(temporary, filename); } catch (error) { await fs.unlink(temporary).catch(() => {}); throw error; }
+  let created = false;
+  try {
+    const handle = await fs.open(temporary, 'wx', 0o600); created = true;
+    try { await handle.writeFile(JSON.stringify({ version, tasks, ...(version >= 7 ? { queues: metadata.queues } : {}) })); await handle.sync(); } finally { await handle.close(); }
+    await replaceJournal(temporary, filename);
+  } catch (error) {
+    if (created) await fs.unlink(temporary).catch(cleanup => { if (cleanup.code !== 'ENOENT') error.cleanupCode = cleanup.code || 'CLEANUP_FAILED'; });
+    throw error;
+  }
 }
 async function backupJournal(filename, version) {
   const backup = path.join(path.dirname(filename), `downloads.v${version}.${crypto.randomUUID()}.backup.json`);
@@ -50,32 +68,5 @@ async function recoverPublished(task) {
     if (!stat.isFile() || stat.isSymbolicLink() || stat.size !== task.downloadedBytes) return false;
     return (await hashFile(task.path)) === task.sha256.toLowerCase();
   } catch { return false; }
-}
-async function preflightPublication(destination) {
-  const source = path.join(path.dirname(destination), `.flowdm-preflight-${crypto.randomUUID()}.tmp`);
-  const target = `${source}.link`;
-  try {
-    const handle = await fs.open(source, 'wx', 0o600);
-    try { await handle.writeFile('FlowDM'); await handle.sync(); } finally { await handle.close(); }
-    try { await fs.link(source, target); }
-    catch (error) {
-      if (['EOPNOTSUPP', 'ENOTSUP', 'ENOSYS', 'EPERM', 'EXDEV', 'EINVAL'].includes(error.code)) throw Object.assign(Error('Destination filesystem does not support safe hard-link publication (FAT/exFAT are unsupported)'), { code: 'UNSUPPORTED_DESTINATION_FILESYSTEM' });
-      throw error;
-    }
-  } finally {
-    await Promise.all([source, target].map(filename => fs.unlink(filename).catch(error => { if (error.code !== 'ENOENT') throw error; })));
-  }
-}
-async function publish(partial, destination) {
-  // Copy into the destination filesystem, then publish an already flushed inode.
-  // link() refuses any preexisting final entry, including symbolic links.
-  const staging = path.join(path.dirname(destination), `.flowdm-${crypto.randomUUID()}.tmp`);
-  try {
-    await fs.copyFile(partial, staging, constants.COPYFILE_EXCL);
-    const handle = await fs.open(staging, 'r+');
-    try { await handle.sync(); } finally { await handle.close(); }
-    await fs.link(staging, destination);
-    await fs.unlink(partial);
-  } finally { await fs.unlink(staging).catch(error => { if (error.code !== 'ENOENT') throw error; }); }
 }
 module.exports = { atomicJournal, backupJournal, uniqueDestination, openPartial, hashFile, publish, recoverPublished, preflightPublication };
