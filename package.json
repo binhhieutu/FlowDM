@@ -1,6 +1,6 @@
 {
   "name": "flowdm",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "Cross-platform HTTP/HTTPS download manager",
   "main": "src/main.cjs",
   "private": true,
@@ -20,10 +20,10 @@
     "dist:mac": "electron-builder --mac zip --x64 --arm64 --publish=never"
   },
   "devDependencies": {
+    "c8": "12.0.0",
     "electron": "45.0.0",
     "electron-builder": "26.15.3",
-    "playwright": "1.64.1",
-    "c8": "12.0.0"
+    "playwright": "1.64.1"
   },
   "build": {
     "appId": "local.flowdm.desktop",
@@ -72,5 +72,8 @@
     "portable": {
       "useZip": true
     }
+  },
+  "dependencies": {
+    "basic-ftp": "6.2.3"
   }
 }
