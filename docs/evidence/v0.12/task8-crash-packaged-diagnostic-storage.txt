@@ -1,0 +1,27 @@
+✖ owned Electron process crash preserves committed HTTP ranges and resumes exact bytes after relaunch (1221.4601ms)
+  Error: Crash fixture download failed: {"status":"failed","error":"Download failed (EPERM)","requests":[{"start":0,"end":0,"range":true}],"storageErrors":[{"code":"EPERM","syscall":"rename","path":"downloads.json.9f3bbe19-4398-4e9b-861e-58080a8d334d.tmp","dest":"downloads.json"}]}
+      at I:\dich_nguoc\FlowDM\tests\e2e\crash-recovery.test.cjs:15:164
+      at async until (I:\dich_nguoc\FlowDM\tests\e2e\crash-recovery.test.cjs:4:119)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\e2e\crash-recovery.test.cjs:15:3)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3)
+
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1580.1255
+
+✖ failing tests:
+
+test at tests\e2e\crash-recovery.test.cjs:5:1
+✖ owned Electron process crash preserves committed HTTP ranges and resumes exact bytes after relaunch (1221.4601ms)
+  Error: Crash fixture download failed: {"status":"failed","error":"Download failed (EPERM)","requests":[{"start":0,"end":0,"range":true}],"storageErrors":[{"code":"EPERM","syscall":"rename","path":"downloads.json.9f3bbe19-4398-4e9b-861e-58080a8d334d.tmp","dest":"downloads.json"}]}
+      at I:\dich_nguoc\FlowDM\tests\e2e\crash-recovery.test.cjs:15:164
+      at async until (I:\dich_nguoc\FlowDM\tests\e2e\crash-recovery.test.cjs:4:119)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\e2e\crash-recovery.test.cjs:15:3)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3)

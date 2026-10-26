@@ -1,0 +1,9 @@
+✔ bounded gateway supports one hundred authenticated nested relay legs without socket-cap failures (503.0269ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 589.4411

@@ -1,0 +1,22 @@
+START tests/e2e/crash-recovery.test.cjs 2026-10-26T05:01:00.557Z
+✔ owned Electron process crash preserves committed HTTP ranges and resumes exact bytes after relaunch (9733.1175ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10218.7504
+EXIT tests/e2e/crash-recovery.test.cjs 0
+START tests/e2e/post-scan-recovery.test.cjs 2026-10-26T05:01:10.868Z
+✔ owned app crash during post-download scan preserves completed file and requires explicit verified rescan (6025.2222ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6727.6141
+EXIT tests/e2e/post-scan-recovery.test.cjs 0

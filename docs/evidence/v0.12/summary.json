@@ -1,0 +1,89 @@
+{
+  "at": "2026-10-26T05:06:42.764Z",
+  "version": "0.12.0",
+  "baseline": "5cb8b99",
+  "task": 8,
+  "completed": [
+    "8a",
+    "8b",
+    "8d",
+    "8f",
+    "8g"
+  ],
+  "partial": [
+    "8c",
+    "8e"
+  ],
+  "artifact": {
+    "path": "dist/FlowDM 0.12.0.exe",
+    "bytes": 263253934,
+    "sha256": "2dd936fa2552d84bf6b878d5e36a918665362eeeb375f937c26e43fe558b04fc",
+    "asarSha256": "9cebfe0a9d1d39e0b03aaeb97f5a1098e5a2844e7507d108e8b0deeabc37a702",
+    "os": "win32",
+    "arch": "x64",
+    "osRelease": "10.0.19045"
+  },
+  "unit": {
+    "pass": 461,
+    "fail": 0,
+    "skip": 0
+  },
+  "coverage": {
+    "lines": 93.22,
+    "branches": 85.92,
+    "functions": 87.24
+  },
+  "auditVulnerabilities": 0,
+  "gates": {
+    "settingsAndFtpCases": 2,
+    "batchCases": 7,
+    "crashCases": 2,
+    "browserSuites": 3,
+    "queueCases": 2,
+    "mediaCases": 5,
+    "mediaOptInSkipped": 5,
+    "portableHttpBytes": 2097152,
+    "runtimeFiles": 68,
+    "ftpDependencyFiles": 16,
+    "realDefenderScan": "passed exit0, benignprivatefile, DisableRemediation, fileunchanged"
+  },
+  "proxy": {
+    "httpAndSocks5": true,
+    "httpHlsDashBrowserVerified": true,
+    "upstreamSecretsPersisted": false,
+    "localCapability": "RAM; mayappearchildargv; neverupstreamcredentials",
+    "youtube": {
+      "status": "access-blocked",
+      "code": "HTTP_401",
+      "bytes": 4697368,
+      "resources": 101,
+      "connects": 48,
+      "shaVerified": false,
+      "decoded": false
+    },
+    "unsupported": [
+      "NTLM",
+      "Kerberos",
+      "FTP through proxy"
+    ]
+  },
+  "filesystem": {
+    "allObserved": "NTFS",
+    "fatExfatSupported": false,
+    "fat32SizeGuard": true,
+    "atomicFallback": false,
+    "powerLossClaim": false
+  },
+  "finalCandidate": 3,
+  "priorCandidates": {
+    "one": "failedrealWindowsjournalrenameEPERM, fixedboundedatomicretry",
+    "two": "allgatespassed, supersededuniformbatch/browserduplicatepolicy"
+  },
+  "platforms": {
+    "windows": "actualsource/packaged/portable",
+    "linux": "directorybuild/integrityonly",
+    "macOS": "notbuilt/run"
+  },
+  "provenance": "Reportsv6/v7/v8/v9/v10/v11retainharnessnamesbutcurrentonesrecord0.12/time/runner+ASAR. Sourceinitialreportsretaintheiractualversion. PublicYouTubeprobeexit0meansreportcleanup, NOTdownloadPASS. Textlogsnormalizeonlytrailingwhitespace.",
+  "published": false
+}

@@ -1,0 +1,21 @@
+✔ preview validates and deduplicates without creating downloads (1.9057ms)
+✔ submit creates only selected unique jobs in requested queue/directory and reports individual failures (0.9527ms)
+✔ rejects whole invalid batch before creating any job and bounds concurrent submits (14.2335ms)
+✔ grab streams dedup preview, cancellation stops crawler and retains existing jobs (15.4218ms)
+✔ invalid settings and crawler failure are explicit, no task side effects (14.6599ms)
+✔ category settings apply only before transfer and persist without changing existing destinations (119.3176ms)
+✔ post-publication scanner failure keeps completed file and separate scan status (112.7406ms)
+✔ manual duplicate guard preserves query and allows explicit second copy (15.9642ms)
+✔ duplicate guard preserves an explicit direct interpretation of manifest URLs (13.8421ms)
+✔ scan intent is durable before publication and interrupted published file can be rescanned (127.8402ms)
+✔ successful explicit rescan reconsiders completion and changed file cannot pass (186.9397ms)
+✔ strict schema loading rejects legacy FTP and mismatched protocol/type (9.1608ms)
+✔ duplicate policy also covers batch imports and browser admission without losing selected jobs (23.7026ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 707.9793

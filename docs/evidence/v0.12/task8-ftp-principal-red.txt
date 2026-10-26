@@ -1,0 +1,35 @@
+✖ FTP resume refuses a different principal with same path SIZE and MDTM (278.9511ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\ftp-download.test.cjs:86:568)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /identity/,
+    operator: 'rejects'
+  }
+
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 358.8277
+
+✖ failing tests:
+
+test at tests\core\ftp-download.test.cjs:86:1
+✖ FTP resume refuses a different principal with same path SIZE and MDTM (278.9511ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\ftp-download.test.cjs:86:568)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /identity/,
+    operator: 'rejects'
+  }

@@ -136,7 +136,10 @@ async function createDashRelay({ finalUrl, manifest, signal, maxBytes }) {
   });
   await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
   const port = server.address().port;
-  return { url: `http://127.0.0.1:${port}${manifestPath}`, close: async () => { server.closeAllConnections(); await new Promise(resolve => server.close(() => resolve())); } };
+  const relayUrl = `http://127.0.0.1:${port}${manifestPath}`;
+  const proxy = require('../core/proxy.cjs').currentProxy();
+  const unregister = proxy ? require('../core/proxy.cjs').registerLocalRelay(proxy, relayUrl) : () => {};
+  return { url: relayUrl, close: async () => { unregister(); server.closeAllConnections(); await new Promise(resolve => server.close(() => resolve())); } };
 }
 function boundedAppend(current, chunk) { return Buffer.concat([current, chunk]).subarray(-MAX_STDIO_BYTES); }
 function processOutputPath(scratch, filename) {
@@ -155,12 +158,14 @@ function terminate(child) {
   }
 }
 function mediaToolEnv(tools) {
+  const proxy = require('../core/proxy.cjs').currentProxy();
+  const proxyEnv = proxy ? { HTTP_PROXY: proxy, HTTPS_PROXY: proxy, ALL_PROXY: proxy, http_proxy: proxy, https_proxy: proxy, all_proxy: proxy, NO_PROXY: '', no_proxy: '' } : {};
   const runtimePaths = [...new Set([tools.ytDlp, tools.ffmpeg, tools.jsRuntime, tools.aria2c].filter(value => typeof value === 'string' && path.isAbsolute(value)).map(path.dirname))];
   if (process.platform === 'win32') {
     const systemRoot = process.env.SystemRoot || process.env.WINDIR || 'C:\\Windows';
-    return { ELECTRON_RUN_AS_NODE: '1', SystemRoot: systemRoot, WINDIR: systemRoot, TEMP: process.env.TEMP || path.join(systemRoot, 'Temp'), TMP: process.env.TMP || process.env.TEMP || path.join(systemRoot, 'Temp'), PATH: [...runtimePaths, path.join(systemRoot, 'System32')].join(';') };
+    return { ...proxyEnv, ELECTRON_RUN_AS_NODE: '1', SystemRoot: systemRoot, WINDIR: systemRoot, TEMP: process.env.TEMP || path.join(systemRoot, 'Temp'), TMP: process.env.TMP || process.env.TEMP || path.join(systemRoot, 'Temp'), PATH: [...runtimePaths, path.join(systemRoot, 'System32')].join(';') };
   }
-  return { ELECTRON_RUN_AS_NODE: '1', PATH: [...runtimePaths, '/usr/bin', '/bin'].join(':') };
+  return { ...proxyEnv, ELECTRON_RUN_AS_NODE: '1', PATH: [...runtimePaths, '/usr/bin', '/bin'].join(':') };
 }
 async function scratchBytes(directory, limit) {
   let total = 0;
@@ -238,13 +243,15 @@ function aria2Arguments(connections, speedLimit) {
     '--enable-rpc=false', '--enable-dht=false', '--enable-dht6=false', '--enable-peer-exchange=false', '--bt-enable-lpd=false', '--check-certificate=true',
     '--file-allocation=none', '--allow-overwrite=false', '--auto-file-renaming=false', '--console-log-level=warn', '--summary-interval=0', '--download-result=hide'
   ];
+  const proxy = require('../core/proxy.cjs').currentProxy();
+  if (proxy) options.push('--all-proxy=' + proxy);
   if (speedLimit) options.push(`--max-download-limit=${speedLimit}`, `--max-overall-download-limit=${speedLimit}`);
   return `aria2c:${options.join(' ')}`;
 }
 async function extractMetadata(tools, prefix, args, source, signal) {
   if (signal?.aborted) throw abortError();
   return new Promise((resolve, reject) => {
-    const child = spawn(tools.ytDlp, [...prefix, ...args, '--dump-single-json', '--skip-download', '--batch-file', '-'], { shell: false, windowsHide: true, detached: process.platform !== 'win32', stdio: ['pipe', 'pipe', 'ignore'], env: mediaToolEnv(tools) });
+    const child = spawn(tools.ytDlp, [...prefix, ...args, ...(require('../core/proxy.cjs').currentProxy() ? ['--proxy', require('../core/proxy.cjs').currentProxy()] : []), '--dump-single-json', '--skip-download', '--batch-file', '-'], { shell: false, windowsHide: true, detached: process.platform !== 'win32', stdio: ['pipe', 'pipe', 'ignore'], env: mediaToolEnv(tools) });
     let bytes = 0; const chunks = []; let reason;
     const stop = error => { reason ||= error; terminate(child); };
     const abort = () => stop(abortError());
@@ -419,7 +426,8 @@ async function downloadExternalOperation({ url, mediaType, headers = {}, output,
     onControlReady(externalResizeControl(metadata, checkpointDir));
     await new Promise((resolve, reject) => {
       if (signal?.aborted) return reject(abortError());
-      child = spawn(actualTools.ytDlp, args, { shell: false, windowsHide: true, detached: process.platform !== 'win32', stdio: ['pipe', 'pipe', 'pipe'], env: mediaToolEnv(actualTools) });
+      const networkArgs = require('../core/proxy.cjs').currentProxy() ? [...args, '--proxy', require('../core/proxy.cjs').currentProxy()] : args;
+      child = spawn(actualTools.ytDlp, networkArgs, { shell: false, windowsHide: true, detached: process.platform !== 'win32', stdio: ['pipe', 'pipe', 'pipe'], env: mediaToolEnv(actualTools) });
       child.stdin?.on('error', () => {});
       child.stdin?.end(metadata ? JSON.stringify(metadata) : `${source}\n`);
       const stop = reason => { stopReason ||= reason; terminate(child); };

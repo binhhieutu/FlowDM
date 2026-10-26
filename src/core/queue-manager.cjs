@@ -13,7 +13,7 @@ class QueueCoordinator {
   }
   load(saved) {
     if (!saved) return [];
-    if (!saved || !Number.isInteger(saved.version) || saved.version < 1 || saved.version > 7 || !Array.isArray(saved.tasks)) throw Error('Unsupported download journal');
+    if (!saved || !Number.isInteger(saved.version) || saved.version < 1 || saved.version > 8 || !Array.isArray(saved.tasks)) throw Error('Unsupported download journal');
     const tasks = structuredClone(saved.tasks), ids = new Set(tasks.map(task => task.id));
     if (ids.size !== tasks.length) throw Error('Duplicate journal task');
     let queues;
@@ -51,7 +51,7 @@ class QueueCoordinator {
     for (const queue of this.queues.values()) queue.taskIds = queue.taskIds.filter(taskId => taskId !== id);
   }
   evaluate() {
-    const tasks = [...this.manager.tasks.values()].filter(task => !this.manager.pendingAdds?.has(task.id)).map(task => ({ ...task, requiresHeadersMissing: !!task.requiresHeaders && !this.manager.secrets?.has(task.id) }));
+    const tasks = [...this.manager.tasks.values()].filter(task => !this.manager.pendingAdds?.has(task.id)).map(task => ({ ...task, requiresHeadersMissing: (!!task.requiresHeaders && !this.manager.secrets?.has(task.id)) || (task.requiresProxy && !this.manager.proxy) || (task.requiresFtpCredentials && !this.manager.ftpSecrets?.has(task.id)) }));
     return evaluateQueues({ queues: this.snapshot(), tasks, now: this.clock(), maxConcurrent: this.manager.maxConcurrent, maxPerHost: this.manager.maxPerHost });
   }
   async transaction(operation) {
@@ -135,8 +135,8 @@ class QueueCoordinator {
     } finally { this.blocked--; this.manager._notify?.(); if (successful) this.manager._pump?.(); }
   }
   completionKey(queue) { return createHash('sha256').update(JSON.stringify([queue.onComplete, [...queue.taskIds].sort()])).digest('hex'); }
-  allCompleted(queue) { return queue.taskIds.length > 0 && queue.taskIds.every(id => this.manager.tasks.get(id)?.status === 'completed' && !this.manager.running.has(id)); }
-  appIdle() { return this.manager.running.size === 0 && [...this.manager.tasks.values()].every(task => ['completed', 'canceled'].includes(task.status)); }
+  allCompleted(queue) { return queue.taskIds.length > 0 && queue.taskIds.every(id => this.manager.tasks.get(id)?.status === 'completed' && !['pending', 'running', 'failed'].includes(this.manager.tasks.get(id)?.postScan?.status) && !this.manager.running.has(id)); }
+  appIdle() { return this.manager.running.size === 0 && !this.manager.scanOperations?.size && [...this.manager.tasks.values()].every(task => ['completed', 'canceled'].includes(task.status) && !['pending', 'running', 'failed'].includes(task.postScan?.status)); }
   flushCompletions() {
     if (!this.appIdle() || this.armedCompletion) return;
     for (const intent of this.pendingCompletions.values()) {

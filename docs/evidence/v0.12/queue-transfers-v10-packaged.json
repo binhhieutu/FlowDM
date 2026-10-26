@@ -1,0 +1,29 @@
+{
+  "at": "2026-10-26T05:03:23.710Z",
+  "appVersion": "0.12.0",
+  "packaged": true,
+  "elapsed": 4494,
+  "peak": 2,
+  "order": [
+    "8b5e8af8-f8ae-4baa-9c33-4d53ea987d91",
+    "78c7e110-613c-44bc-b736-01a02594c1ee"
+  ],
+  "httpSha256": [
+    "5fa241bfcb0034b6b226cddc8c251ab3195c0cf100b3629a59503b14b198927c",
+    "5fa241bfcb0034b6b226cddc8c251ab3195c0cf100b3629a59503b14b198927c"
+  ],
+  "hlsSha256": "8fd49049fe73583d0e179541f59b57090178a412cd8676250cabbcb6f0bfbc4e",
+  "ffmpegDecodeExit": 0,
+  "firstCountdownSeconds": 60,
+  "cancelledAt": 1792990881426,
+  "secondStarted": 1792990942479,
+  "calls": [
+    {
+      "action": "shutdown",
+      "context": {
+        "queueName": "Nguồn giả lập"
+      },
+      "at": 1792991003637
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+✔ schema8 journal stores queues atomically and requires queue metadata (12.092ms)
+✔ journal disk-full write and failed sync preserve prior journal and clean own temporary (8.9617ms)
+▶ owned child termination at publication and journal commit boundaries preserves valid committed state
+  ✔ after-data-sync (77.9952ms)
+  ✔ before-publication (69.9059ms)
+  ✔ after-publication (73.3353ms)
+  ✔ before-journal-replace (69.3428ms)
+  ✔ after-journal-replace (74.082ms)
+✔ owned child termination at publication and journal commit boundaries preserves valid committed state (365.8422ms)
+✔ contradictory crash journal byte counters are refused without modifying retained state (31.7134ms)
+✔ capabilities refuse unsupported FAT/exFAT and FAT32 oversized files explicitly (9.4173ms)
+✔ publication flushes and commits exact Unicode path without overwriting existing data (16.954ms)
+✔ publication preserves partial and cleans staging after disk-full and permission failures (7.5398ms)
+✔ destination creation race never overwrites the racing entry or drops partial (7.2762ms)
+✔ preflight refuses missing hard-link capability and leaves no probe files (6.1384ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 490.9672

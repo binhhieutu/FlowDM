@@ -1,0 +1,36 @@
+{
+  "at": "2026-10-26T05:01:10.349Z",
+  "appVersion": "0.12.0",
+  "packaged": true,
+  "restored": {
+    "id": "bca050b4-fca5-4376-b597-e01cd65e00f7",
+    "name": "Video đã sửa",
+    "enabled": false,
+    "concurrency": 2,
+    "speedLimit": 524288,
+    "schedule": {
+      "timezone": "Asia/Ho_Chi_Minh",
+      "weekdays": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "start": "22:00",
+      "stop": "06:00"
+    },
+    "onComplete": "none",
+    "taskIds": [],
+    "lastCompletionKey": null,
+    "windowState": {
+      "key": null,
+      "closedKeys": [
+        "2026-10-25"
+      ]
+    },
+    "error": null
+  }
+}

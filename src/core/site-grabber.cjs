@@ -3,6 +3,7 @@ const http = require('node:http');
 const https = require('node:https');
 const { canonicalUrl, MAX_URLS, MAX_TEXT_BYTES } = require('./batch-import.cjs');
 const { extractLinks } = require('./html-links.cjs');
+const { requestViaProxy } = require('./proxy.cjs');
 const MAX_HTML = 2 * 1024 * 1024;
 function deadline(milliseconds, parent) {
   const controller = new AbortController();
@@ -23,9 +24,9 @@ function checkOptions(options) {
 }
 async function responseFor(url, signal) {
   const response = await new Promise((resolve, reject) => {
-    const transport = new URL(url).protocol === 'https:' ? https : http;
-    const request = transport.get(url, { headers: { 'accept-encoding': 'identity', accept: 'text/html, application/xhtml+xml' }, signal }, resolve);
+    const request = requestViaProxy(url, { headers: { 'accept-encoding': 'identity', accept: 'text/html, application/xhtml+xml' }, signal }, resolve);
     request.on('error', reject);
+    request.end();
   });
   response.on('error', () => {});
   // Own cancellation until the response body is finished, not only until headers

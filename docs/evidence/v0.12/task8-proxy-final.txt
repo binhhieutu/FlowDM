@@ -1,0 +1,29 @@
+✔ strict proxy configuration keeps credentials out of safe public info (17.2909ms)
+✔ HTTP authenticated upstream carries actual byte-exact HTTP without leaking proxy auth to origin (33.6433ms)
+✔ SOCKS5 authenticated upstream carries actual byte-exact HTTP without leaking proxy auth to origin (12.3785ms)
+✔ HTTP rejects bad upstream credentials with redacted errors and no origin request (7.8605ms)
+✔ SOCKS5 rejects bad upstream credentials with redacted errors and no origin request (8.4969ms)
+✔ SOCKS sends domain names to upstream DNS and reports DNS refusal without direct fallback (7.918ms)
+✔ loopback gateway rejects unauthenticated requests and unsupported scheme/method (6.6496ms)
+✔ ALS isolates concurrent proxy choices and cancelled requests close sockets (54.445ms)
+✔ HTTP CONNECT TLS tunnel validates destination certificate and allows explicitly trusted test CA only (196.2861ms)
+✔ SOCKS5 TLS tunnel validates destination certificate and allows explicitly trusted test CA only (123.6292ms)
+✔ closing gateway aborts active connections without an upstream-to-origin fallback (25.086ms)
+✔ CONNECT preserves explicit port 80 instead of normalizing it to HTTPS default (4.7933ms)
+✔ SOCKS username/password credentials enforce protocol nonempty password bounds (0.2085ms)
+✔ SOCKS IPv6 literals use the protocol IPv6 address type without local DNS (5.756ms)
+✔ silent SOCKS tunnel terminates at the real ten second handshake deadline (10013.9856ms)
+✔ HTTP direct local relay routing requires explicit private registration and gateway capability (15.8416ms)
+✔ SOCKS direct local relay routing requires explicit private registration and gateway capability (10.8316ms)
+✔ bounded gateway supports one hundred authenticated nested relay legs without socket-cap failures (427.9082ms)
+✔ HTTP strips private URL fragments on the wire without mutating caller URL objects (16.5649ms)
+✔ SOCKS5 strips private URL fragments on the wire without mutating caller URL objects (12.8996ms)
+✔ proxy fixture handles abrupt peer reset during SOCKS negotiation as local teardown (118.2279ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11214.6643

@@ -1,0 +1,43 @@
+✖ bounded gateway supports one hundred authenticated nested relay legs without socket-cap failures (199.334ms)
+  AssertionError [ERR_ASSERTION]: Every nested relay transfer must remain byte-exact
+
+  0 !== 100
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\proxy.test.cjs:33:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 100,
+    operator: 'strictEqual'
+  }
+
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 272.5344
+
+✖ failing tests:
+
+test at tests\core\proxy.test.cjs:24:1
+✖ bounded gateway supports one hundred authenticated nested relay legs without socket-cap failures (199.334ms)
+  AssertionError [ERR_ASSERTION]: Every nested relay transfer must remain byte-exact
+
+  0 !== 100
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\proxy.test.cjs:33:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 100,
+    operator: 'strictEqual'
+  }

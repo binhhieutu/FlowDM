@@ -1,0 +1,9 @@
+  • electron-builder  version=26.15.3 os=10.0.19045
+  • loaded configuration  file=package.json ("build" field)
+  • executing @electron/rebuild  electronVersion=45.0.0 arch=x64 buildFromSource=false workspaceRoot=I:\dich_nguoc\FlowDM projectDir=./ appDir=./
+  • installing native dependencies  arch=x64
+  • completed installing native dependencies
+  • packaging       platform=linux arch=x64 electron=45.0.0 appOutDir=dist\linux-unpacked
+  • downloaded      label=electron progress=100%
+  • downloaded electron zip extracted successfully  output=I:\dich_nguoc\FlowDM\dist\linux-unpacked
+  • searching for node modules  pm=npm searchDir=I:\dich_nguoc\FlowDM

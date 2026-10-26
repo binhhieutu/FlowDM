@@ -1,0 +1,10 @@
+✔ owned Electron process crash preserves committed HTTP ranges and resumes exact bytes after relaunch (9113.3555ms)
+✔ owned app crash during post-download scan preserves completed file and requires explicit verified rescan (3261.6835ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 13067.407

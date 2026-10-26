@@ -42,12 +42,12 @@ test('queues preserve move/order/caps across app restart and finish exact data',
   for (const task of f.manager.list()) { assert.equal(task.sha256, crypto.createHash('sha256').update(f.body).digest('hex')); assert.deepEqual(await fs.readFile(task.path), f.body); }
   await assert.rejects(f.manager.deleteQueue('default')); await assert.rejects(f.manager.deleteQueue(q.id));
 });
-test('schema6 migrates to a default queue with exact backup before schema7 write', async t => {
+test('schema6 migrates to a default queue with exact backup before schema8 write', async t => {
   const f = await fixture(t); const task = await f.manager.add({ url: f.url + '/legacy', startAt: Date.now() + 60000 }); await f.manager.close();
   const filename = path.join(f.options.dataDir, 'downloads.json'); const legacy = JSON.parse(await fs.readFile(filename, 'utf8')); legacy.version = 6; delete legacy.queues;
   for (const item of legacy.tasks) { delete item.queueId; delete item.queueHold; }
   const raw = JSON.stringify(legacy, null, 2) + '\n'; await fs.writeFile(filename, raw); await f.relaunch();
-  const saved = JSON.parse(await fs.readFile(filename, 'utf8')); assert.equal(saved.version, 7);
+  const saved = JSON.parse(await fs.readFile(filename, 'utf8')); assert.equal(saved.version, 8);
   assert.deepEqual(saved.queues[0].taskIds, [task.id]); assert.equal(saved.tasks[0].queueId, 'default');
   const names = (await fs.readdir(f.options.dataDir)).filter(n => /^downloads\.v6\..*\.backup\.json$/.test(n)); assert.equal(names.length, 1);
   assert.equal(await fs.readFile(path.join(f.options.dataDir, names[0]), 'utf8'), raw);

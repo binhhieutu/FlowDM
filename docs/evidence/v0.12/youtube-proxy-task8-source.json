@@ -1,0 +1,25 @@
+{
+  "at": "2026-10-26T04:37:07.899Z",
+  "version": "0.12.0",
+  "packaged": false,
+  "sourceEvidence": "docs/evidence/v0.8/youtube-native-live-v8-source.json",
+  "status": "transfer-failed",
+  "bytes": 7718904,
+  "wholeFileDecoded": false,
+  "proxyAuthenticated": true,
+  "afterInspect": {
+    "connects": 2,
+    "forwards": 0,
+    "youtubeTunnels": 1,
+    "cdnTunnels": 1,
+    "upstreamAuthenticatedEveryRequest": true
+  },
+  "routeCounters": {
+    "connects": 28,
+    "forwards": 0,
+    "youtubeTunnels": 2,
+    "cdnTunnels": 26,
+    "upstreamAuthenticatedEveryRequest": true
+  },
+  "elapsedMs": 13504
+}

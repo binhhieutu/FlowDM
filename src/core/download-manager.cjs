@@ -3,8 +3,9 @@ const { EventEmitter } = require('node:events');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
+const { createReadStream } = require('node:fs');
 const { setTimeout: delay } = require('node:timers/promises');
-const { inputOptions, integer, checkedUrl } = require('./policy.cjs');
+const { inputOptions, integer, checkedUrl, checkedDownloadUrl } = require('./policy.cjs');
 const { probe, retryRequest, rangeInfo, contentLength } = require('./http-client.cjs');
 const { atomicJournal, backupJournal, uniqueDestination, openPartial, hashFile, publish, recoverPublished, preflightPublication } = require('./storage.cjs');
 const { HttpRangePool, MAX_SEGMENTS } = require('./http-range-pool.cjs');
@@ -21,6 +22,12 @@ const { QueueCoordinator } = require('./queue-manager.cjs');
 const { effectiveQueueRate } = require('./queue-scheduler.cjs');
 const { PowerActionController, SystemPowerAdapter } = require('./power-actions.cjs');
 
+const { Preferences } = require('./preferences.cjs');
+const { categoryDestination } = require('./categories.cjs');
+const { findDuplicate } = require('./clipboard-policy.cjs');
+const { scanFile } = require('../tools/post-download.cjs');
+const { createProxy, withProxy } = require('./proxy.cjs');
+const { downloadFtp, ftpSourceHash } = require('./ftp-download.cjs');
 const clone = value => structuredClone(value);
 const STATES = ['queued', 'downloading', 'paused', 'completed', 'failed', 'canceled'];
 function plan(total, connections, ranges) {
@@ -36,6 +43,7 @@ class DownloadManager extends EventEmitter {
     this.maxConcurrent = integer(maxConcurrent, 1, 16, 'Concurrent downloads');
     this.maxPerHost = integer(maxPerHost, 1, 16, 'Per-host downloads');
     this.maxBytes = integer(maxBytes, 1, Number.MAX_SAFE_INTEGER, 'Size limit');
+    this.preferences = new Preferences(this.dataDir, this.downloadDir); this.proxy = null; this.ftpSecrets = new Map(); this.scanOperations = new Map();
     if (typeof externalDownloader !== 'function') throw Error('External media downloader must be a function');
     this.externalDownloader = externalDownloader;
     if (typeof mediaInspector !== 'function') throw Error('Media inspector must be a function');
@@ -54,17 +62,19 @@ class DownloadManager extends EventEmitter {
     if (this.initialized) return this;
     await fs.mkdir(this.dataDir, { recursive: true, mode: 0o700 });
     await fs.mkdir(this.downloadDir, { recursive: true });
+    await this.preferences.init();
     let saved;
     try { saved = JSON.parse(await fs.readFile(this.journal, 'utf8')); } catch (error) { if (error.code !== 'ENOENT') throw Error(`Cannot read download journal: ${error.message}`); }
     if (saved) {
-      if (![1, 2, 3, 4, 5, 6, 7].includes(saved.version) || !Array.isArray(saved.tasks)) throw Error('Unsupported download journal');
+      if (![1, 2, 3, 4, 5, 6, 7, 8].includes(saved.version) || !Array.isArray(saved.tasks)) throw Error('Unsupported download journal');
       for (const task of saved.tasks) this._validateStored(task, saved.version);
       const restoredTasks = this.queueState.load(saved);
-      if (saved.version < 7) await backupJournal(this.journal, saved.version);
+      if (saved.version < 8) await backupJournal(this.journal, saved.version);
       for (const task of restoredTasks) {
         if (task.status === 'downloading' && this.queueState.require(task.queueId).schedule) task.queueHold = true;
-        const needsPause = task.status === 'downloading' || (task.status === 'queued' && task.requiresHeaders);
+        const needsPause = task.status === 'downloading' || (task.status === 'queued' && (task.requiresHeaders || task.requiresProxy || task.requiresFtpCredentials));
         const restored = { ...task, ...(task.activeConnections === undefined ? {} : { activeConnections: 0 }), status: needsPause ? 'paused' : task.status, speed: 0 };
+        if (['pending', 'running'].includes(restored.postScan?.status)) restored.postScan = { status: 'failed', error: 'Scan interrupted; run it again explicitly' };
         await this._recoverPublished(restored);
         this.tasks.set(task.id, restored);
       }
@@ -78,13 +88,20 @@ class DownloadManager extends EventEmitter {
 
   _validateStored(task, version = 6) {
     if (!task || !/^[a-f0-9-]{36}$/.test(task.id) || !STATES.includes(task.status) || !path.isAbsolute(task.path) || path.basename(task.path) !== task.filename) throw Error('Invalid download journal task');
-    checkedUrl(task.url);
-    if (task.mediaType !== undefined && !['direct', 'hls', 'dash', 'youtube'].includes(task.mediaType)) throw Error('Invalid journal media type');
+    const storedUrl = version < 8 ? checkedUrl(task.url) : checkedDownloadUrl(task.url);
+    if (version >= 8 && (['ftp:', 'ftps:'].includes(storedUrl.protocol) !== (task.mediaType === 'ftp'))) throw Error('Journal protocol and type mismatch');
+    if (task.mediaType !== undefined && !['direct', 'hls', 'dash', 'youtube', ...(version >= 8 ? ['ftp'] : [])].includes(task.mediaType)) throw Error('Invalid journal media type');
     if (task.selection !== undefined) {
       if (version < 6 || !['dash', 'youtube'].includes(task.mediaType)) throw Error('Invalid selected media journal version or type');
       validateSelection(task.selection);
       if (!['mp4', 'webm', 'mkv', 'm4a', 'opus', 'mp3', 'aac', 'flac', 'wav', 'ogg', 'mka'].includes(task.media?.selectionExtension) || path.extname(task.filename) !== `.${task.media.selectionExtension}`) throw Error('Invalid selected media container');
     }
+    if (task.mediaType === 'ftp') {
+      if (!['ftp:', 'ftps:'].includes(new URL(task.url).protocol) || task.connections !== 1) throw Error('Invalid FTP task');
+      if (task.ftpIdentity && (Object.keys(task.ftpIdentity).sort().join(',') !== 'modifiedAt,size,sourceHash' || !/^[a-f0-9]{64}$/.test(task.ftpIdentity.sourceHash) || task.ftpIdentity.size !== task.totalBytes || (task.ftpIdentity.modifiedAt !== null && !Number.isFinite(Date.parse(task.ftpIdentity.modifiedAt))))) throw Error('Invalid FTP identity');
+    }
+    for (const key of ['requiresProxy', 'requiresFtpCredentials']) if (task[key] !== undefined && typeof task[key] !== 'boolean') throw Error('Invalid session marker');
+    if (task.postScan && !['pending', 'running', 'passed', 'failed', 'skipped'].includes(task.postScan.status)) throw Error('Invalid scan status');
     integer(task.connections, 1, 16, 'Connections'); integer(task.speedLimit, 0, Number.MAX_SAFE_INTEGER, 'Speed limit');
     if (!Array.isArray(task.segments) || task.segments.length > (version < 5 ? 16 : MAX_SEGMENTS)) throw Error('Invalid journal segments');
     let received = 0, next = 0;
@@ -98,6 +115,71 @@ class DownloadManager extends EventEmitter {
   }
 
   list() { return clone([...this.tasks.values()]); }
+  network(operation) { return withProxy(this.proxy?.url ?? null, operation); }
+  preferenceInfo() { return { settings: this.preferences.snapshot(), proxy: this.proxy ? { ...this.proxy.configInfo } : null }; }
+  configure(input) {
+    this.cancelPower();
+    return this._mutate(async () => {
+      this._ready();
+      if (!input || typeof input !== 'object' || Array.isArray(input) || Object.keys(input).some(k => !['settings', 'proxy'].includes(k))) throw Error('Invalid configuration');
+      const settings = input.settings === undefined ? this.preferences.snapshot() : this.preferences.validate(input.settings);
+      const changeProxy = Object.hasOwn(input, 'proxy');
+      if (changeProxy && (this.running.size || this.mediaCatalog.operations.size)) throw Error('Pause all downloads and inspections before changing proxy');
+      const replacement = changeProxy && input.proxy !== null ? await createProxy(input.proxy) : null;
+      try { if (input.settings !== undefined) await this.preferences.update(settings); }
+      catch (error) { await replacement?.close(); throw error; }
+      if (changeProxy) { const previous = this.proxy; this.proxy = replacement; await previous?.close(); }
+      this.emit('preferences', this.preferenceInfo()); this._notify(); this._pump(); return this.preferenceInfo();
+    });
+  }
+  _validateFtpCredentials(value) {
+    if (!value || typeof value !== 'object' || Array.isArray(value) || Object.keys(value).some(k => !['user', 'password'].includes(k)) || !['user', 'password'].every(k => typeof value[k] === 'string' && value[k].length <= 256 && !/[\x00-\x1f\x7f]/.test(value[k]))) throw Error('Invalid FTP credentials');
+  }
+  bindFtpCredentials(id, value) {
+    this.cancelPower();
+    return this._mutate(async () => { this._ready(); const task = this._require(id); this._validateFtpCredentials(value); if (task.mediaType !== 'ftp' || !['paused', 'failed'].includes(task.status) || this.running.has(id)) throw Error('Pause the FTP task before binding credentials'); if (task.ftpIdentity && task.ftpIdentity.sourceHash !== ftpSourceHash(task.url, value.user)) throw Error('FTP account does not match the saved resume identity'); this.ftpSecrets.set(id, clone(value)); task.requiresFtpCredentials = true; await this._persist(); return clone(task); });
+  }
+  allowDirect(id) {
+    this.cancelPower();
+    return this._mutate(async () => { this._ready(); const task = this._require(id); if (!['paused', 'failed', 'queued'].includes(task.status) || this.running.has(id)) throw Error('Pause before changing route'); task.requiresProxy = false; await this._persist(); return clone(task); });
+  }
+  _authorizeTaskRoute(task) { if (task.requiresProxy && !this.proxy) throw Error('Proxy session is missing. Configure it again or explicitly allow direct transfer.'); }
+  async _verifyScanTarget(task, signal) {
+    signal.throwIfAborted();
+    const stat = await fs.lstat(task.path);
+    if (!stat.isFile() || stat.isSymbolicLink() || stat.size !== task.totalBytes || !/^[a-f0-9]{64}$/.test(task.sha256 || '')) return false;
+    const hash = crypto.createHash('sha256');
+    for await (const chunk of createReadStream(task.path)) { signal.throwIfAborted(); hash.update(chunk); }
+    return hash.digest('hex') === task.sha256;
+  }
+  rescan(id) {
+    this.cancelPower();
+    if (this.scanOperations.has(id)) return Promise.reject(Error('Scan is already running'));
+    const record = { controller: new AbortController(), promise: null };
+    this.scanOperations.set(id, record);
+    record.promise = this._mutate(async () => {
+      this._ready(); const task = this._require(id), config = this.preferences.snapshot().scanner;
+      if (task.status !== 'completed' || this.running.has(id) || !config.enabled) throw Error('Enable a scanner and wait for the completed task');
+      const previous = task.postScan; task.postScan = { status: 'running' };
+      try { await this._persist(); } catch (error) { task.postScan = previous; throw error; }
+      this._notify(); return { task: clone(task), config };
+    }).then(async ({ task, config }) => {
+      let result;
+      try {
+        if (!await this._verifyScanTarget(task, record.controller.signal)) throw Error('Published file changed');
+        result = await scanFile(task.path, config, { signal: record.controller.signal });
+        if (result.status === 'passed' && !await this._verifyScanTarget(task, record.controller.signal)) result = { status: 'failed', error: 'Published file changed during scanning' };
+      } catch { result = { status: 'failed', error: 'Scan interrupted or published file changed' }; }
+      return this._mutate(async () => {
+        const current = this.tasks.get(id); if (!current) return null;
+        current.postScan = result; await this._persist();
+        if (this.scanOperations.get(id) === record) this.scanOperations.delete(id);
+        if (!this.closed && result.status === 'passed') await this.queueState.completed(id);
+        this._notify(); return clone(current);
+      });
+    }).finally(() => { if (this.scanOperations.get(id) === record) this.scanOperations.delete(id); });
+    return record.promise;
+  }
   listQueues() { return this.queueState.snapshot().map(queue => ({ ...queue, error: this.queueError })); }
   _queueCall(method, ...args) { this.cancelPower(); return this._mutate(() => { this._ready(); return this.queueState[method](...args); }); }
   createQueue(input) { return this._queueCall('createQueue', input); }
@@ -154,7 +236,7 @@ class DownloadManager extends EventEmitter {
   _persist() {
     const snapshot = this.list();
     const queues = this.queueState.snapshot();
-    const write = this.persistence.catch(() => {}).then(() => atomicJournal(this.journal, snapshot, 7, { queues }));
+    const write = this.persistence.catch(() => {}).then(() => atomicJournal(this.journal, snapshot, 8, { queues }));
     this.persistence = write; return write;
   }
   _mutate(operation) {
@@ -164,7 +246,7 @@ class DownloadManager extends EventEmitter {
   _persistProgress(runtime) {
     void this._persist().catch(error => { runtime.persistenceError ||= error; runtime.controller.abort(); });
   }
-  async inspectMedia(input) { this._ready(); const result = await this.mediaCatalog.inspect(input); this._ready(); return result; }
+  async inspectMedia(input) { this._ready(); const result = await this.network(() => this.mediaCatalog.inspect(input)); this._ready(); return result; }
   async addPlaylist(input) {
     this._ready();
     if (!input || typeof input !== 'object' || Array.isArray(input) || Object.keys(input).some(key => !['catalogId', 'entryIds', 'connections', 'speedLimit', 'directory', 'queueId'].includes(key))) throw Error('Invalid playlist options');
@@ -183,19 +265,25 @@ class DownloadManager extends EventEmitter {
     return this._mutate(async () => {
       this._ready();
       const options = inputOptions(input, this.downloadDir);
+        if (input.checkDuplicate && this.preferences.value.duplicateWarnings && !input.allowDuplicate && findDuplicate({ url: options.url, mediaType: options.mediaType, selection: options.selection }, this.list())) throw Error('DUPLICATE: Liên kết và định dạng đã có. Bật cho phép bản tải trùng để tiếp tục.');
       this.queueState.require(input.queueId ?? 'default');
       const selected = options.selection === undefined ? null : this.mediaCatalog.resolve({ url: options.url, mediaType: options.mediaType, selection: options.selection, catalogId: input.catalogId });
       if (selected) options.filename = `${path.parse(options.filename).name}.${selected.extension}`;
-      const destination = await uniqueDestination(options.directory, options.filename, new Set(this.list().map(task => task.path.toLowerCase())));
+      const category = categoryDestination({ filename: options.filename, mime: input.mime, ...this.preferences.value.categories, directory: input.directory });
+        if (category.directory) options.directory = category.directory;
+        const destination = await uniqueDestination(options.directory, options.filename, new Set(this.list().map(task => task.path.toLowerCase())));
       const task = { id: crypto.randomUUID(), url: options.url, ...destination, status: 'queued', totalBytes: null, downloadedBytes: 0, speed: 0, error: null, connections: options.connections, segments: [], createdAt: new Date().toISOString(), startAt: options.startAt, speedLimit: options.speedLimit, finalUrl: null, sha256: null, validator: null, ranges: false, requiresHeaders: Object.keys(options.headers).length > 0 };
       task.mediaType = options.mediaType;
+        if (category.category) task.category = category.category;
+        if (this.proxy) task.requiresProxy = true;
+        if (task.mediaType === 'ftp' && input.ftpCredentials) { this._validateFtpCredentials(input.ftpCredentials); task.requiresFtpCredentials = true; this.ftpSecrets.set(task.id, structuredClone(input.ftpCredentials)); }
       if (selected) { task.selection = selected.selection; task.media = { selectionExtension: selected.extension, format: selected.extension }; }
       this.queueState.attach(task, input.queueId ?? 'default');
       this.pendingAdds.add(task.id);
       this.tasks.set(task.id, task); this.secrets.set(task.id, options.headers);
       try { await this._persist(); }
       catch (error) {
-        this.tasks.delete(task.id); this.secrets.delete(task.id); this.queueState.detach(task.id);
+        this.tasks.delete(task.id); this.secrets.delete(task.id); this.ftpSecrets.delete(task.id); this.queueState.detach(task.id);
         // A running download may have queued a snapshot while this add was pending.
         // Queue its removal after those snapshots; retain the original add failure.
         await this._persist().catch(() => {});
@@ -216,6 +304,7 @@ class DownloadManager extends EventEmitter {
       this._ready(); const connections = integer(value, 1, 16, 'Connections'); const task = this._require(id);
       if (!['queued', 'downloading', 'paused', 'failed'].includes(task.status)) throw Error('This download cannot change connections');
       if (task.connections === connections) return clone(task);
+      if (task.mediaType === 'ftp' && connections !== 1) throw Error('FTP supports one passive connection');
       const runtime = this.running.get(id);
       if (runtime?.rangePool) await runtime.rangePool.resize(connections);
       else if (runtime?.hlsControl) await runtime.hlsControl.resize(connections, () => this._commitConnections(task, connections));
@@ -232,15 +321,16 @@ class DownloadManager extends EventEmitter {
       this._notify(); return clone(task);
     });
   }
-  prepareHeaderRebind(id, headers, options) { return this._mutate(() => prepareHeaderRebind(this, id, headers, options)); }
+  prepareHeaderRebind(id, headers, options) { return this._mutate(() => { this._ready(); this._authorizeTaskRoute(this._require(id)); return this.network(() => prepareHeaderRebind(this, id, headers, options)); }); }
   rebindHeaders(id, headers, options) { return this.prepareHeaderRebind(id, headers, options).then(prepared => prepared.commit()); }
   refreshSource(id, input) {
     this.cancelPower();
     return this._mutate(async () => {
       this._ready(); const task = this._require(id);
       if (!['paused', 'failed'].includes(task.status) || this.running.has(id)) throw Error('Pause the download before updating its source');
+      this._authorizeTaskRoute(task);
       const previousHeaders = this.secrets.get(id);
-      const prepared = await prepareSourceReplacement({ task: clone(task), input, previousHeaders, checkpointDir: this._mediaDirectory(id), maxBytes: this.maxBytes, signal: AbortSignal.timeout(30000), externalValidator: require('../media/external.cjs').validateExternalReplacement });
+      const prepared = await this.network(() => prepareSourceReplacement({ task: clone(task), input, previousHeaders, checkpointDir: this._mediaDirectory(id), maxBytes: this.maxBytes, signal: AbortSignal.timeout(30000), externalValidator: require('../media/external.cjs').validateExternalReplacement }));
       this._ready();
       const updated = { ...task, url: prepared.url, status: 'paused', error: null, speed: 0, requiresHeaders: Object.keys(prepared.headers).length > 0 };
       if (prepared.checkpointSourceHash) updated.media = { ...task.media, checkpointSourceHash: prepared.checkpointSourceHash };
@@ -271,6 +361,8 @@ class DownloadManager extends EventEmitter {
     if (!['paused', 'failed'].includes(task.status)) return clone(task);
     if (await this._recoverPublished(task)) { await this._persist(); this._notify(); return clone(task); }
     if (task.requiresHeaders && !this.secrets.has(id)) throw Error('Request headers are not persisted. Reconnect the browser session for this download before resuming.');
+    if (task.requiresProxy && !this.proxy) throw Error('Proxy session is missing. Configure it again or explicitly allow direct transfer.');
+    if (task.requiresFtpCredentials && !this.ftpSecrets.has(id)) throw Error('FTP credentials are RAM-only; bind them again before resume');
     this.powerController.cancel('new-work'); task.status = 'queued'; task.queueHold = false; task.error = null; task.startAt = null;
     await this._persist(); this._notify(); this._pump(); return clone(task);
   }
@@ -281,6 +373,7 @@ class DownloadManager extends EventEmitter {
     await this._pause(id);
     if (task.status === 'completed') return clone(task);
     task.status = 'canceled';
+    this.ftpSecrets.delete(id);
     await fs.unlink(this._partial(id)).catch(error => { if (error.code !== 'ENOENT') throw error; });
     await this._clearCheckpoint(task);
     await this._persist(); this._notify(); return clone(task);
@@ -288,13 +381,15 @@ class DownloadManager extends EventEmitter {
   remove(id) { this.cancelPower(); return this._mutate(() => this._remove(id)); }
   async _remove(id) {
     this._ready(); if (!this.tasks.has(id)) return false;
-    await this._cancel(id); this.tasks.delete(id); this.secrets.delete(id); this.queueState.detach(id);
+    await this._cancel(id); this.tasks.delete(id); this.secrets.delete(id); this.ftpSecrets.delete(id); this.queueState.detach(id);
+    this.scanOperations.get(id)?.controller.abort();
     await this._persist(); this._notify(); return true;
   }
   async close() {
     if (this.closed) { await this.persistence; return; }
     this.closed = true; clearInterval(this.timer);
     this.powerController.close();
+    for (const operation of this.scanOperations.values()) operation.controller.abort();
     const closing = [...this.running.entries()];
     for (const [id, runtime] of closing) {
       const task = this._require(id);
@@ -307,7 +402,9 @@ class DownloadManager extends EventEmitter {
     await this.mediaCatalog.close();
     await this.mutations.catch(() => {});
     await Promise.all(closing.map(([, runtime]) => runtime.promise));
+    await Promise.allSettled([...this.scanOperations.values()].map(operation => operation.promise));
     if (this.initialized) await this._persist();
+    await this.proxy?.close(); this.ftpSecrets.clear();
   }
 
   _pump() {
@@ -329,7 +426,8 @@ class DownloadManager extends EventEmitter {
       if ([...this.running.values()].filter(runtime => runtime.host === host).length >= this.maxPerHost) continue;
       const runtime = { controller: new AbortController(), host, transferred: 0, began: Date.now(), lastEvent: 0, speedLimit: effectiveQueueRate(queue, task) };
       task.status = 'downloading'; this.running.set(task.id, runtime);
-      runtime.promise = this._run(task, runtime).finally(() => {
+      if (this.proxy) task.requiresProxy = true;
+        runtime.promise = this.network(() => this._run(task, runtime)).finally(() => {
         this.running.delete(task.id); this._notify();
         if (!this.closed && task.status === 'completed') void this._mutate(() => this.queueState.completed(task.id)).catch(() => { this.queueError = 'Cannot save queue completion'; this._notify(); });
         this._pump();
@@ -374,8 +472,9 @@ class DownloadManager extends EventEmitter {
     let handle;
     try {
       if (await this._recoverPublished(task)) { await this._persist(); return; }
-      const prepared = await this._prepare(task, runtime); handle = prepared.handle;
-      if (prepared.external) await this._transferExternal(task, runtime);
+      const prepared = task.mediaType === 'ftp' ? { ftp: true } : await this._prepare(task, runtime); handle = prepared.handle;
+      if (prepared.ftp) await this._transferFtp(task, runtime);
+      else if (prepared.external) await this._transferExternal(task, runtime);
       else if (prepared.playlist) await this._transferHls(task, prepared.playlist, handle, runtime);
       else await this._transfer(task, prepared.headers, handle, runtime);
       if (runtime.persistenceError) throw runtime.persistenceError;
@@ -384,17 +483,22 @@ class DownloadManager extends EventEmitter {
       if (handle) { await handle.sync(); await handle.close(); handle = null; }
       task.sha256 = await hashFile(this._partial(task.id));
       if (runtime.controller.signal.aborted || task.status !== 'downloading') return;
+      const scanner = this.preferences.value.scanner.enabled ? clone(this.preferences.value.scanner) : null;
+      if (scanner) task.postScan = { status: 'pending' };
       await this._persist();
       await publish(this._partial(task.id), task.path);
+      this.ftpSecrets.delete(task.id);
       await this._clearCheckpoint(task);
       task.totalBytes = task.downloadedBytes; task.status = 'completed'; task.error = null; task.speed = 0;
+      if (scanner) { task.postScan = { status: 'running' }; await this._persist(); this._notify(); task.postScan = await scanFile(task.path, scanner, { signal: runtime.controller.signal }).catch(() => ({ status: 'failed', error: 'Scan could not start' })); }
+      this.ftpSecrets.delete(task.id);
       await this._persist();
     } catch (error) {
       if (task.status === 'downloading') {
         task.status = 'failed'; task.error = this._safeError(error); task.speed = 0;
       }
       await this._persist().catch(persistError => { task.status = 'failed'; task.error = `Cannot save journal: ${persistError.code || 'storage error'}`; });
-    } finally { if (handle) await handle.close().catch(() => {}); }
+    } finally { if (handle) await handle.close().catch(() => {}); if (task.mediaType === 'ftp') task.activeConnections = 0; }
   }
 
   async _recoverPublished(task) {
@@ -402,7 +506,23 @@ class DownloadManager extends EventEmitter {
     await fs.unlink(this._partial(task.id)).catch(error => { if (error.code !== 'ENOENT') throw error; });
     await this._clearCheckpoint(task);
     task.status = 'completed'; task.totalBytes = task.downloadedBytes; task.error = null; task.speed = 0;
+    if (['pending', 'running'].includes(task.postScan?.status)) task.postScan = { status: 'failed', error: 'Scan interrupted; run it again explicitly' };
     return true;
+  }
+
+  async _transferFtp(task, runtime) {
+    if (this.proxy) throw Error('FTP through proxy is not supported; direct fallback is refused');
+    await preflightPublication(task.path);
+    let persistence = Promise.resolve();
+    try {
+      await downloadFtp({ url: task.url, partialPath: this._partial(task.id), startOffset: task.downloadedBytes, ...(task.ftpIdentity ? { expectedIdentity: task.ftpIdentity } : {}), credentials: this.ftpSecrets.get(task.id), signal: runtime.controller.signal, maxBytes: this.maxBytes, speedLimit: runtime.speedLimit,
+        onProgress: progress => {
+          task.ftpIdentity = clone(progress.identity); task.totalBytes = progress.totalBytes; task.downloadedBytes = progress.downloadedBytes;
+          task.segments = [{ index: 0, start: 0, end: progress.totalBytes - 1, received: progress.downloadedBytes }]; task.activeConnections = 1;
+          persistence = persistence.then(() => this._persist()).catch(error => { runtime.persistenceError = error; runtime.controller.abort(); });
+          if (Date.now() - runtime.lastEvent > 100) { runtime.lastEvent = Date.now(); this._notify(); }
+        } });
+    } finally { await persistence; task.activeConnections = 0; }
   }
 
   async _prepareHls(task, runtime) {
@@ -485,7 +605,7 @@ class DownloadManager extends EventEmitter {
     // Network diagnostics never include URL/header values or server response bodies.
     if (error.code) return `Download failed (${error.code})`;
     const message = String(error.message || 'Download failed');
-    return message.replace(/https?:\/\/\S+/g, '[URL]').slice(0, 300);
+    return message.replace(/(?:https?|ftps?):\/\/\S+/g, '[URL]').slice(0, 300);
   }
 
   async _segment(task, segment, headers, handle, runtime, signal = runtime.controller.signal) {

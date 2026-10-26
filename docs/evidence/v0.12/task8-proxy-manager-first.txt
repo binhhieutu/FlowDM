@@ -1,0 +1,10 @@
+✔ http proxy routes actual HTTP HLS and DASH without upstream auth at origin (3164.5576ms)
+✔ socks5 proxy routes actual HTTP HLS and DASH without upstream auth at origin (3074.1484ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6333.6078

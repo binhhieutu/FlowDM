@@ -1,0 +1,44 @@
+✖ HTTP strips private URL fragments on the wire without mutating caller URL objects (41.2809ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(!JSON.stringify(f.events).includes('private-fragment'))
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\proxy.test.cjs:37:625)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }
+
+✔ SOCKS5 strips private URL fragments on the wire without mutating caller URL objects (10.3449ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 118.2126
+
+✖ failing tests:
+
+test at tests\core\proxy.test.cjs:37:33
+✖ HTTP strips private URL fragments on the wire without mutating caller URL objects (41.2809ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(!JSON.stringify(f.events).includes('private-fragment'))
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\proxy.test.cjs:37:625)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }

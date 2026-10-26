@@ -1,0 +1,20 @@
+[
+  {
+    "test": "credential-rebind",
+    "exit": 0,
+    "proxy": false,
+    "asarSha256": "9cebfe0a9d1d39e0b03aaeb97f5a1098e5a2844e7507d108e8b0deeabc37a702"
+  },
+  {
+    "test": "browser",
+    "exit": 0,
+    "proxy": true,
+    "asarSha256": "9cebfe0a9d1d39e0b03aaeb97f5a1098e5a2844e7507d108e8b0deeabc37a702"
+  },
+  {
+    "test": "firefox",
+    "exit": 0,
+    "proxy": false,
+    "asarSha256": "9cebfe0a9d1d39e0b03aaeb97f5a1098e5a2844e7507d108e8b0deeabc37a702"
+  }
+]

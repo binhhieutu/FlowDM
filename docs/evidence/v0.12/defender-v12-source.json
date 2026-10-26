@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-26T04:45:16.829Z",
+  "version": "0.12.0",
+  "scanner": "Microsoft Defender MpCmdRun",
+  "customFileOnly": true,
+  "disableRemediation": true,
+  "fileUnchanged": true,
+  "result": {
+    "status": "passed",
+    "at": "2026-10-26T04:45:16.828Z"
+  },
+  "exitCode": 0,
+  "systemCode": null,
+  "scannerVersion": "4.18.26090.9-0"
+}

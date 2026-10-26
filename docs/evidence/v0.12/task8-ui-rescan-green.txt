@@ -1,0 +1,10 @@
+✔ real desktop categories scanner duplicate and opt-in clipboard workflows (3992.2832ms)
+✔ real desktop FTP credentials stay in RAM and rebind after restart without replay (2492.0218ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6929.3445

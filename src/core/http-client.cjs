@@ -4,14 +4,15 @@ const https = require('node:https');
 const { setTimeout: delay } = require('node:timers/promises');
 const { checkedUrl } = require('./policy.cjs');
 const { isStrongEtag, identityEncoding } = require('./http-resume.cjs');
+const { requestViaProxy } = require('./proxy.cjs');
 
 async function request(url, headers, signal, redirects = 0) {
   const parsed = checkedUrl(url);
   const response = await new Promise((resolve, reject) => {
-    const transport = parsed.protocol === 'https:' ? https : http;
-    const req = transport.get(parsed, { headers: { ...headers, 'accept-encoding': 'identity' }, signal }, resolve);
+    const req = requestViaProxy(parsed, { headers: { ...headers, 'accept-encoding': 'identity' }, signal }, resolve);
     req.setTimeout(15000, () => req.destroy(Error('Network timeout')));
     req.on('error', reject);
+    req.end();
   });
   // A response may be destroyed before its caller starts consuming it.
   response.on('error', () => {});

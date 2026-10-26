@@ -1,0 +1,22 @@
+[
+  {
+    "platform": "win-unpacked",
+    "filesVerified": 68,
+    "ftpDependency": {
+      "version": "6.2.3",
+      "filesVerified": 16,
+      "license": "MIT"
+    },
+    "asarSha256": "9cebfe0a9d1d39e0b03aaeb97f5a1098e5a2844e7507d108e8b0deeabc37a702"
+  },
+  {
+    "platform": "linux-unpacked",
+    "filesVerified": 68,
+    "ftpDependency": {
+      "version": "6.2.3",
+      "filesVerified": 16,
+      "license": "MIT"
+    },
+    "asarSha256": "9cebfe0a9d1d39e0b03aaeb97f5a1098e5a2844e7507d108e8b0deeabc37a702"
+  }
+]

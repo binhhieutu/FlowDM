@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, shell, Menu, Notification, powerMonitor } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell, Menu, Notification, powerMonitor, clipboard } = require('electron');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const { DownloadManager } = require('./core/download-manager.cjs');
@@ -10,6 +10,7 @@ const { mediaToolStatus } = require('./tools/media-tools.cjs');
 const { SystemPowerAdapter } = require('./core/power-actions.cjs');
 const { BatchService, selectedUrls } = require('./core/batch-service.cjs');
 const { randomUUID } = require('node:crypto');
+const { ClipboardWatcher } = require('./core/clipboard-policy.cjs');
 
 const dataDir = process.env.FLOWDM_DATA_DIR || path.join(app.getPath('userData'), 'state');
 if (process.env.FLOWDM_DATA_DIR) app.setPath('userData', path.dirname(dataDir));
@@ -17,6 +18,7 @@ const downloadDir = process.env.FLOWDM_DOWNLOAD_DIR || path.join(app.getPath('do
 const uiFile = path.join(__dirname, 'ui', 'index.html');
 let manager; let win; let bridge; let browserSetup; let credentialRebind; let closing = false; let bridgeError = null;
 let batches; let stagedBatch = null;
+let clipboardWatcher;
 
 if (!app.requestSingleInstanceLock()) app.quit();
 else {
@@ -28,11 +30,15 @@ else {
     } });
     manager = new DownloadManager({ dataDir, downloadDir, maxConcurrent: 3, powerAdapter });
     await manager.init();
+    clipboardWatcher = new ClipboardWatcher({ readText: () => clipboard.readText(), tasks: () => manager.list(), onSuggest: value => { if (win && !win.isDestroyed()) win.webContents.send('flow:clipboardSuggestion', value); } });
+    clipboardWatcher.setEnabled(manager.preferenceInfo().settings.clipboard.enabled);
+    manager.on('preferences', value => { clipboardWatcher.setEnabled(value.settings.clipboard.enabled); if (win && !win.isDestroyed()) win.webContents.send('flow:preferences', value); });
     batches = new BatchService(manager);
     batches.on('change', value => { if (win && !win.isDestroyed()) win.webContents.send('flow:grabChanged', value); });
     credentialRebind = createCredentialRebind(manager);
     browserSetup = createBrowserSetup({ appDir: app.getAppPath(), dataDir, userDataDir: app.getPath('userData'), executablePath: process.execPath });
-    bridge = await createBridge({ dataDir, onAdd: createBrowserAdmission(manager),
+    const admission = createBrowserAdmission(manager);
+    bridge = await createBridge({ dataDir, onAdd: input => manager.network(() => admission(input)),
       onPreviewBatch: input => {
         const urls = selectedUrls(input.urls); manager.cancelPower();
         const previewId = randomUUID(); stagedBatch = { text: urls.join('\n') };
@@ -41,7 +47,7 @@ else {
         win.show(); win.focus(); return { previewId, count: urls.length };
       },
       onCredentialRequests: input => ({ requests: credentialRebind.requests(input.origin) }),
-      onRebindCredentials: (input, context) => credentialRebind.prepare(input, context),
+      onRebindCredentials: (input, context) => manager.network(() => credentialRebind.prepare(input, context)),
       onCommitCredentials: (input, context) => credentialRebind.commit(input, context),
       onCancelCredentials: input => credentialRebind.cancel(input)
     }).catch(error => { bridgeError = error.message; return null; });
@@ -83,9 +89,15 @@ function installHandlers() {
   handle('browserConnect', input => browserSetup.connect(input || {}));
   handle('browserDisconnect', browser => browserSetup.disconnect(browser));
   handle('list', () => manager.list());
+  handle('preferences', () => manager.preferenceInfo());
+  handle('rescan', input => { if (!input || Object.keys(input).join(',') !== 'id' || typeof input.id !== 'string') throw Error('Invalid scan request'); return manager.rescan(input.id); });
+  handle('configure', input => { if (Object.hasOwn(input || {}, 'proxy') && batches.listGrabs()[0]?.status === 'running') throw Error('Stop Site Grabber before changing proxy'); return manager.configure(input); });
+  handle('bindFtp', input => { if (!input || Object.keys(input).some(k => !['id', 'credentials'].includes(k)) || typeof input.id !== 'string') throw Error('Invalid FTP binding'); return manager.bindFtpCredentials(input.id, input.credentials); });
+  handle('allowDirect', input => { if (!input || Object.keys(input).join(',') !== 'id' || typeof input.id !== 'string') throw Error('Invalid route change'); return manager.allowDirect(input.id); });
+  handle('chooseScanner', async () => { const result = await dialog.showOpenDialog(win, { title: 'Chọn executable antivirus', properties: ['openFile'], ...(process.platform === 'win32' ? { filters: [{ name: 'Executable', extensions: ['exe'] }] } : {}) }); return result.canceled ? null : result.filePaths[0]; });
   handle('previewBatch', input => batches.previewBatch(input));
   handle('submitBatch', input => batches.submitBatch(input));
-  handle('startGrab', input => { manager.cancelPower(); return batches.startGrab(input); });
+  handle('startGrab', input => { manager.cancelPower(); return manager.network(() => batches.startGrab(input)); });
   handle('cancelGrab', input => batches.cancelGrab(input));
   handle('listGrabs', () => batches.listGrabs());
   const queueInput = (input, keys) => {
@@ -107,9 +119,10 @@ function installHandlers() {
   });
   handle('add', input => {
     if (!input || typeof input !== 'object' || Array.isArray(input)) throw new Error('Thông tin tải không hợp lệ.');
-    const allowed = ['url', 'filename', 'connections', 'directory', 'startAt', 'speedLimit', 'mediaType', 'selection', 'catalogId', 'queueId'];
+    const allowed = ['url', 'filename', 'connections', 'directory', 'startAt', 'speedLimit', 'mediaType', 'selection', 'catalogId', 'queueId', 'ftpCredentials', 'allowDuplicate'];
     if (Object.keys(input).some(key => !allowed.includes(key))) throw new Error('Tham số không được hỗ trợ.');
-    return manager.add(input);
+    if (input.allowDuplicate !== undefined && typeof input.allowDuplicate !== 'boolean') throw Error('Invalid duplicate consent');
+    return manager.add({ ...input, checkDuplicate: true });
   });
   handle('action', async input => {
     if (!input || !['pause', 'resume', 'cancel', 'remove', 'reveal'].includes(input.action) || typeof input.id !== 'string') throw new Error('Thao tác không hợp lệ.');
@@ -123,7 +136,7 @@ function installHandlers() {
   });
   handle('refreshSource', input => {
     if (!input || typeof input !== 'object' || Array.isArray(input) || typeof input.id !== 'string' || typeof input.url !== 'string' || Object.keys(input).some(key => !['id', 'url'].includes(key))) throw Error('Thông tin cập nhật liên kết không hợp lệ.');
-    return manager.refreshSource(input.id, { url: input.url }).catch(error => { throw Error(manager._safeError(error)); });
+    return manager.network(() => manager.refreshSource(input.id, { url: input.url })).catch(error => { throw Error(manager._safeError(error)); });
   });
   handle('setConnections', input => {
     if (!input || typeof input !== 'object' || Array.isArray(input) || typeof input.id !== 'string' || Object.keys(input).some(key => !['id', 'connections'].includes(key))) throw Error('Thông tin số kết nối không hợp lệ.');
@@ -145,5 +158,6 @@ app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(
 app.on('before-quit', event => {
   if (closing || !manager) return;
   event.preventDefault(); closing = true;
+  clipboardWatcher?.close();
   Promise.allSettled([batches?.close(), credentialRebind?.close(), manager.close(), bridge?.close(), browserSetup?.waitForIdle()]).then(() => app.quit());
 });

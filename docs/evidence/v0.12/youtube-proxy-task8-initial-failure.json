@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-26T04:36:14.495Z",
+  "reports": [
+    {
+      "status": "fixture-process-crash",
+      "bytes": 9885992,
+      "wholeFileDecoded": false,
+      "errorCategory": "unhandled-fixture-socket-write-ECONNABORTED",
+      "noPassClaim": true
+    }
+  ],
+  "privateTemporaryOutputsRemoved": true
+}

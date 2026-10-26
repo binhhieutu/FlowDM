@@ -9,6 +9,7 @@ const { spawnSync } = require('node:child_process');
 const { chromium, _electron } = require('playwright');
 const { createBrowserSetup } = require('../../src/browser/setup.cjs');
 const { createRegistration } = require('../../src/browser/registration.cjs');
+const { createProxyFixture } = require('../helpers/proxy-fixture.cjs');
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function until(check, description, timeout = 25000) {
   const end = Date.now() + timeout; let last;
@@ -24,8 +25,10 @@ test('real Chromium extension auto capture, video/HLS, cookie consent and host-d
   const body = crypto.randomBytes(2 * 1024 * 1024); let desktop; let context; let popup;
   const registrations = createRegistration(); const before = {};
   const browsers = process.platform === 'win32' ? ['chrome', 'testing', 'chromium'] : ['chromium'];
+  let proxyFixture; let proxyAuthAtOrigin = false;
   const events = []; const tasks = async () => (await desktop.page.evaluate(() => window.flow.list())).data;
   const server = http.createServer(async (req, res) => {
+    proxyAuthAtOrigin ||= !!req.headers['proxy-authorization'];
     const url = new URL(req.url, 'http://localhost');
     if (url.pathname === '/') { res.setHeader('Content-Type', 'text/html'); res.end('<!doctype html><title>FlowDM browser fixture</title><h1>Browser integration fixture</h1><a id="file" href="/auto.bin" download>Download file</a><a id="fallback" href="/fallback.bin" download>Fallback file</a><a id="auth" href="/auth.bin" download>Authenticated file</a><div id="media"></div>'); return; }
     if (url.pathname.endsWith('.bin')) {
@@ -76,8 +79,10 @@ test('real Chromium extension auto capture, video/HLS, cookie consent and host-d
     const executablePath = process.env.FLOWDM_EXECUTABLE;
     const app = await _electron.launch({ ...(executablePath ? { executablePath } : {}), args: executablePath ? [] : [path.resolve('.')], env: { ...env, FLOWDM_DATA_DIR: stateDir, FLOWDM_DOWNLOAD_DIR: output } });
     const page = await app.firstWindow(); page.setDefaultTimeout(15000); await page.getByRole('button', { name: 'Thêm liên kết', exact: true }).waitFor();
+    if (proxyFixture) { const configured = await page.evaluate(proxy => window.flow.configure({ proxy }), proxyFixture.config); assert.equal(configured.ok, true, configured.error); }
     return { app, page };
   }
+  if (process.env.FLOWDM_TEST_PROXY === '1') proxyFixture = await createProxyFixture(t, { requireAuth: true });
   desktop = await openDesktop();
   context = await chromium.launchPersistentContext(profile, { channel: 'chromium', ...(process.env.FLOWDM_BROWSER_EXECUTABLE ? { executablePath: process.env.FLOWDM_BROWSER_EXECUTABLE } : {}), headless: true, acceptDownloads: true, downloadsPath: path.join(root, 'browser-files'), args: [`--disable-extensions-except=${extension}`, `--load-extension=${extension}`] });
   context.setDefaultTimeout(15000);
@@ -238,5 +243,6 @@ test('real Chromium extension auto capture, video/HLS, cookie consent and host-d
   assert.equal(await fallback.failure(), null); assert.deepEqual(await fs.readFile(await fallback.path()), body);
   await fs.mkdir('test-results', { recursive: true }); await page.screenshot({ path: 'test-results/browser-video-v2.png' });
   const report = { at: new Date().toISOString(), platform: process.platform, extensionId, browser: context.browser().version(), nativeMessaging: true, automaticCapture: true, disabledFallback: true, hostDownFallback: true, cookieConsent: true, syntheticClickBlocked: true, hlsTsFmp4ByteExact: true, decoder: 'ffmpeg', fixturesPregrantCookieApi: true, events };
+  report.proxy = proxyFixture ? { enabled: true, authenticated: true, requests: proxyFixture.events.filter(e => e.type === 'http-forward' || e.type === 'http-connect').length, authAtOrigin: proxyAuthAtOrigin } : null; if (proxyFixture) { assert.ok(report.proxy.requests > 0); assert.equal(proxyAuthAtOrigin, false); }
   await fs.writeFile('test-results/browser-v2.json', JSON.stringify(report, null, 2));
 });

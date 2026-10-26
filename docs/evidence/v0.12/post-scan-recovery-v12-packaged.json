@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-26T05:01:17.574Z",
+  "version": "0.12.0",
+  "packaged": true,
+  "id": "fd737a1e-7713-405d-98c9-f70ec881dd51",
+  "bytes": 65536,
+  "sha256": "c516e69b05eff1a54017723c3489734b91b585c2a248efbcf9cacda5ae3603bc",
+  "persistedBeforeCrash": "running",
+  "recoveredAfterCrash": "failed",
+  "explicitRescan": "passed",
+  "completedFilePreserved": true,
+  "failedFilterVerified": true,
+  "finiteBenignScanner": true,
+  "scannerExitMode": "terminated with owned Electron app",
+  "termination": "owned app main process only, SIGKILL/TerminateProcess; not power loss"
+}

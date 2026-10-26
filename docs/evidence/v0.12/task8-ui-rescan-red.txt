@@ -1,0 +1,31 @@
+✖ real desktop categories scanner duplicate and opt-in clipboard workflows (4433.6259ms)
+  locator.click: Timeout 3000ms exceeded.
+  Call log:
+  [2m  - waiting for locator('[data-task="30350f91-0316-476a-b032-55a12f9b9a25"]').getByRole('button', { name: 'Quét lại', exact: true })[22m
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\e2e\settings.test.cjs:3:3321) {
+    name: 'TimeoutError',
+    log: [ `  - waiting for locator('[data-task="30350f91-0316-476a-b032-55a12f9b9a25"]').getByRole('button', { name: 'Quét lại', exact: true })` ]
+  }
+
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4996.5936
+
+✖ failing tests:
+
+test at tests\e2e\settings.test.cjs:3:1
+✖ real desktop categories scanner duplicate and opt-in clipboard workflows (4433.6259ms)
+  locator.click: Timeout 3000ms exceeded.
+  Call log:
+  [2m  - waiting for locator('[data-task="30350f91-0316-476a-b032-55a12f9b9a25"]').getByRole('button', { name: 'Quét lại', exact: true })[22m
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\e2e\settings.test.cjs:3:3321) {
+    name: 'TimeoutError',
+    log: [ `  - waiting for locator('[data-task="30350f91-0316-476a-b032-55a12f9b9a25"]').getByRole('button', { name: 'Quét lại', exact: true })` ]
+  }

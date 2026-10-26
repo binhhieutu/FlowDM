@@ -485,7 +485,7 @@ test('published recovery rejects size mismatches and non-file destinations', asy
   assert.equal(await recoverPublished({ ...task, totalBytes: null }), true);
 });
 
-test('migrates version 1 direct queued and paused tasks unchanged into version 7 journal', async t => {
+test('migrates version 1 direct queued and paused tasks unchanged into version 8 journal', async t => {
   const { manager, root, url } = await fixture(t);
   await manager.add({ url, startAt: Date.now() + 60000 });
   const paused = await manager.add({ url, filename: 'paused.bin', startAt: Date.now() + 60000 });
@@ -499,7 +499,7 @@ test('migrates version 1 direct queued and paused tasks unchanged into version 7
   try {
     await restored.init();
     const migrated = JSON.parse(await fs.readFile(journal, 'utf8'));
-    assert.equal(migrated.version, 7);
+    assert.equal(migrated.version, 8);
     assert.deepEqual(migrated.tasks, legacy.tasks);
   } finally { await restored.close(); }
 });

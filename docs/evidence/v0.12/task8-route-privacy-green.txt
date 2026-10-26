@@ -1,0 +1,15 @@
+✔ duplicates preserve meaningful queries and exact format selection (1.4468ms)
+✔ clipboard offers only valid URLs without leaking tokens in display or auto download (0.442ms)
+✔ clipboard watcher is opt-in, keeps no text history and suppresses unchanged clipboard (0.7277ms)
+✔ duplicate keys support FTP and infer HLS while clipboard remains HTTP-only (0.1796ms)
+✔ clipboard banner never exposes path-carried tokens (0.2113ms)
+✔ http proxy routes actual HTTP HLS and DASH without upstream auth at origin (3171.8096ms)
+✔ socks5 proxy routes actual HTTP HLS and DASH without upstream auth at origin (2975.4343ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6251.3821

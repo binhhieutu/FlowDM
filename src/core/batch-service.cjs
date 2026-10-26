@@ -34,7 +34,7 @@ class BatchService extends EventEmitter {
     try {
       for (const [index, url] of urls.entries()) {
         if (this.closed) { errors.push({ index, message: 'Batch service closed' }); break; }
-        try { created.push(await this.manager.add({ url, queueId, connections, ...(input.directory === undefined ? {} : { directory: input.directory }) })); }
+        try { created.push(await this.manager.add({ url, queueId, connections, checkDuplicate: true, ...(input.directory === undefined ? {} : { directory: input.directory }) })); }
         catch (error) { errors.push({ index, message: safeError(error) }); }
       }
       return { created, errors };

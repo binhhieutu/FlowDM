@@ -1,0 +1,79 @@
+✖ scan intent is durable before publication and interrupted published file can be rescanned (96.9846ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  false !== true
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\task8-integration.test.cjs:8:823)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual'
+  }
+
+✖ successful explicit rescan reconsiders completion and changed file cannot pass (125.996ms)
+  TypeError [Error]: f.manager.rescan is not a function
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\task8-integration.test.cjs:9:799)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+✖ strict schema loading rejects legacy FTP and mismatched protocol/type (10.7001ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\task8-integration.test.cjs:10:200)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: undefined,
+    operator: 'throws'
+  }
+
+ℹ tests 3
+ℹ suites 0
+ℹ pass 0
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 332.3814
+
+✖ failing tests:
+
+test at tests\core\task8-integration.test.cjs:8:1
+✖ scan intent is durable before publication and interrupted published file can be rescanned (96.9846ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  false !== true
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\task8-integration.test.cjs:8:823)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual'
+  }
+
+test at tests\core\task8-integration.test.cjs:9:1
+✖ successful explicit rescan reconsiders completion and changed file cannot pass (125.996ms)
+  TypeError [Error]: f.manager.rescan is not a function
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\task8-integration.test.cjs:9:799)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+test at tests\core\task8-integration.test.cjs:10:1
+✖ strict schema loading rejects legacy FTP and mismatched protocol/type (10.7001ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\task8-integration.test.cjs:10:200)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: undefined,
+    operator: 'throws'
+  }

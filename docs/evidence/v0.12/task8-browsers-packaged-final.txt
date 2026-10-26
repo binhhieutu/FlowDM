@@ -1,0 +1,32 @@
+✔ real Chromium rebinds rotated HTTP/HLS cookies after app restart and resumes exact retained data (33076.1672ms)
+ℹ {"rows":[{"kind":"direct","taskId":"4496542b-9f96-4bd5-8ccc-cff4aa0ac7f0","pausedBytes":98304,"restoredBytes":98304,"connections":1,"bytes":2097152,"sha256":"411e416f231a38296893d772490a30eaf07fcb6026a714934db87e95a30544db","sameTaskPreserved":true,"completedDataNotRequestedAgain":true,"rotatedCookieAccepted":true,"wholeFileDecoded":true},{"kind":"hls","taskId":"0c0b43c5-42fe-491e-a0c5-28f1812a4c4c","pausedBytes":15416,"restoredBytes":15416,"connections":1,"bytes":47188,"sha256":"8fd49049fe73583d0e179541f59b57090178a412cd8676250cabbcb6f0bfbc4e","sameTaskPreserved":true,"completedDataNotRequestedAgain":true,"rotatedCookieAccepted":true,"wholeFileDecoded":true}],"hostDownFallback":true}
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 33418.6609
+✔ real Chromium extension auto capture, video/HLS, cookie consent and host-down fallback (26022.8503ms)
+ℹ Loaded real extension lmdljegbhacmnknfemcoimmkijkbedkh
+ℹ Native messaging launches the generated host successfully
+ℹ Auto capture completed exact bytes and original browser download was canceled after ACK
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 26428.7304
+✔ real Firefox captures authenticated HTTP/HLS, rebinds after app restart and restores native registration (29099.4482ms)
+ℹ {"at":"2026-10-26T05:02:04.960Z","packaged":true,"rows":[{"type":"direct","transitions":["capture","pause","close","relaunch","rebind","resume"],"pausedBytes":65536,"restoredBytes":65536,"bytes":2097152,"sha256":"411e416f231a38296893d772490a30eaf07fcb6026a714934db87e95a30544db","connections":1,"committedReplay":false,"wholeFileDecoded":true},{"type":"hls","transitions":["capture","pause","close","relaunch","rebind","resume"],"pausedBytes":15416,"restoredBytes":15416,"bytes":47188,"sha256":"8fd49049fe73583d0e179541f59b57090178a412cd8676250cabbcb6f0bfbc4e","connections":1,"committedReplay":false,"wholeFileDecoded":true}],"firefoxBrowserHandoff":"ack-before-cancel","fixturesPregrantCookieApi":true,"scope":"private Firefox profile, temporary unsigned addon, authenticated local actual video fixtures","version":"0.12.0","firefoxVersion":"149.0.2","pageLinks":{"uncheckedByDefault":true,"selected":1,"desktopPreviewOnly":true,"jobsCreated":0},"automaticBrowserDownloadCanceled":true,"nativeMessaging":true,"cookieConsent":true,"hostDownFallback":true,"status":"passed"}
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 29562.323

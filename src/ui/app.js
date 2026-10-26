@@ -23,7 +23,7 @@ function taskButton(task, op, name, className = '') {
   button.addEventListener('click', event => { event.stopPropagation(); action(task.id, op); }); return button;
 }
 function matches(task) {
-  const groups = { all: true, active: ['downloading', 'queued'].includes(task.status), paused: task.status === 'paused', completed: task.status === 'completed', failed: ['failed', 'canceled'].includes(task.status) };
+  const groups = { all: true, active: ['downloading', 'queued'].includes(task.status), paused: task.status === 'paused', completed: task.status === 'completed', failed: (['failed', 'canceled'].includes(task.status) || task.postScan?.status === 'failed') };
   const query = $('search').value.toLocaleLowerCase();
   return groups[filter] && (!query || `${task.filename} ${task.url}`.toLocaleLowerCase().includes(query));
 }
@@ -32,7 +32,7 @@ function render() {
   $('count-active').textContent = tasks.filter(t => ['downloading', 'queued'].includes(t.status)).length;
   $('count-paused').textContent = tasks.filter(t => t.status === 'paused').length;
   $('count-completed').textContent = tasks.filter(t => t.status === 'completed').length;
-  $('count-failed').textContent = tasks.filter(t => ['failed', 'canceled'].includes(t.status)).length;
+  $('count-failed').textContent = tasks.filter(t => ['failed', 'canceled'].includes(t.status) || t.postScan?.status === 'failed').length;
   $('transfer-speed').textContent = `${bytes(tasks.reduce((sum, t) => sum + (t.status === 'downloading' ? t.speed || 0 : 0), 0))}/s`;
   const active = tasks.filter(t => t.status === 'downloading').length;
   const queued = tasks.filter(t => t.status === 'queued').length;
@@ -49,7 +49,10 @@ function render() {
     info.append(element('div', 'file-icon', ext));
     const copy = element('div', 'file-copy'); copy.append(element('span', 'file-name', task.filename));
     let host = ''; try { host = new URL(task.url).hostname; } catch { host = 'Địa chỉ không hợp lệ'; }
-    copy.append(element('span', 'file-host', host)); info.append(copy);
+    copy.append(element('span', 'file-host', host));
+    if (task.category) copy.append(element('small', 'scan-status', 'Nhóm: ' + task.category));
+    if (task.postScan) copy.append(element('small', 'scan-status ' + task.postScan.status, ({ running: 'Đang quét sau tải', pending: 'Chờ quét', passed: 'Quét hoàn tất', failed: 'Quét lỗi — giữ nguyên tệp', skipped: 'Không quét' })[task.postScan.status] || 'Trạng thái quét chưa rõ'));
+    info.append(copy);
     const progress = element('div', 'task-progress'); const meta = element('div', 'progress-meta');
     const pct = task.totalBytes ? Math.min(100, task.downloadedBytes / task.totalBytes * 100) : task.status === 'completed' ? 100 : 0;
     meta.append(element('span', `status ${task.status}`, labels[task.status] || task.status), element('span', '', task.totalBytes || task.status === 'completed' ? `${pct.toFixed(0)}%` : '—'));
@@ -63,7 +66,7 @@ function render() {
     if (['paused', 'failed'].includes(task.status)) {
       const update = element('button', '', 'Cập nhật liên kết'); update.type = 'button';
       update.addEventListener('click', event => { event.stopPropagation(); refreshingId = task.id; $('refresh-url').value = ''; $('refresh-error').hidden = true; $('refresh-dialog').showModal(); $('refresh-url').focus(); });
-      buttons.append(update);
+      if (task.mediaType !== 'ftp') buttons.append(update);
       if (['direct', 'hls'].includes(task.mediaType || 'direct')) {
         const reconnect = element('button', '', 'Kết nối lại từ trình duyệt'); reconnect.type = 'button';
         reconnect.addEventListener('click', async event => {
@@ -81,6 +84,7 @@ function render() {
     if (task.status === 'completed') buttons.append(taskButton(task, 'reveal', 'Mở vị trí'));
     if (['downloading', 'queued', 'paused'].includes(task.status)) buttons.append(taskButton(task, 'cancel', 'Hủy', 'danger'));
     else buttons.append(taskButton(task, 'remove', 'Xóa khỏi danh sách', 'remove'));
+    window.settingsUI?.decorateTask(buttons, task);
     row.append(info, progress, buttons); window.queueUI?.decorateTask(row, task); return row;
   }));
   const task = tasks.find(t => t.id === selected);
@@ -89,20 +93,20 @@ function render() {
     $('detail-name').textContent = task.filename; $('detail-state').textContent = labels[task.status];
     const streamed = ['hls', 'dash', 'youtube'].includes(task.mediaType); $('detail-path').textContent = task.path; $('detail-connections').textContent = streamed ? `${task.connections} kết nối tối đa · ${task.media?.completedSegments || 0}/${task.media?.segmentCount || '?'} đoạn ${task.mediaType.toUpperCase()}` : `${task.activeConnections || 0}/${task.connections} kết nối · ${task.segments.length} vùng`;
     if (connectionTask !== task.id) { connectionTask = task.id; connectionDraft = null; $('connection-change-error').hidden = true; }
-    $('connection-controls').hidden = !['queued', 'downloading', 'paused', 'failed'].includes(task.status);
+    $('connection-controls').hidden = task.mediaType === 'ftp' || !['queued', 'downloading', 'paused', 'failed'].includes(task.status);
     const count = String(connectionDraft ?? task.connections);
     if (![...$('live-connections').options].some(option => option.value === count)) $('live-connections').add(new Option(`${count} kết nối`, count));
     const unavailable = streamed && task.status === 'downloading' && task.media?.canResize === false;
     $('live-connections').value = count; $('live-connections').disabled = changingConnections; $('apply-connections').disabled = changingConnections || unavailable;
     $('connection-hint').textContent = streamed ? task.mediaType === 'hls' ? 'Đổi số kết nối tại ranh giới đoạn, giữ lại các đoạn đã tải.' : unavailable ? 'Đang chuẩn bị hoặc định dạng hiện tại chưa hỗ trợ đổi kết nối an toàn; tác vụ vẫn tiếp tục.' : 'Đổi kết nối bằng tiếp tục từ checkpoint; giữ các đoạn hoàn tất.' : task.ranges ? 'Giữ tiến độ khi đổi số kết nối; tự chia phần còn thiếu.' : 'Số kết nối thực tế phụ thuộc máy chủ; có thể chỉ dùng một kết nối.';
     $('detail-hash').textContent = task.sha256 || 'Được tính khi tải hoàn tất';
-    $('detail-error').hidden = !task.error && !streamed; $('detail-error').textContent = task.error || (streamed ? `Giữ lại các đoạn đã tải khi tạm dừng hoặc đóng app. Đã dùng lại ${task.media?.reusedResources || 0} đoạn; đoạn còn dở có thể tải lại riêng.` : '');
+    $('detail-error').hidden = !task.error && !streamed && task.postScan?.status !== 'failed'; $('detail-error').textContent = task.error || (task.postScan?.status === 'failed' ? 'Tải đã hoàn tất; quét sau tải thất bại. Tệp được giữ nguyên. ' + (task.postScan.error || '') : '') || (streamed ? `Giữ lại các đoạn đã tải khi tạm dừng hoặc đóng app. Đã dùng lại ${task.media?.reusedResources || 0} đoạn; đoạn còn dở có thể tải lại riêng.` : '');
     $('segments').replaceChildren(...(task.segments || []).map((segment, index) => {
       const meter = element('progress', 'meter'); meter.max = Math.max(1, segment.end - segment.start + 1); meter.value = segment.received || 0; meter.title = `Vùng ${index + 1}: ${bytes(segment.received)}`; return meter;
     }));
   }
 }
-function showAdd() { window.mediaChoice?.reset(); $('form-error').hidden = true; $('directory').value = defaultDirectory; $('add-dialog').showModal(); $('url').focus(); }
+function showAdd() { window.mediaChoice?.reset(); $('form-error').hidden = true; $('directory').value = defaultDirectory; $('directory').dataset.explicit = 'false'; if ($('allow-duplicate')) $('allow-duplicate').checked = false; if ($('ftp-user')) $('ftp-user').value = ''; if ($('ftp-password')) $('ftp-password').value = ''; window.settingsUI?.ftpHint(); $('add-dialog').showModal(); $('url').focus(); }
 $('live-connections').addEventListener('change', () => { connectionDraft = Number($('live-connections').value); });
 $('apply-connections').addEventListener('click', async () => {
   if (changingConnections) return;
@@ -128,7 +132,7 @@ $('refresh-form').addEventListener('submit', async event => {
 });
 $('add-button').addEventListener('click', showAdd); $('empty-add').addEventListener('click', showAdd);
 for (const id of ['close-dialog', 'cancel-dialog']) $(id).addEventListener('click', () => $('add-dialog').close());
-$('choose-directory').addEventListener('click', async () => { const result = await window.flow.chooseDirectory(); if (result.ok && result.data) $('directory').value = result.data; else if (!result.ok) toast(result.error); });
+$('choose-directory').addEventListener('click', async () => { const result = await window.flow.chooseDirectory(); if (result.ok && result.data) { $('directory').value = result.data; $('directory').dataset.explicit = 'true'; } else if (!result.ok) toast(result.error); });
 $('open-folder').addEventListener('click', async () => { const result = await window.flow.openFolder(); if (!result.ok) toast(result.error); });
 $('search').addEventListener('input', render);
 for (const button of document.querySelectorAll('[data-filter]')) button.addEventListener('click', () => {
@@ -146,7 +150,9 @@ $('add-form').addEventListener('submit', async event => {
     const input = { url: $('url').value.trim(), queueId: $('add-queue')?.value || 'default', connections: Number($('connections').value), speedLimit: Number($('speed-limit').value) * 1024 };
     if ($('media-type').value !== 'auto') input.mediaType = $('media-type').value;
     if ($('filename').value.trim()) input.filename = $('filename').value.trim();
-    if ($('directory').value) input.directory = $('directory').value;
+    if ($('directory').value && (!window.downloadPreferences?.settings.categories.enabled || $('directory').dataset.explicit === 'true')) input.directory = $('directory').value;
+    if ($('allow-duplicate')?.checked) input.allowDuplicate = true;
+    if (/^ftps?:/i.test(input.url) && $('ftp-user')?.value) input.ftpCredentials = { user: $('ftp-user').value, password: $('ftp-password').value };
     if ($('start-at').value) input.startAt = new Date($('start-at').value).toISOString();
     const media = window.mediaChoice?.optionsForUrl(input.url) || {};
     let result;
@@ -159,7 +165,7 @@ $('add-form').addEventListener('submit', async event => {
     } else result = await window.flow.add({ ...input, ...media });
     if (!result.ok) throw new Error(result.error);
     selected = result.data.id; filter = 'all'; document.querySelector('[data-filter="all"]').click();
-    $('add-dialog').close(); $('url').value = ''; $('filename').value = ''; $('start-at').value = ''; await refresh();
+    $('add-dialog').close(); if ($('ftp-password')) $('ftp-password').value = ''; $('url').value = ''; $('filename').value = ''; $('start-at').value = ''; await refresh();
   } catch (error) { $('form-error').textContent = error.message; $('form-error').hidden = false; }
   finally { delete $('add-form').dataset.busy; $('submit-download').disabled = false; }
 });

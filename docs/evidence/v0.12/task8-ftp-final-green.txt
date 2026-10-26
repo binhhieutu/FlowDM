@@ -1,0 +1,18 @@
+✔ FTP passive Unicode listing, SIZE/MDTM and actual download preserve exact bytes (295.6004ms)
+✔ FTP pause retains bytes and REST resumes only the committed local offset (278.7296ms)
+✔ FTP changed or missing resume identity is refused without modifying partial bytes (10.3674ms)
+✔ explicit FTPS validates certificate on control and passive data channels (410.2492ms)
+✔ FTP validates boundaries before network, credentials stay RAM and errors are redacted (5.1504ms)
+✔ FTP size limits and existing destination/offset mismatches preserve local data (12.9451ms)
+✔ FTP speed cap applies to actual persisted bytes and abort stops capped transfer (2070.8512ms)
+✔ FTP reconnect resumes an owned zero-byte partial after cancellation before data (266.7937ms)
+✔ FTP refuses publication when SIZE or MDTM changes during the transfer (249.3649ms)
+✔ FTP falls back to PASV and FTPS rejects an untrusted passive data certificate (731.8078ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4416.1145

@@ -1,0 +1,26 @@
+[
+  {
+    "DriveLetter": "E",
+    "FileSystemType": "NTFS"
+  },
+  {
+    "DriveLetter": "D",
+    "FileSystemType": "NTFS"
+  },
+  {
+    "DriveLetter": "I",
+    "FileSystemType": "NTFS"
+  },
+  {
+    "DriveLetter": "G",
+    "FileSystemType": "NTFS"
+  },
+  {
+    "DriveLetter": "F",
+    "FileSystemType": "NTFS"
+  },
+  {
+    "DriveLetter": "C",
+    "FileSystemType": "NTFS"
+  }
+]

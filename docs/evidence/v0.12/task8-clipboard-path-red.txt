@@ -1,0 +1,45 @@
+✖ clipboard banner never exposes path-carried tokens (8.7208ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(!value.display.includes('eyJhbGci'))
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\clipboard-policy.test.cjs:6:219)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.start (node:internal/test_runner/test:829:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:297:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }
+
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 79.9898
+
+✖ failing tests:
+
+test at tests\core\clipboard-policy.test.cjs:6:1
+✖ clipboard banner never exposes path-carried tokens (8.7208ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(!value.display.includes('eyJhbGci'))
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\clipboard-policy.test.cjs:6:219)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.start (node:internal/test_runner/test:829:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:297:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '=='
+  }

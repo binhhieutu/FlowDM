@@ -1,0 +1,15 @@
+✔ category settings apply only before transfer and persist without changing existing destinations (129.1964ms)
+✔ post-publication scanner failure keeps completed file and separate scan status (108.032ms)
+✔ manual duplicate guard preserves query and allows explicit second copy (16.173ms)
+✔ duplicate guard preserves an explicit direct interpretation of manifest URLs (13.3109ms)
+✔ scan intent is durable before publication and interrupted published file can be rescanned (131.6244ms)
+✔ successful explicit rescan reconsiders completion and changed file cannot pass (186.7288ms)
+✔ strict schema loading rejects legacy FTP and mismatched protocol/type (11.5452ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 700.136

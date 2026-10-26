@@ -1,0 +1,10 @@
+✔ queue controls create, edit and persist a scheduled queue in real Electron (2841.0686ms)
+✔ real queue ordering, movement, HTTP/HLS integrity, rate budget and safe power countdown (133264.3899ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 136921.2855

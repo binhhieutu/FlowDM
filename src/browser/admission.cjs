@@ -7,7 +7,7 @@ function createBrowserAdmission(manager, { timeoutMs = 2000, maxPending = 8, res
     if (pending >= maxPending) throw new Error('Browser admission busy');
     pending++; const controller = new AbortController(); const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      const url = checkedUrl(payload.url);
+      const url = checkedUrl(payload.url); let mime;
       const delegatedMedia = ['dash', 'youtube'].includes(payload.mediaType);
       if (delegatedMedia) {
         const resolve = resolveTools || require('../tools/media-tools.cjs').resolveTools;
@@ -17,6 +17,7 @@ function createBrowserAdmission(manager, { timeoutMs = 2000, maxPending = 8, res
       if (hls) await loadPlaylist(url.href, payload.headers || {}, controller.signal);
       else if (!delegatedMedia) {
         const { response } = await retryRequest(url.href, { ...payload.headers, range: 'bytes=0-0' }, controller.signal);
+        mime = typeof response.headers['content-type'] === 'string' ? response.headers['content-type'].slice(0, 200) : undefined;
         try {
           if (![200, 206].includes(response.statusCode)) throw new Error(`HTTP ${response.statusCode}`);
           if (/^(text\/html|application\/xhtml\+xml)(?:;|$)/i.test(response.headers['content-type'] || '')) throw new Error('HTML/login response stays in browser');
@@ -28,7 +29,8 @@ function createBrowserAdmission(manager, { timeoutMs = 2000, maxPending = 8, res
         } finally { response.destroy(); }
       }
       if (controller.signal.aborted) throw new Error('Browser admission timed out');
-      return await manager.add(payload);
+      const settings = manager.preferenceInfo?.().settings;
+      return await manager.add({ ...payload, ...(settings?.categories.enabled ? { mime } : {}), ...(settings?.duplicateWarnings ? { checkDuplicate: true } : {}) });
     } finally { clearTimeout(timer); pending--; }
   };
 }

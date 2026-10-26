@@ -1,0 +1,25 @@
+{
+  "at": "2026-10-26T05:01:00.556Z",
+  "version": "0.12.0",
+  "executable": "I:/dich_nguoc/FlowDM/dist/win-unpacked/FlowDM.exe",
+  "asarSha256": "9cebfe0a9d1d39e0b03aaeb97f5a1098e5a2844e7507d108e8b0deeabc37a702",
+  "toolOverridesPresent": false,
+  "tests": [
+    {
+      "file": "tests/e2e/crash-recovery.test.cjs",
+      "start": "2026-10-26T05:01:00.558Z",
+      "finished": "2026-10-26T05:01:10.868Z",
+      "exitCode": 0,
+      "error": null,
+      "signal": null
+    },
+    {
+      "file": "tests/e2e/post-scan-recovery.test.cjs",
+      "start": "2026-10-26T05:01:10.868Z",
+      "finished": "2026-10-26T05:01:17.705Z",
+      "exitCode": 0,
+      "error": null,
+      "signal": null
+    }
+  ]
+}

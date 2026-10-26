@@ -1,0 +1,27 @@
+START tests/e2e/crash-recovery.test.cjs 2026-10-26T04:47:00.688Z
+✖ owned Electron process crash preserves committed HTTP ranges and resumes exact bytes after relaunch (31421.008ms)
+  Error: Timeout: durably committed prefix
+      at until (I:\dich_nguoc\FlowDM\tests\e2e\crash-recovery.test.cjs:4:180)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\e2e\crash-recovery.test.cjs:14:3)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3)
+
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 31777.66
+
+✖ failing tests:
+
+test at tests\e2e\crash-recovery.test.cjs:5:1
+✖ owned Electron process crash preserves committed HTTP ranges and resumes exact bytes after relaunch (31421.008ms)
+  Error: Timeout: durably committed prefix
+      at until (I:\dich_nguoc\FlowDM\tests\e2e\crash-recovery.test.cjs:4:180)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\e2e\crash-recovery.test.cjs:14:3)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3)
+EXIT tests/e2e/crash-recovery.test.cjs 1

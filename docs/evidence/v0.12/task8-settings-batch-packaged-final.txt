@@ -1,0 +1,30 @@
+{"revision":3,"asarSha256":"9cebfe0a9d1d39e0b03aaeb97f5a1098e5a2844e7507d108e8b0deeabc37a702"}
+{"file":"tests/e2e/settings.test.cjs","start":"2026-10-26T05:00:55.249Z","exit":0}
+✔ real desktop categories scanner duplicate and opt-in clipboard workflows (3932.9798ms)
+✔ real desktop FTP credentials stay in RAM and rebind after restart without replay (2769.0684ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7031.1779
+
+{"file":"tests/e2e/batch.test.cjs","start":"2026-10-26T05:01:02.327Z","exit":0}
+✔ batch preview creates only selected queue jobs and bounded Site Grabber cancels without losing downloads (2016.2306ms)
+✔ late preview response cannot replace newer staged text or a closed and reopened view (1954.9847ms)
+✔ late crawler start acknowledgment is cancelled after a newer browser preview (1768.2287ms)
+▶ stale directory picker results and errors cannot change a newer staged batch
+  ✔ success (2860.2121ms)
+  ✔ error (2370.7591ms)
+✔ stale directory picker results and errors cannot change a newer staged batch (5232.3996ms)
+✔ stale queue refresh cannot replace newer staged batch queue options or selection (2161.8534ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 13615.9038

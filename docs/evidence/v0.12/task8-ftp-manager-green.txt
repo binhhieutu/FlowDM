@@ -1,0 +1,13 @@
+✔ manager downloads anonymous FTP with SHA and preserves canonical URL in schema8 (305.5401ms)
+✔ manager pauses, closes and resumes FTP from the same committed REST byte after relaunch (1094.4407ms)
+✔ manager requires RAM-only FTP credentials to be rebound after app restart (1115.784ms)
+✔ manager refuses changed FTP MDTM on resume without altering partial bytes or publishing (92.6028ms)
+✔ manager configured proxy refuses FTP before contacting its origin (30.2908ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2728.7167

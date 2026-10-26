@@ -1,0 +1,38 @@
+{
+  "at": "2026-10-26T04:40:52.541Z",
+  "version": "0.12.0",
+  "packaged": false,
+  "sourceEvidence": "docs/evidence/v0.8/youtube-native-live-v8-source.json",
+  "status": "access-blocked",
+  "bytes": 4697368,
+  "wholeFileDecoded": false,
+  "proxyAuthenticated": true,
+  "afterInspect": {
+    "connects": 2,
+    "forwards": 0,
+    "youtubeTunnels": 1,
+    "cdnTunnels": 1,
+    "upstreamAuthenticatedEveryRequest": true
+  },
+  "progress": {
+    "completedResources": 101,
+    "totalBytes": null,
+    "canResize": true
+  },
+  "safeError": "",
+  "safeToolDiagnostics": [
+    "ERROR: \r[download] Got error: HTTP Error 401: Unauthorized. Giving up after 10 retries"
+  ],
+  "routeCounters": {
+    "connects": 48,
+    "forwards": 0,
+    "youtubeTunnels": 2,
+    "cdnTunnels": 46,
+    "upstreamAuthenticatedEveryRequest": true
+  },
+  "elapsedMs": 11502,
+  "safeErrorCode": "HTTP_401",
+  "errorCategory": "upstream-access",
+  "stage": "native-fragment-transfer",
+  "observedAccessErrorStoppedProbe": true
+}

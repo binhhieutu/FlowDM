@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-26T05:01:02.197Z",
+  "version": "0.12.0",
+  "plaintextWarning": true,
+  "sameTaskId": true,
+  "pausedBytes": 147456,
+  "restoredBytes": 147456,
+  "restOffset": 147456,
+  "bytes": 524288,
+  "sha256": "19d392799c01767e28224f221e31a836bb73d15d77dca330b8012f386ee2e3b3",
+  "credentialsRamOnly": true,
+  "bindingDoesNotResume": true,
+  "connections": 1
+}
