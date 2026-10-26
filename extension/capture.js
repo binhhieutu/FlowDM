@@ -1,7 +1,7 @@
 /* Native ownership transfer: browser remains the fallback until a durable matching ACK. */
 (function(root){
   const httpUrl=value=>{try{const u=new URL(value);return ['http:','https:'].includes(u.protocol)&&!u.username&&!u.password?u.href:null;}catch{return null;}};
-  function createCapture(chrome,{timeoutMs=5000,pauseRetryMs=50,userAgent=()=>root.navigator?.userAgent||'',uuid=()=>crypto.randomUUID(),onStatus=()=>{}}={}){
+  function createCapture(chrome,{timeoutMs=5000,credentialTimeoutMs=35000,pauseRetryMs=50,automaticMode='pause-before-ack',userAgent=()=>root.navigator?.userAgent||'',uuid=()=>crypto.randomUUID(),onStatus=()=>{}}={}){
     const settings={autoCapture:true,credentials:{},connections:4};const handled=new Set();const pausing=new Set();const requests=new Map();
     const consentEpochs=new Map();let permissionEpoch=0;
     const context=origin=>({origin,consent:settings.credentials[origin]===true,consentEpoch:consentEpochs.get(origin)||0,permissionEpoch});
@@ -74,11 +74,86 @@
         try{chrome.runtime.sendNativeMessage('local.flowdm.bridge',request,response=>{const error=chrome.runtime.lastError;finish(!error&&response?.ok===true&&response.request_id===request.request_id&&typeof response.payload?.id==='string'&&response.payload.id.length>0);});}catch{finish(false);}
       });
     }
+    function nativeCredentials(op,data,deadline=op==='rebindCredentials'?credentialTimeoutMs:Math.min(5000,credentialTimeoutMs)){
+      const request={schema:1,request_id:uuid(),op,payload:data};
+      return new Promise(resolve=>{
+        let settled=false;const finish=value=>{if(settled)return;settled=true;clearTimeout(timer);resolve(value);};
+        const timer=setTimeout(()=>finish({ok:false}),deadline);
+        try{chrome.runtime.sendNativeMessage('local.flowdm.bridge',request,response=>{
+          const error=chrome.runtime.lastError;
+          finish(!error&&response?.ok===true&&response.request_id===request.request_id?{ok:true,payload:response.payload}:{ok:false});
+        });}catch{finish({ok:false});}
+      });
+    }
+    function checkedChallenge(value,origin){
+      if(!value||typeof value!=='object'||Array.isArray(value))return null;
+      const keys=['requestId','taskId','origin','url','filename','expiresAt'];
+      if(Object.keys(value).some(key=>!keys.includes(key)))return null;
+      if(!['requestId','taskId'].every(key=>typeof value[key]==='string'&&/^[A-Za-z0-9_-]{1,128}$/.test(value[key])))return null;
+      const url=httpUrl(value.url);if(!url||url.length>16384||value.origin!==origin||new URL(url).origin!==origin)return null;
+      if(typeof value.filename!=='string'||value.filename.length>180||/[\u0000-\u001f\u007f]/.test(value.filename))return null;
+      if(!Number.isFinite(value.expiresAt)||value.expiresAt<=Date.now()||value.expiresAt>Date.now()+120000)return null;
+      return {requestId:value.requestId,taskId:value.taskId,origin,url,filename:value.filename,expiresAt:value.expiresAt};
+    }
+    async function credentialContext(stamp,isCurrent){
+      try{return stamp.consent&&validContext(stamp)&&await permissionAllowed(stamp)&&await isCurrent()&&validContext(stamp);}catch{return false;}
+    }
+    const credentialError=()=>({ok:false,error:'Chưa kết nối lại. Kiểm tra FlowDM, trang đang mở và quyền đăng nhập rồi thử lại.'});
+    async function listCredentialRequests(origin,{isCurrent=async()=>true}={}){
+      const normalized=httpUrl(origin);if(!normalized||new URL(normalized).origin!==origin)return credentialError();
+      const stamp=context(origin);if(!await credentialContext(stamp,isCurrent))return credentialError();
+      const reply=await nativeCredentials('credentialRequests',{origin});
+      if(!reply.ok||!await credentialContext(stamp,isCurrent)||!Array.isArray(reply.payload?.requests)||reply.payload.requests.length>8)return credentialError();
+      const requests=reply.payload.requests.map(value=>checkedChallenge(value,origin));
+      if(requests.some(value=>!value)||new Set(requests.map(value=>value.requestId)).size!==requests.length)return credentialError();
+      return {ok:true,requests};
+    }
+    async function rebindCredentials(value,{isCurrent=async()=>true}={}){
+      const challenge=checkedChallenge(value,value?.origin);if(!challenge)return credentialError();
+      const stamp=context(challenge.origin);if(!await credentialContext(stamp,isCurrent))return credentialError();
+      const observed=payload({url:challenge.url,mediaType:'direct'}).headers||{};
+      const headers=Object.fromEntries(Object.entries(observed).filter(([name])=>name.toLowerCase()!=='cookie'));
+      Object.assign(headers,await cookieHeaders(challenge.url,stamp));
+      if(!Object.entries(headers).some(([name,value])=>['cookie','authorization'].includes(name.toLowerCase())&&value))return credentialError();
+      if(!await credentialContext(stamp,isCurrent))return credentialError();
+      const binding={taskId:challenge.taskId,origin:challenge.origin,requestId:challenge.requestId};
+      const cancel=()=>nativeCredentials('cancelCredentials',binding,Math.min(1000,credentialTimeoutMs));
+      const prepared=await nativeCredentials('rebindCredentials',{...binding,headers});
+      if(!prepared.ok||prepared.payload?.id!==challenge.taskId||prepared.payload?.prepared!==true||!await credentialContext(stamp,isCurrent)){
+        await cancel();return credentialError();
+      }
+      const committed=await nativeCredentials('commitCredentials',binding);
+      if(!committed.ok||committed.payload?.id!==challenge.taskId){await cancel();return credentialError();}
+      onStatus('Đã kết nối lại. Nhấn Tiếp tục trong FlowDM để tải.');return {ok:true};
+    }
+    async function automaticRunning(item,url,stamp){
+      // Firefox pause() cancels the network transfer and may discard a 0-byte
+      // download. Keep its fallback running until durable ownership is ACKed.
+      const running=value=>value&&value.state==='in_progress'&&value.danger==='safe'&&!value.incognito&&!value.paused&&httpUrl(value.finalUrl||value.url)===url;
+      const uncertain=()=>{onStatus('FlowDM đã nhận nhưng chưa xác nhận hủy tải trình duyệt. Kiểm tra hai hàng đợi.');return false;};
+      if(item.paused)return false;
+      pausing.add(item.id);
+      try{
+        const current=(await call('search',{id:item.id}))?.result?.[0];
+        if(!settings.autoCapture||!validContext(stamp)||!running(current))return false;
+        handled.add(item.id);while(handled.size>512)handled.delete(handled.values().next().value);
+        const accepted=await send({url,filename:current.filename||item.filename});
+        if(!accepted)return false;
+        if(!settings.autoCapture||!validContext(stamp)||!await permissionAllowed(stamp)||!validContext(stamp))return uncertain();
+        const latest=(await call('search',{id:item.id}))?.result?.[0];
+        if(!settings.autoCapture||!validContext(stamp)||!running(latest))return uncertain();
+        const canceled=await call('cancel',item.id);
+        const after=(await call('search',{id:item.id}))?.result?.[0];
+        if(canceled&&after?.state==='interrupted'&&!after.paused&&after.error==='USER_CANCELED'&&httpUrl(after.finalUrl||after.url)===url)return true;
+        return uncertain();
+      }finally{pausing.delete(item.id);}
+    }
     async function automatic(item){
       const url=httpUrl(item.finalUrl||item.url);const record=requests.get(url);
       if(!settings.autoCapture||!url||/\.mpd(?:$|[?#])/i.test(url)||item.incognito||item.state!=='in_progress'||item.danger!=='safe'||(record&&record.method!=='GET')||(handled.has(item.id)||pausing.has(item.id)))return false;
       if(record?.hasCredentials&&!settings.credentials[new URL(url).origin]){onStatus('Tải cần đăng nhập: bật quyền cho trang này để chuyển sang FlowDM. Trình duyệt tiếp tục tải.');return false;}
       const autoStamp=context(new URL(url).origin);
+      if(automaticMode==='ack-before-cancel')return automaticRunning(item,url,autoStamp);
       pausing.add(item.id);let paused;try{paused=await pauseWhenReady(item.id);}finally{pausing.delete(item.id);}
       if(!paused)return false;
       handled.add(item.id);while(handled.size>512)handled.delete(handled.values().next().value);
@@ -94,7 +169,7 @@
     function revoke(origin){consentEpochs.set(origin,(consentEpochs.get(origin)||0)+1);delete settings.credentials[origin];for(const [url]of requests)if(new URL(url).origin===origin)requests.delete(url);}
     function grant(origin){consentEpochs.set(origin,(consentEpochs.get(origin)||0)+1);settings.credentials[origin]=true;}
     function permissionsRemoved(){permissionEpoch++;for(const origin of Object.keys(settings.credentials))revoke(origin);}
-    return {settings,automatic,send,remember,revoke,grant,permissionsRemoved,context,current:validContext};
+    return {settings,automatic,send,remember,revoke,grant,permissionsRemoved,context,current:validContext,listCredentialRequests,rebindCredentials};
   }
   root.FlowDMCapture={createCapture,httpUrl};if(typeof module!=='undefined')module.exports=root.FlowDMCapture;
 })(globalThis);

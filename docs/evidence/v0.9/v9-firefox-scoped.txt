@@ -1,0 +1,13 @@
+✔ Firefox registration targets only per-user Mozilla locations (0.8446ms)
+✔ Firefox host grants one exact Gecko ID without Chromium origins (13.222ms)
+✔ Firefox registry override touches only the preferred 32-bit view and restores the prior value (0.8779ms)
+✔ Firefox export is separate and restores its prior registration without replacing Chromium (103.6663ms)
+✔ Firefox existing external registration changes are never overwritten on disconnect (73.1594ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 259.0618

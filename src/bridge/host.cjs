@@ -11,7 +11,7 @@ async function runHost({input=process.stdin,output=process.stdout,dataDir}={}) {
     pending=pending.then(async()=>{
       let reply={request_id:typeof request?.request_id==='string'?request.request_id.slice(0,128):null,ok:false,error:'INVALID_REQUEST'};
       if(validRequest(request)) {
-        try {const config=JSON.parse(await fs.readFile(path.join(dataDir,CONFIG_NAME),'utf8'));reply=await dispatch(config,request);}
+        try {const config=JSON.parse(await fs.readFile(path.join(dataDir,CONFIG_NAME),'utf8'));reply=await dispatch(config,request,{timeoutMs:request.op==='rebindCredentials'?35000:4500});}
         catch {reply={request_id:request.request_id,ok:false,error:'DESKTOP_UNAVAILABLE'};}
       }
       output.write(encodeFrame(reply));

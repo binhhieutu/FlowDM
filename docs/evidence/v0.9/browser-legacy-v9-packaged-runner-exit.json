@@ -1,0 +1,11 @@
+{
+  "startedAt": "2026-10-26T00:50:22.521Z",
+  "finishedAt": "2026-10-26T00:50:44.618Z",
+  "code": 0,
+  "signal": null,
+  "error": null,
+  "version": "0.9.0",
+  "artifact": "I:\\dich_nguoc\\FlowDM\\dist\\win-unpacked\\FlowDM.exe",
+  "asarSha256": "221342a6e55991f265fe00996e193753d12357b94a2e20361786eaf01207c417",
+  "asarUnchanged": true
+}

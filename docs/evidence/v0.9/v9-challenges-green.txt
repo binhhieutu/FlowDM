@@ -1,0 +1,19 @@
+✔ only desktop initiation exposes bounded same-origin requests, clones DTOs and supersedes old nonce (52.4543ms)
+✔ prepare never authorizes resume, commit consumes exact binding and leaves the job paused (36.7988ms)
+✔ wrong task or origin, expired nonce and changed source cannot install credentials (31.3291ms)
+✔ cancel and application shutdown discard prepared headers and reject late commits (22.5327ms)
+✔ aborted preflight and failed commit journal never create late credential binding (27.8756ms)
+✔ lost browser credentials rebind to the same HTTP task without replaying retained byte ranges (1592.4799ms)
+✔ prepared credentials remain unusable until commit and cannot commit after task source/state changes (122.9587ms)
+✔ rebind rejects login HTML, changed identity, unsupported headers and cross-origin redirects while preserving bytes (354.7856ms)
+✔ abort never installs staged credentials or discards HTTP bytes (114.5865ms)
+✔ zero-byte browser jobs refuse login HTML and invalid or adapter-blocked header envelopes (23.7613ms)
+✔ HLS browser rebind resumes retained resources after restart without fetching completed fragments again (419.3291ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2709.9855

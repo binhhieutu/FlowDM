@@ -1,0 +1,31 @@
+✔ bridge accepts only bounded integer connection choices (1.595ms)
+✔ frames preserve Unicode through partial prefixes, payload and multiple frames (1.1515ms)
+✔ malformed, truncated, oversized and invalid UTF8 frames fail (4.8183ms)
+✔ authenticated private IPC acknowledges and deduplicates concurrent requests (24.644ms)
+✔ schema, operations, credentials, URLs, fields and request ids are rejected before callback (9.4335ms)
+✔ v2 payload permits explicit direct/HLS metadata and bounded allowlisted headers (9.2959ms)
+✔ dedupe compares entire canonical payload, cloned headers and redacted acknowledgment (6.9862ms)
+✔ host bundle validates inputs and creates an executable isolated native host (108.5149ms)
+✔ host handles invalid requests, malformed/truncated frames and message flood without echoing credentials (3.5286ms)
+✔ installer CLI preserves legacy interface and rejects unsafe paths (102.3686ms)
+✔ callback errors and deadlines return bounded safe errors (48.6422ms)
+✔ invalid callback results and absent configuration fail safely (8.3863ms)
+✔ native host subprocess uses framed stdout with Unicode and absent desktop error (122.8042ms)
+✔ Firefox registration targets only per-user Mozilla locations (1.2011ms)
+✔ Firefox host grants one exact Gecko ID without Chromium origins (31.6112ms)
+✔ Firefox export is separate and restores its prior registration without replacing Chromium (111.6402ms)
+✔ Firefox existing external registration changes are never overwritten on disconnect (81.9278ms)
+✔ setup exports a stable extension, validates inputs and restores prior registration (264.3457ms)
+✔ registration targets are scoped to named per-user native hosts (0.9357ms)
+✔ POSIX registration restores byte-exact contents and removes only its own file (4.6295ms)
+✔ host runtime is verified and Windows copy survives portable extraction cleanup (871.8086ms)
+✔ write-ahead setup intent preserves previous ownership when registration mutates then throws (89.662ms)
+✔ recovers pending before/after/disconnect states and preserves unrelated external changes (21.0704ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1343.6033

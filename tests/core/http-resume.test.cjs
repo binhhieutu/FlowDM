@@ -45,10 +45,10 @@ test('probe reads the one-byte range and returns representation metadata', async
   await withServer((req, res) => {
     assert.equal(req.headers.range, 'bytes=0-0');
     assert.equal(req.headers['accept-encoding'], 'identity');
-    res.writeHead(206, { 'content-range': 'bytes 0-0/128', 'content-length': '1', etag: '"revision-1"' });
+    res.writeHead(206, { 'content-range': 'bytes 0-0/128', 'content-length': '1', etag: '"revision-1"', 'content-type': 'video/mp4' });
     res.end('a');
   }, async url => {
-    assert.deepEqual(await inspect(url), { finalUrl: url, ranges: true, total: 128, validator: { type: 'etag', value: '"revision-1"' }, contentEncoding: 'identity' });
+    assert.deepEqual(await inspect(url), { finalUrl: url, ranges: true, total: 128, validator: { type: 'etag', value: '"revision-1"' }, contentEncoding: 'identity', contentType: 'video/mp4' });
   });
 });
 test('probe refuses malformed ranges, lengths, truncation, encodings and error statuses', async () => {

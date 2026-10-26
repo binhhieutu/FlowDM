@@ -16,6 +16,7 @@ const { validateSelection } = require('../media/catalog.cjs');
 const { MediaCatalogService, playlistFilename } = require('./media-catalog-service.cjs');
 const { assessHttpResume } = require('./http-resume.cjs');
 const { prepareSourceReplacement } = require('./source-refresh.cjs');
+const { prepareHeaderRebind } = require('./header-rebind.cjs');
 
 const clone = value => structuredClone(value);
 const STATES = ['queued', 'downloading', 'paused', 'completed', 'failed', 'canceled'];
@@ -201,6 +202,8 @@ class DownloadManager extends EventEmitter {
       this._notify(); return clone(task);
     });
   }
+  prepareHeaderRebind(id, headers, options) { return this._mutate(() => prepareHeaderRebind(this, id, headers, options)); }
+  rebindHeaders(id, headers, options) { return this.prepareHeaderRebind(id, headers, options).then(prepared => prepared.commit()); }
   refreshSource(id, input) {
     return this._mutate(async () => {
       this._ready(); const task = this._require(id);
@@ -234,7 +237,7 @@ class DownloadManager extends EventEmitter {
     this._ready(); const task = this._require(id);
     if (!['paused', 'failed'].includes(task.status)) return clone(task);
     if (await this._recoverPublished(task)) { await this._persist(); this._notify(); return clone(task); }
-    if (task.requiresHeaders && !this.secrets.has(id)) throw Error('Request headers are not persisted. Add this download again with its required headers.');
+    if (task.requiresHeaders && !this.secrets.has(id)) throw Error('Request headers are not persisted. Reconnect the browser session for this download before resuming.');
     task.status = 'queued'; task.error = null; task.startAt = null;
     await this._persist(); this._notify(); this._pump(); return clone(task);
   }

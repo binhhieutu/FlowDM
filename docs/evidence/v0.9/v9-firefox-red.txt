@@ -1,0 +1,78 @@
+✖ Firefox registration targets only per-user Mozilla locations (1.2721ms)
+  Error: Trình duyệt không được hỗ trợ.
+      at registrationTarget (I:\dich_nguoc\FlowDM\src\browser\registration.cjs:9:46)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\firefox-setup.test.cjs:17:16)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.start (node:internal/test_runner/test:829:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:297:17)
+
+✖ Firefox host grants one exact Gecko ID without Chromium origins (5.1234ms)
+  Error: Expected exact Chrome/Edge extension ID
+      at createHostBundle (I:\dich_nguoc\FlowDM\src\bridge\install.cjs:8:51)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\firefox-setup.test.cjs:23:24)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+✖ Firefox export is separate and restores its prior registration without replacing Chromium (2.127ms)
+  Error: Trình duyệt không được hỗ trợ.
+      at registrationTarget (I:\dich_nguoc\FlowDM\src\browser\registration.cjs:9:46)
+      at target (I:\dich_nguoc\FlowDM\src\browser\registration.cjs:15:29)
+      at Object.set (I:\dich_nguoc\FlowDM\src\browser\registration.cjs:36:24)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\firefox-setup.test.cjs:33:22)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+✖ Firefox existing external registration changes are never overwritten on disconnect (2.5799ms)
+  Error: ID tiện ích phải có 32 ký tự a–p.
+      at I:\dich_nguoc\FlowDM\src\browser\setup.cjs:74:57
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\firefox-setup.test.cjs:55:3)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+ℹ tests 4
+ℹ suites 0
+ℹ pass 0
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 82.3236
+
+✖ failing tests:
+
+test at tests\browser\firefox-setup.test.cjs:16:1
+✖ Firefox registration targets only per-user Mozilla locations (1.2721ms)
+  Error: Trình duyệt không được hỗ trợ.
+      at registrationTarget (I:\dich_nguoc\FlowDM\src\browser\registration.cjs:9:46)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\firefox-setup.test.cjs:17:16)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.start (node:internal/test_runner/test:829:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:297:17)
+
+test at tests\browser\firefox-setup.test.cjs:21:1
+✖ Firefox host grants one exact Gecko ID without Chromium origins (5.1234ms)
+  Error: Expected exact Chrome/Edge extension ID
+      at createHostBundle (I:\dich_nguoc\FlowDM\src\bridge\install.cjs:8:51)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\firefox-setup.test.cjs:23:24)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+test at tests\browser\firefox-setup.test.cjs:30:1
+✖ Firefox export is separate and restores its prior registration without replacing Chromium (2.127ms)
+  Error: Trình duyệt không được hỗ trợ.
+      at registrationTarget (I:\dich_nguoc\FlowDM\src\browser\registration.cjs:9:46)
+      at target (I:\dich_nguoc\FlowDM\src\browser\registration.cjs:15:29)
+      at Object.set (I:\dich_nguoc\FlowDM\src\browser\registration.cjs:36:24)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\firefox-setup.test.cjs:33:22)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+test at tests\browser\firefox-setup.test.cjs:51:1
+✖ Firefox existing external registration changes are never overwritten on disconnect (2.5799ms)
+  Error: ID tiện ích phải có 32 ký tự a–p.
+      at I:\dich_nguoc\FlowDM\src\browser\setup.cjs:74:57
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\firefox-setup.test.cjs:55:3)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)

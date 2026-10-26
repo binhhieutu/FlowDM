@@ -3,7 +3,8 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const { promisify } = require('node:util');
 const execFile = promisify(require('node:child_process').execFile);
-const { createHostBundle } = require('../bridge/install.cjs');
+const { createHostBundle, validExtensionId } = require('../bridge/install.cjs');
+const { firefoxManifest, FIREFOX_EXTENSION_ID } = require('./firefox-manifest.cjs');
 const { createRegistration, registrationTarget } = require('./registration.cjs');
 async function verifyRuntime(executable) {
   const result = await execFile(executable, ['-p', 'JSON.stringify({node:process.versions.node,electron:process.versions.electron})'], { env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' }, windowsHide: true, timeout: 15000 });
@@ -32,6 +33,7 @@ async function prepareHostRuntime({ executablePath, directory, platform = proces
 }
 function createBrowserSetup({ appDir, dataDir, userDataDir, executablePath, platform = process.platform, registration = createRegistration({ platform }) }) {
   const extensionPath = path.join(userDataDir, 'browser-extension');
+  const firefoxExtensionPath = path.join(userDataDir, 'browser-extension-firefox');
   const statePath = path.join(userDataDir, 'browser-setup.json');
   let mutation = Promise.resolve();
   const serialize = operation => { const result = mutation.catch(() => {}).then(operation); mutation = result; return result; };
@@ -58,28 +60,34 @@ function createBrowserSetup({ appDir, dataDir, userDataDir, executablePath, plat
       const current = await registration.read(browser);
       return { browser, extensionId: item.extensionId, connected: current.exists && current.value === item.current };
     }));
-    return { extensionPath, connected: browsers.some(item => item.connected), browsers, platform };
+    return { extensionPath, extensionPaths: { chromium: extensionPath, firefox: firefoxExtensionPath }, firefoxExtensionId: FIREFOX_EXTENSION_ID, connected: browsers.some(item => item.connected), browsers, platform };
   }
-  async function prepareExtension() {
-    await fs.mkdir(extensionPath, { recursive: true, mode: 0o700 });
+  async function prepareExtension(browser = 'chrome') {
+    registrationTarget(browser, platform);
+    const destination = browser === 'firefox' ? firefoxExtensionPath : extensionPath;
+    await fs.mkdir(destination, { recursive: true, mode: 0o700 });
     const source = path.join(appDir, 'extension');
     for (const entry of await fs.readdir(source, { withFileTypes: true })) {
       if (!entry.isFile() || !/\.(?:json|js|css|html|png)$/.test(entry.name)) throw new Error('Unexpected extension asset');
-      await fs.copyFile(path.join(source, entry.name), path.join(extensionPath, entry.name));
+      await fs.copyFile(path.join(source, entry.name), path.join(destination, entry.name));
     }
-    return extensionPath;
+    if (browser === 'firefox') {
+      const chromium = JSON.parse(await fs.readFile(path.join(source, 'manifest.json'), 'utf8'));
+      await fs.writeFile(path.join(destination, 'manifest.json'), JSON.stringify(firefoxManifest(chromium), null, 2) + '\n', { mode: 0o600 });
+    }
+    return destination;
   }
   async function connect({ extensionId, browser }) {
     return serialize(async () => {
-      if (!/^[a-p]{32}$/.test(extensionId || '')) throw new Error('ID tiện ích phải có 32 ký tự a–p.');
+      if (!validExtensionId(extensionId, browser) || (browser === 'firefox' && extensionId !== FIREFOX_EXTENSION_ID)) throw new Error(browser === 'firefox' ? `ID Firefox phải là ${FIREFOX_EXTENSION_ID}.` : 'ID tiện ích phải có 32 ký tự a–p.');
       registrationTarget(browser, platform);
       const state = await recover(); const original = state.browsers[browser];
       const previous = original ? original.previous : await registration.read(browser);
       if (original && JSON.stringify(await registration.read(browser)) !== JSON.stringify({ exists: true, value: original.current })) throw new Error('Đăng ký host đã thay đổi ngoài FlowDM.');
-      await prepareExtension();
+      await prepareExtension(browser);
       const runtime = await prepareHostRuntime({ executablePath, directory: path.join(userDataDir, 'browser-host-runtime'), platform });
       const output = path.join(userDataDir, 'browser-host', crypto.randomUUID());
-      const bundle = await createHostBundle({ output, dataDir, extensionId, ...runtime });
+      const bundle = await createHostBundle({ output, dataDir, extensionId, browser, ...runtime });
       const current = platform === 'win32' ? bundle.manifestPath : await fs.readFile(bundle.manifestPath, 'utf8');
       const nextBrowsers = { ...state.browsers, [browser]: { extensionId, previous, current } };
       await save({ ...state, pending: { browser, before: original ? { exists: true, value: original.current } : previous, after: { exists: true, value: current }, nextBrowsers } });
@@ -101,6 +109,6 @@ function createBrowserSetup({ appDir, dataDir, userDataDir, executablePath, plat
       return info();
     });
   }
-  return { info: () => serialize(info), prepareExtension: () => serialize(prepareExtension), connect, disconnect, waitForIdle: () => mutation.catch(() => {}) };
+  return { info: () => serialize(info), prepareExtension: browser => serialize(() => prepareExtension(browser)), connect, disconnect, waitForIdle: () => mutation.catch(() => {}) };
 }
 module.exports = { createBrowserSetup, prepareHostRuntime };

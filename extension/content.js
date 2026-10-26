@@ -1,5 +1,6 @@
 /* This isolated content script never starts a transfer until its button is clicked. */
 (()=>{
+ const extensionAPI=globalThis.browser||chrome;
  const buttons=new WeakMap();let queued=false;
  const mime=element=>element.tagName==='VIDEO'?'video/mp4':'audio/mpeg';
  function sources(element){return [element.currentSrc,element.src,...Array.from(element.querySelectorAll('source'),s=>s.src)].filter(url=>FlowDMMedia.classify(url,mime(element)));}
@@ -7,13 +8,13 @@
   button.disabled=true;
   try{
    const urls=sources(element);
-   await chrome.runtime.sendMessage({type:'flowdm:media',items:urls.map(url=>({url,mime:mime(element),title:document.title}))});
+   await extensionAPI.runtime.sendMessage({type:'flowdm:media',items:urls.map(url=>({url,mime:mime(element),title:document.title}))});
    const pageYoutube=FlowDMMedia.youtubeUrl(globalThis.location?.href||'');
-   if(pageYoutube)await chrome.runtime.sendMessage({type:'flowdm:youtube',url:pageYoutube,title:document.title});
-   const options=await chrome.runtime.sendMessage({type:'flowdm:options'});
+   if(pageYoutube)await extensionAPI.runtime.sendMessage({type:'flowdm:youtube',url:pageYoutube,title:document.title});
+   const options=await extensionAPI.runtime.sendMessage({type:'flowdm:options'});
    const selected=pageYoutube?{url:pageYoutube,mediaType:'youtube'}:urls.length?{url:urls[0],mediaType:FlowDMMedia.classify(urls[0],mime(element))}:(options.items||[]).find(item=>['hls','dash','direct'].includes(item.mediaType));
    if(!selected){button.textContent='Chưa phát hiện liên kết tải; hãy phát video';return;}
-   const result=await chrome.runtime.sendMessage({type:'flowdm:download',url:selected.url,mediaType:selected.mediaType});
+   const result=await extensionAPI.runtime.sendMessage({type:'flowdm:download',url:selected.url,mediaType:selected.mediaType});
    button.textContent=result.ok?'Đã chuyển sang FlowDM':'Mở FlowDM và kiểm tra cầu nối';
   }catch{button.textContent='Chưa kết nối được FlowDM';}finally{button.disabled=false;}
  }
@@ -29,8 +30,10 @@
     button.addEventListener('click',event=>{if(event.isTrusted)return download(element,button);});element.insertAdjacentElement('afterend',button);buttons.set(element,button);
    }
   }
-  if(items.length)chrome.runtime.sendMessage({type:'flowdm:media',items:items.slice(0,30)}).catch(()=>{});
-  const pageYoutube=FlowDMMedia.youtubeUrl(globalThis.location?.href||'');if(pageYoutube&&document.querySelector('video'))chrome.runtime.sendMessage({type:'flowdm:youtube',url:pageYoutube,title:document.title}).catch(()=>{});
+  if(items.length)extensionAPI.runtime.sendMessage({type:'flowdm:media',items:items.slice(0,30)}).catch(()=>{
+ const extensionAPI=globalThis.browser||chrome;});
+  const pageYoutube=FlowDMMedia.youtubeUrl(globalThis.location?.href||'');if(pageYoutube&&document.querySelector('video'))extensionAPI.runtime.sendMessage({type:'flowdm:youtube',url:pageYoutube,title:document.title}).catch(()=>{
+ const extensionAPI=globalThis.browser||chrome;});
  }
  function schedule(){if(!queued){queued=true;queueMicrotask(report);}}
  new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['src','type']});

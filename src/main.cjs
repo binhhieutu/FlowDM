@@ -5,13 +5,14 @@ const { DownloadManager } = require('./core/download-manager.cjs');
 const { createBridge } = require('./bridge/server.cjs');
 const { createBrowserSetup } = require('./browser/setup.cjs');
 const { createBrowserAdmission } = require('./browser/admission.cjs');
+const { createCredentialRebind } = require('./browser/credential-rebind.cjs');
 const { mediaToolStatus } = require('./tools/media-tools.cjs');
 
 const dataDir = process.env.FLOWDM_DATA_DIR || path.join(app.getPath('userData'), 'state');
 if (process.env.FLOWDM_DATA_DIR) app.setPath('userData', path.dirname(dataDir));
 const downloadDir = process.env.FLOWDM_DOWNLOAD_DIR || path.join(app.getPath('downloads'), 'FlowDM');
 const uiFile = path.join(__dirname, 'ui', 'index.html');
-let manager; let win; let bridge; let browserSetup; let closing = false; let bridgeError = null;
+let manager; let win; let bridge; let browserSetup; let credentialRebind; let closing = false; let bridgeError = null;
 
 if (!app.requestSingleInstanceLock()) app.quit();
 else {
@@ -19,8 +20,14 @@ else {
   app.whenReady().then(async () => {
     manager = new DownloadManager({ dataDir, downloadDir, maxConcurrent: 3 });
     await manager.init();
+    credentialRebind = createCredentialRebind(manager);
     browserSetup = createBrowserSetup({ appDir: app.getAppPath(), dataDir, userDataDir: app.getPath('userData'), executablePath: process.execPath });
-    bridge = await createBridge({ dataDir, onAdd: createBrowserAdmission(manager) }).catch(error => { bridgeError = error.message; return null; });
+    bridge = await createBridge({ dataDir, onAdd: createBrowserAdmission(manager),
+      onCredentialRequests: input => ({ requests: credentialRebind.requests(input.origin) }),
+      onRebindCredentials: (input, context) => credentialRebind.prepare(input, context),
+      onCommitCredentials: (input, context) => credentialRebind.commit(input, context),
+      onCancelCredentials: input => credentialRebind.cancel(input)
+    }).catch(error => { bridgeError = error.message; return null; });
     installHandlers(); createWindow();
     manager.on('change', tasks => { if (win && !win.isDestroyed()) win.webContents.send('flow:changed', tasks); });
     app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
@@ -49,10 +56,15 @@ function installHandlers() {
   });
   handle('info', async () => ({ version: app.getVersion(), platform: process.platform, downloadDir, bridgeAvailable: !!bridge, bridgeError, browser: await browserSetup.info(), mediaTools: await mediaToolStatus() }));
   handle('browserInfo', () => browserSetup.info());
-  handle('browserExport', async () => { const directory = await browserSetup.prepareExtension(); const error = await shell.openPath(directory); if (error) throw new Error(error); return directory; });
+  handle('browserExport', async browser => { const directory = await browserSetup.prepareExtension(browser); const error = await shell.openPath(directory); if (error) throw new Error(error); return directory; });
   handle('browserConnect', input => browserSetup.connect(input || {}));
   handle('browserDisconnect', browser => browserSetup.disconnect(browser));
   handle('list', () => manager.list());
+  handle('requestCredentials', input => {
+    if (!input || typeof input !== 'object' || Array.isArray(input) || Object.keys(input).join(',') !== 'id' || typeof input.id !== 'string') throw Error('Thông tin kết nối lại không hợp lệ.');
+    if (!bridge) throw Error('Cầu nối trình duyệt chưa sẵn sàng.');
+    return credentialRebind.request(input.id);
+  });
   handle('add', input => {
     if (!input || typeof input !== 'object' || Array.isArray(input)) throw new Error('Thông tin tải không hợp lệ.');
     const allowed = ['url', 'filename', 'connections', 'directory', 'startAt', 'speedLimit', 'mediaType', 'selection', 'catalogId'];
@@ -93,5 +105,5 @@ app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(
 app.on('before-quit', event => {
   if (closing || !manager) return;
   event.preventDefault(); closing = true;
-  Promise.allSettled([manager.close(), bridge?.close(), browserSetup?.waitForIdle()]).then(() => app.quit());
+  Promise.allSettled([credentialRebind?.close(), manager.close(), bridge?.close(), browserSetup?.waitForIdle()]).then(() => app.quit());
 });

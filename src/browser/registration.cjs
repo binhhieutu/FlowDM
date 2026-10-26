@@ -6,6 +6,10 @@ const { promisify } = require('node:util');
 const execFile = promisify(require('node:child_process').execFile);
 const BRANDS = { chrome: ['Google\\Chrome', 'google-chrome', 'Google/Chrome'], edge: ['Microsoft\\Edge', 'microsoft-edge', 'Microsoft Edge'], chromium: ['Chromium', 'chromium', 'Chromium'], testing: ['Google\\ChromeForTesting', 'google-chrome-for-testing', 'Google/ChromeForTesting'] };
 function registrationTarget(browser, platform = process.platform, homeDir = os.homedir()) {
+  if (browser === 'firefox') {
+    if (platform === 'win32') return 'HKCU\\Software\\Mozilla\\NativeMessagingHosts\\local.flowdm.bridge';
+    return platform === 'darwin' ? path.join(homeDir, 'Library', 'Application Support', 'Mozilla', 'NativeMessagingHosts', 'local.flowdm.bridge.json') : path.join(homeDir, '.mozilla', 'native-messaging-hosts', 'local.flowdm.bridge.json');
+  }
   if (!Object.hasOwn(BRANDS, browser)) throw new Error('Trình duyệt không được hỗ trợ.');
   const brand = BRANDS[browser];
   if (platform === 'win32') return `HKCU\\Software\\${brand[0]}\\NativeMessagingHosts\\local.flowdm.bridge`;
@@ -13,17 +17,20 @@ function registrationTarget(browser, platform = process.platform, homeDir = os.h
 }
 function createRegistration({ platform = process.platform, homeDir = os.homedir(), exec = execFile } = {}) {
   const target = browser => registrationTarget(browser, platform, homeDir);
+  // Firefox checks the 32-bit view first. Own only that view and leave any
+  // prior 64-bit host untouched; removing our override reveals it again.
+  const view = browser => browser === 'firefox' ? '/reg:32' : '/reg:64';
   return {
     async read(browser) {
       const location = target(browser);
       if (platform === 'win32') {
         let result;
-        try { result = await exec('reg.exe', ['query', location, '/ve', '/reg:64'], { windowsHide: true, timeout: 5000 }); }
+        try { result = await exec('reg.exe', ['query', location, '/ve', view(browser)], { windowsHide: true, timeout: 5000 }); }
         catch (error) { if (error.code === 1) return { exists: false }; throw error; }
         // `/ve` prints a synthetic '(value not set)' REG_SZ for an empty key.
         // Compare the actual enumerated values rather than localized wording.
         const label = /^\s*(.*?)\s+REG_\w+/m.exec(result.stdout)?.[1];
-        const all = await exec('reg.exe', ['query', location, '/reg:64'], { windowsHide: true, timeout: 5000 });
+        const all = await exec('reg.exe', ['query', location, view(browser)], { windowsHide: true, timeout: 5000 });
         if (label && !all.stdout.split(/\r?\n/).some(line => /^\s*(.*?)\s+REG_\w+/.exec(line)?.[1] === label)) return { exists: false };
         const match = /REG_SZ\s+([^\r\n]+)/.exec(result.stdout);
         if (!match) throw new Error('Đăng ký host hiện có không phải đường dẫn REG_SZ.');
@@ -35,7 +42,7 @@ function createRegistration({ platform = process.platform, homeDir = os.homedir(
     async set(browser, value) {
       const location = target(browser);
       if (typeof value !== 'string' || value.length > 65536 || value.includes('\0')) throw new Error('Invalid registration');
-      if (platform === 'win32') { await exec('reg.exe', ['add', location, '/ve', '/t', 'REG_SZ', '/d', value, '/f', '/reg:64'], { windowsHide: true, timeout: 5000 }); return; }
+      if (platform === 'win32') { await exec('reg.exe', ['add', location, '/ve', '/t', 'REG_SZ', '/d', value, '/f', view(browser)], { windowsHide: true, timeout: 5000 }); return; }
       await fs.mkdir(path.dirname(location), { recursive: true, mode: 0o700 });
       const temporary = `${location}.${crypto.randomUUID()}.tmp`;
       try { await fs.writeFile(temporary, value, { flag: 'wx', mode: 0o600 }); await fs.rename(temporary, location); }
@@ -43,7 +50,7 @@ function createRegistration({ platform = process.platform, homeDir = os.homedir(
     },
     async remove(browser) {
       const location = target(browser);
-      if (platform === 'win32') { try { await exec('reg.exe', ['delete', location, '/ve', '/f', '/reg:64'], { windowsHide: true, timeout: 5000 }); } catch (error) { if (error.code !== 1) throw error; } }
+      if (platform === 'win32') { try { await exec('reg.exe', ['delete', location, '/ve', '/f', view(browser)], { windowsHide: true, timeout: 5000 }); } catch (error) { if (error.code !== 1) throw error; } }
       else await fs.unlink(location).catch(error => { if (error.code !== 'ENOENT') throw error; });
     }
   };

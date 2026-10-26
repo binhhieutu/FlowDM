@@ -30,7 +30,7 @@ async function hlsSavedIdentity(directory) {
   } finally { await handle.close(); }
 }
 
-async function prepareSourceReplacement({ task, input, previousHeaders, checkpointDir, maxBytes, signal, externalValidator }) {
+async function prepareSourceReplacement({ task, input, previousHeaders, checkpointDir, maxBytes, signal, externalValidator, credentialRebind = false }) {
   if (!input || typeof input !== 'object' || Array.isArray(input) || Object.keys(input).some(key => !['url', 'headers'].includes(key))) throw Error('Invalid source refresh options');
   const url = checkedUrl(input.url).href;
   if (new URL(url).origin !== new URL(task.url).origin) throw Error('Replacement source must use the same origin');
@@ -44,12 +44,15 @@ async function prepareSourceReplacement({ task, input, previousHeaders, checkpoi
     }
   } else if (mediaType === 'hls') {
     const playlist = await loadPlaylist(url, headers, signal);
+    if (credentialRebind && new URL(playlist.finalUrl).origin !== new URL(task.url).origin) throw Error('Browser credentials cannot rebind across a redirected origin');
     if (task.media?.resumePolicy === 'checkpoint') {
       const result = validateReplacement({ taskIdentity: { kind: 'hls', digest: await hlsSavedIdentity(checkpointDir) }, candidateIdentity: { kind: 'hls', digest: playlistIdentity(playlist) } });
       if (!result.compatible) throw Error(result.reason);
     }
   } else {
     const metadata = await probe(url, headers, signal, maxBytes);
+    if (credentialRebind && new URL(metadata.finalUrl).origin !== new URL(task.url).origin) throw Error('Browser credentials cannot rebind across a redirected origin');
+    if (credentialRebind && ['text/html', 'application/xhtml+xml'].includes(metadata.contentType.split(';', 1)[0].trim().toLowerCase())) throw Error('HTML/login response cannot restore download credentials');
     if (task.downloadedBytes > 0 || task.validator) {
       const result = validateReplacement({ taskIdentity: { ...task, kind: 'direct' }, candidateIdentity: { ...metadata, kind: 'direct' } });
       if (!result.compatible) throw Error(result.reason);

@@ -1,0 +1,152 @@
+✖ Firefox automatic transfer keeps the browser running until durable ACK and verifies cancellation (2.5171ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  false !== true
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\credential-extension.test.cjs:239:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual'
+  }
+
+✖ Firefox error leaves the original download entirely untouched (0.4713ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'interrupted'
+  - 'in_progress'
+       ^
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\credential-extension.test.cjs:247:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'interrupted',
+    expected: 'in_progress',
+    operator: 'strictEqual'
+  }
+
+✖ Firefox timeout leaves the original download entirely untouched (0.2141ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'interrupted'
+  - 'in_progress'
+       ^
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\credential-extension.test.cjs:247:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'interrupted',
+    expected: 'in_progress',
+    operator: 'strictEqual'
+  }
+
+✖ Firefox checks the browser state instead of trusting a no-op cancel callback (0.2833ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'interrupted'
+  - 'in_progress'
+       ^
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\credential-extension.test.cjs:279:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'interrupted',
+    expected: 'in_progress',
+    operator: 'strictEqual'
+  }
+
+ℹ tests 4
+ℹ suites 0
+ℹ pass 0
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 76.5623
+
+✖ failing tests:
+
+test at tests\browser\credential-extension.test.cjs:237:1
+✖ Firefox automatic transfer keeps the browser running until durable ACK and verifies cancellation (2.5171ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  false !== true
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\credential-extension.test.cjs:239:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual'
+  }
+
+test at tests\browser\credential-extension.test.cjs:245:43
+✖ Firefox error leaves the original download entirely untouched (0.4713ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'interrupted'
+  - 'in_progress'
+       ^
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\credential-extension.test.cjs:247:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'interrupted',
+    expected: 'in_progress',
+    operator: 'strictEqual'
+  }
+
+test at tests\browser\credential-extension.test.cjs:245:43
+✖ Firefox timeout leaves the original download entirely untouched (0.2141ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'interrupted'
+  - 'in_progress'
+       ^
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\credential-extension.test.cjs:247:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'interrupted',
+    expected: 'in_progress',
+    operator: 'strictEqual'
+  }
+
+test at tests\browser\credential-extension.test.cjs:277:1
+✖ Firefox checks the browser state instead of trusting a no-op cancel callback (0.2833ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'interrupted'
+  - 'in_progress'
+       ^
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\credential-extension.test.cjs:279:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'interrupted',
+    expected: 'in_progress',
+    operator: 'strictEqual'
+  }

@@ -1,0 +1,14 @@
+✔ lost browser credentials rebind to the same HTTP task without replaying retained byte ranges (1613.4299ms)
+✔ prepared credentials remain unusable until commit and cannot commit after task source/state changes (123.1948ms)
+✔ rebind rejects login HTML, changed identity, unsupported headers and cross-origin redirects while preserving bytes (342.243ms)
+✔ abort never installs staged credentials or discards HTTP bytes (98.5397ms)
+✔ zero-byte browser jobs refuse login HTML and invalid or adapter-blocked header envelopes (24.8694ms)
+✔ HLS browser rebind resumes retained resources after restart without fetching completed fragments again (424.0064ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2703.4498

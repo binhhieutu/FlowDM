@@ -76,7 +76,7 @@ async function probe(url, headers, signal, maxBytes) {
     if (total !== null && total > maxBytes) throw Error('Download exceeds size limit');
     const etag = response.headers.etag;
     const candidate = { type: 'etag', value: etag };
-    return { finalUrl: result.finalUrl, ranges, total, validator: isStrongEtag(candidate) ? candidate : response.headers['last-modified'] ? { type: 'modified', value: response.headers['last-modified'] } : null, contentEncoding: 'identity' };
+    return { finalUrl: result.finalUrl, ranges, total, validator: isStrongEtag(candidate) ? candidate : response.headers['last-modified'] ? { type: 'modified', value: response.headers['last-modified'] } : null, contentEncoding: 'identity', contentType: response.headers['content-type'] || '' };
   } finally { response.destroy(); }
 }
 module.exports = { retryRequest, probe, rangeInfo, contentLength };

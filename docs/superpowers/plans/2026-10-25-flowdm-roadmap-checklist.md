@@ -4,7 +4,7 @@
 
 **Ngày:** 2026-10-25. **Trạng thái:** kế hoạch; chưa triển khai các mục chưa đánh dấu.
 
-**Tiến độ 2026-10-26:** Task 1–2 hoàn tất ở 0.6.0, Task 3 hoàn tất ở 0.7.0. Task 4 và đổi N khi tải media đã qua kiểm thử nguồn và review trong phạm vi 0.8; final coverage/audit đã đạt; build/artifact cuối đang chờ. Task 5–10 chưa triển khai. Xem [VERIFICATION_V8.md](../../VERIFICATION_V8.md) và [review 0.8](../../media-selection-v8-review.md). Xem [VERIFICATION_V7.md](../../VERIFICATION_V7.md) và [review Task 3](../../dynamic-ranges-v7-review.md). Xem [VERIFICATION_V6.md](../../VERIFICATION_V6.md) và [review](../../source-refresh-v6-review.md). External HTTP fallback thiếu validator vẫn bị từ chối; legacy DASH thiếu base hash được giữ nguyên nhưng không resume an toàn.
+**Tiến độ 2026-10-26:** Task 1–2 hoàn tất ở 0.6.0, Task 3 hoàn tất ở 0.7.0. Task 4 và đổi N khi tải media đã qua kiểm thử nguồn và review trong phạm vi 0.8; final coverage/audit đã đạt; build/artifact cuối đang chờ. Task 5 hoàn tất ở 0.9.0; Task 6–10 chưa triển khai. Xem [VERIFICATION_V9.md](../../VERIFICATION_V9.md) và [review Task5](../../browser-rebind-v9-review.md). Xem [VERIFICATION_V8.md](../../VERIFICATION_V8.md) và [review 0.8](../../media-selection-v8-review.md). Xem [VERIFICATION_V7.md](../../VERIFICATION_V7.md) và [review Task 3](../../dynamic-ranges-v7-review.md). Xem [VERIFICATION_V6.md](../../VERIFICATION_V6.md) và [review](../../source-refresh-v6-review.md). External HTTP fallback thiếu validator vẫn bị từ chối; legacy DASH thiếu base hash được giữ nguyên nhưng không resume an toàn.
 
 **Goal:** Hoàn thiện những khả năng tải xuống còn thiếu theo hướng sử dụng tương tự IDM, giữ được dữ liệu tải dở và kiểm chứng thực tế trên Windows/Linux/macOS.
 
@@ -119,15 +119,23 @@ Các task tùy chọn 7–8 không chặn bản phát hành A/B. Không mở t�
 
 ## Task 5 — Gắn lại phiên trình duyệt và Firefox
 
-**Files:** sửa `src/bridge/protocol.cjs`, `src/browser/admission.cjs`, `src/browser/registration.cjs`, `src/browser/setup.cjs`, `src/core/download-manager.cjs`, `extension/background.js`, `extension/popup.js`, `extension/manifest.json`; tạo `tests/browser/credential-rebind.test.cjs`, `tests/e2e/firefox.test.cjs`; mở rộng `tests/e2e/browser.test.cjs`.
+**Files thực tế:** thêm `src/browser/credential-rebind.cjs`, `src/core/header-rebind.cjs`, `src/browser/firefox-manifest.cjs`; sửa manager/source-refresh/probe, native protocol/server/host/install, registration/setup, main/preload/desktop UI và extension capture/background/popup/content. Thêm các test credential core/challenge/extension/bridge, Firefox setup, E2E Chromium và Firefox cùng fixture/driver riêng.
 
-**Interface mới:** native message `rebindCredentials` có `{ taskId, origin, requestId }`, header envelope giữ RAM-only và reuse consent policy hiện có. Desktop xác minh sender/origin và job binding trước `manager.rebindHeaders(id, headers)`. Firefox dùng manifest/registration riêng phù hợp Firefox, không cài đè bản Chromium.
+**Interface:** desktop `requestCredentials(id)` tạo challenge RAM `{taskId,origin,requestId,url,filename,expiresAt}`; native `credentialRequests` tìm theo origin, `rebindCredentials` chuẩn bị headers/identity, `commitCredentials` gắn vào RAM, `cancelCredentials` bỏ staging. Frame request_id riêng cho mỗi operation. `manager.rebindHeaders(id,headers)` và prepare/commit nội bộ giữ cùng tác vụ đã dừng. Không tự resume.
 
-- [ ] RED: test relaunch mất headers, consent bị thu hồi, origin sai, redirect khác origin, replay ACK và host vắng; journal/log không chứa secret.
-- [ ] Chạy `node --test tests/browser/credential-rebind.test.cjs`; xác nhận FAIL.
-- [ ] Implement “Kết nối lại từ trình duyệt” cho HTTP/HLS; người dùng mở trang hợp lệ và đồng ý cấp headers. DASH/YouTube authenticated là lane riêng: chỉ bật khi adapter hỗ trợ truyền bí mật an toàn và có review; chưa đạt thì giữ từ chối, ghi trạng thái blocked-by-adapter, không khai đã hỗ trợ.
-- [ ] GREEN: Chromium và Firefox thật với profile riêng: capture → pause → đóng/mở app → rebind → resume; test fallback khi host down và xác minh khôi phục native registration.
-- [ ] Review security/code rồi commit `feat: rebind browser sessions and support Firefox capture`.
+- [x] RED: thiếu API/service/operation; test mất headers khi relaunch, nonce cũ/hết hạn/nhầm task/origin, consent/permission/navigation đổi, ACK sai/replay, native timeout/disconnect, HTML/identity/redirect đổi và rollback journal. Không ghi headers/nonce vào journal/browser storage.
+- [x] Chạy `node --test tests/browser/credential-rebind.test.cjs` xác nhận RED trước implement; core6/6 GREEN, challenge5/5, bridge4/4; 72/72 extension regressions đạt.
+- [x] Implement **Kết nối lại từ trình duyệt** cho HTTP/HLS: explicit desktop nonce, hai bước preflight/commit, TTL2phút/max8, giữ checkpoint/ID/N; authenticated DASH/YouTube giữ trạng thái rõ `blocked-by-adapter`.
+- [x] Firefox export MV2/thư mục/native manifest/GeckoID riêng; Windows Mozilla HKCU view32 backup/restore đúng, view64 giữ nguyên. Namespace Promise và optional origins được kiểm tra trên Firefox thật.
+- [x] GREEN nguồn và Windows packaged0.9: Chromium156/Firefox149.0.2 thật, profile riêng; capture → pause → đóng/mở app → đổi cookie → popup rebind → manual resume. HTTP2MiB/HLS3TS đúng bytes/SHA/full decode, không replay phần commit; no-consent/host-down fallback đạt và native registrations khôi phục đúng.
+- [x] Review độc lập không có P1/P2 có thể tái hiện: 34/34 ban đầu, delta Firefox mới17/17+Chromium23/23. Final full286/286, coverage96.15% lines/86.30% branches/93.48% functions, audit0. Windows portable/Linuxdir build, 50file ASAR/tool integrity, portable smoke và hồi quy browser/media/refresh đạt.
+- [x] Commit `feat: rebind browser sessions and support Firefox capture`.
+
+**Milestone đổi kết nối:** đã triển khai ở0.8 và giữ nguyên trong0.9; kiểm thử core HTTP có cookie sau rebind đổi1→4→1 đạt. Windows packaged HTTP/HLS/DASH1→4→1/relaunch có peak4; video HTTP Internet W3C4372373B khớp tải liên tục và full decode. Không triển khai trùng engine.
+
+**Quyết định Firefox:** không pause lượt trình duyệt vì Firefox có thể hủy khi chưa có partial. Giữ stream đến durableACK, kiểm tra lại safe/URL/quyền rồi cancel và xác minh USER_CANCELED. Cầu nối lỗi giữ lượt gốc; có thể truyền byte đồng thời/tải trùng khi ACK muộn. Chromium giữ protocol pause trướcACK. Addon Firefox unsigned nạp tạm; signed distribution và Linux/macOS native thuộc Task9–10.
+
+**Bằng chứng:** [VERIFICATION_V9.md](../../VERIFICATION_V9.md), [evidence/v0.9](../../evidence/v0.9). CookieAPI được pregrant trong fixture tự động hóa, consent theo origin vẫn được kiểm tra. Bốn thư mục probe tạm giữ lại do auto-review chặn cleanup (`blocked by policy`); không ảnh hưởng các gate, E2E registrations đã khôi phục.
 
 ## Task 6 — Nhiều queue, lịch lặp và hành động sau hoàn tất
 

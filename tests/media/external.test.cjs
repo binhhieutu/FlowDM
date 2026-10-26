@@ -144,7 +144,7 @@ function runAria2(executable, args) {
 
 test('pinned aria2c accepts FlowDM arguments and bounds direct HTTP concurrency', async t => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'flowdm-aria2-'));
-  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  t.after(() => { assert.equal(path.dirname(root), os.tmpdir()); assert.ok(path.basename(root).startsWith('flowdm-aria2-')); return fs.rm(root, { recursive: true, force: true }); });
   const payload = Buffer.alloc(32 * 1024 * 1024, 0x5a);
   const digest = crypto.createHash('sha256').update(payload).digest('hex');
   let active = 0; let peak = 0;
@@ -156,12 +156,16 @@ test('pinned aria2c accepts FlowDM arguments and bounds direct HTTP concurrency'
     if (start > end || end >= payload.length) return res.writeHead(416).end();
     active++; peak = Math.max(peak, active);
     res.writeHead(range ? 206 : 200, { 'accept-ranges': 'bytes', 'content-length': end - start + 1, ...(range ? { 'content-range': `bytes ${start}-${end}/${payload.length}` } : {}) });
-    let offset = start;
+    let offset = start, timer;
+    // Count live responses, including early client cancellation. A delayed send
+    // timer can otherwise keep a closed prior request in the next run's count.
+    res.once('close', () => { active--; clearTimeout(timer); });
     const send = () => {
-      if (offset > end) { res.end(); active--; return; }
+      if (res.destroyed) return;
+      if (offset > end) { res.end(); return; }
       const next = Math.min(offset + 256 * 1024, end + 1);
       res.write(payload.subarray(offset, next)); offset = next;
-      setTimeout(send, 8).unref();
+      timer = setTimeout(send, 8); timer.unref();
     };
     send();
   });

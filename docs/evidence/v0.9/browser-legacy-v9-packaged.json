@@ -1,0 +1,88 @@
+{
+  "at": "2026-10-26T00:50:43.984Z",
+  "platform": "win32",
+  "extensionId": "knfcbjlpgbhlenhfejjhimfkdaklbind",
+  "browser": "156.0.8078.4",
+  "nativeMessaging": true,
+  "automaticCapture": true,
+  "disabledFallback": true,
+  "hostDownFallback": true,
+  "cookieConsent": true,
+  "syntheticClickBlocked": true,
+  "hlsTsFmp4ByteExact": true,
+  "decoder": "ffmpeg",
+  "fixturesPregrantCookieApi": true,
+  "events": [
+    "direct-video-and-hls-ts-fmp4-decoded",
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": null
+    },
+    {
+      "authRequest": true,
+      "hasCookie": false,
+      "range": "bytes=0-0"
+    },
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": null
+    },
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": "bytes=0-0"
+    },
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": "bytes=0-0"
+    },
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": "bytes=0-262143"
+    },
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": "bytes=262144-524287"
+    },
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": "bytes=524288-786431"
+    },
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": "bytes=786432-1048575"
+    },
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": "bytes=1048576-1310719"
+    },
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": "bytes=1310720-1572863"
+    },
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": "bytes=1572864-1835007"
+    },
+    {
+      "authRequest": true,
+      "hasCookie": true,
+      "range": "bytes=1835008-2097151"
+    }
+  ],
+  "version": "0.9.0",
+  "packaged": true,
+  "artifact": "I:\\dich_nguoc\\FlowDM\\dist\\win-unpacked\\FlowDM.exe",
+  "versionVerifiedFrom": "dist/win-unpacked/resources/app.asar/package.json",
+  "asarSha256": "221342a6e55991f265fe00996e193753d12357b94a2e20361786eaf01207c417"
+}

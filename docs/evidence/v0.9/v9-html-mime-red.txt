@@ -1,0 +1,35 @@
+✖ zero-byte browser jobs refuse login HTML and invalid or adapter-blocked header envelopes (53.6357ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\credential-rebind.test.cjs:111:3)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /HTML|login/i,
+    operator: 'rejects'
+  }
+
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 131.4352
+
+✖ failing tests:
+
+test at tests\browser\credential-rebind.test.cjs:106:1
+✖ zero-byte browser jobs refuse login HTML and invalid or adapter-blocked header envelopes (53.6357ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\credential-rebind.test.cjs:111:3)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /HTML|login/i,
+    operator: 'rejects'
+  }

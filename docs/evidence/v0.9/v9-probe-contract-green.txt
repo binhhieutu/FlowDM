@@ -1,0 +1,21 @@
+✔ lost browser credentials rebind to the same HTTP task without replaying retained byte ranges (1584.4861ms)
+✔ prepared credentials remain unusable until commit and cannot commit after task source/state changes (124.0506ms)
+✔ rebind rejects login HTML, changed identity, unsupported headers and cross-origin redirects while preserving bytes (356.1962ms)
+✔ abort never installs staged credentials or discards HTTP bytes (105.2077ms)
+✔ zero-byte browser jobs refuse login HTML and invalid or adapter-blocked header envelopes (23.7844ms)
+✔ HLS browser rebind resumes retained resources after restart without fetching completed fragments again (435.1909ms)
+✔ HTTP resume requires the same strong validator, size, range and representation (1.9242ms)
+✔ saved metadata must meet the same contract; legacy identity encoding is supported (0.2359ms)
+✔ probe reads the one-byte range and returns representation metadata (25.6034ms)
+✔ probe refuses malformed ranges, lengths, truncation, encodings and error statuses (21.2193ms)
+✔ weak or malformed ETags never become strong validators (3.1902ms)
+✔ probe rejects a socket closing before the declared range byte arrives (3.2427ms)
+✔ Content-Length parser rejects non-decimal syntax (0.2403ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2706.296

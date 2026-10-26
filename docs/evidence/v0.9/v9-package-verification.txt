@@ -1,0 +1,1 @@
+[{"platform":"win-unpacked","filesVerified":50,"asarSha256":"221342a6e55991f265fe00996e193753d12357b94a2e20361786eaf01207c417"},{"platform":"linux-unpacked","filesVerified":50,"asarSha256":"221342a6e55991f265fe00996e193753d12357b94a2e20361786eaf01207c417"}]

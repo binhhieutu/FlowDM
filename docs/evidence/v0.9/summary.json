@@ -1,0 +1,168 @@
+{
+  "version": "0.9.0",
+  "baseline": "9e7fd2a",
+  "completedAt": "2026-10-26T00:53:38.698Z",
+  "artifact": {
+    "name": "FlowDM 0.9.0.exe",
+    "bytes": 263179670,
+    "sha256": "fa88fb5f6f620a45bce4ef9a1c85103160605acc251044c5436dd211e167bc5c"
+  },
+  "unitIntegration": {
+    "passed": 286,
+    "failed": 0,
+    "skipped": 0
+  },
+  "coverage": {
+    "lines": {
+      "total": 3741,
+      "covered": 3597,
+      "skipped": 0,
+      "pct": 96.15
+    },
+    "statements": {
+      "total": 3741,
+      "covered": 3597,
+      "skipped": 0,
+      "pct": 96.15
+    },
+    "functions": {
+      "total": 399,
+      "covered": 373,
+      "skipped": 0,
+      "pct": 93.48
+    },
+    "branches": {
+      "total": 3513,
+      "covered": 3032,
+      "skipped": 0,
+      "pct": 86.3
+    },
+    "branchesTrue": {
+      "total": 0,
+      "covered": 0,
+      "skipped": 0,
+      "pct": 100
+    }
+  },
+  "auditVulnerabilities": 0,
+  "sourceCoverageGui": {
+    "desktopPassed": 1,
+    "local4KPassed": 1,
+    "optionalPublicSkipped": 3
+  },
+  "packagedGui": {
+    "credentialChromiumPassed": 1,
+    "credentialFirefoxPassed": 1,
+    "legacyChromiumPassed": 1,
+    "regressionsPassed": 5,
+    "optionalYouTubePlaylistSkipped": 5,
+    "portableSmokePassed": 1
+  },
+  "packageVerification": [
+    {
+      "platform": "win-unpacked",
+      "filesVerified": 50,
+      "asarSha256": "221342a6e55991f265fe00996e193753d12357b94a2e20361786eaf01207c417"
+    },
+    {
+      "platform": "linux-unpacked",
+      "filesVerified": 50,
+      "asarSha256": "221342a6e55991f265fe00996e193753d12357b94a2e20361786eaf01207c417"
+    }
+  ],
+  "platforms": {
+    "windows": {
+      "buildPassed": true,
+      "nativeTested": true
+    },
+    "linux": {
+      "directoryBuildPassed": true,
+      "nativeTested": false,
+      "archiveBuilt": false
+    },
+    "macOS": {
+      "built": false,
+      "nativeTested": false
+    }
+  },
+  "scope": {
+    "rebind": "authenticated HTTP/HLS only; stopped tasks; RAM-only desktop nonce plus prepare/commit; no automatic resume",
+    "authenticatedDashYouTube": "blocked-by-adapter",
+    "nativeFirefox": "temporary unsigned addon; signed distribution Task10",
+    "tasks6Through10": "not implemented",
+    "firefoxOwnership": "browser continues until durable matching ACK, then fresh safety/consent checks and verified cancellation; duplicate bytes/late-ACK duplicates possible"
+  },
+  "diagnosticsRetained": {
+    "count": 4,
+    "reason": "Automatic approval review blocked cleanup with only reason blocked by policy; no retry; exported addon copies and one failed-start Firefox profile retained in probe temp roots"
+  },
+  "evidenceFiles": [
+    "coverage-summary.json",
+    "audit-final.json",
+    "package-verification.json",
+    "portable-smoke.json",
+    "portable-smoke.png",
+    "packaged-regressions-exit.json",
+    "http-dynamic-packaged.json",
+    "http-dynamic-packaged.png",
+    "http-live-public-packaged.json",
+    "http-live-public-packaged.png",
+    "media-live-packaged.json",
+    "media-live-packaged.png",
+    "media-selection-packaged.json",
+    "media-selection-packaged.png",
+    "source-refresh-packaged.json",
+    "source-refresh-packaged.png",
+    "browser-legacy-v9-packaged-popup.png",
+    "browser-legacy-v9-packaged-runner-exit.json",
+    "browser-legacy-v9-packaged-runner.txt",
+    "browser-legacy-v9-packaged.json",
+    "browser-legacy-v9-packaged.png",
+    "credential-rebind-chromium-packaged-popup.png",
+    "credential-rebind-chromium-packaged-runner-exit.json",
+    "credential-rebind-chromium-packaged-runner.txt",
+    "credential-rebind-chromium-packaged.json",
+    "credential-rebind-chromium-packaged.png",
+    "credential-rebind-chromium-source-popup.png",
+    "credential-rebind-chromium-source.json",
+    "credential-rebind-chromium-source.png",
+    "firefox-credential-v9-packaged-runner-exit.json",
+    "firefox-credential-v9-packaged-runner.txt",
+    "firefox-credential-v9-packaged.json",
+    "firefox-credential-v9-packaged.png",
+    "firefox-credential-v9-source.json",
+    "firefox-credential-v9-source.png",
+    "v9-coverage-final-retry.txt",
+    "v9-coverage-final.txt",
+    "v9-unit-all.txt",
+    "v9-probe-contract-green.txt",
+    "v9-rebind-core-red.txt",
+    "v9-rebind-core-green.txt",
+    "v9-challenges-red.txt",
+    "v9-challenges-green.txt",
+    "v9-credential-bridge-red.txt",
+    "v9-credential-bridge-green.txt",
+    "v9-html-mime-red.txt",
+    "v9-html-mime-green.txt",
+    "v9-aria2-counter-green.txt",
+    "v9-build-windows.txt",
+    "v9-build-linux-dir.txt",
+    "v9-package-verification.txt",
+    "v9-portable-smoke.txt",
+    "v9-packaged-regressions.txt",
+    "v9-extension-firefox-ownership-green.txt",
+    "v9-extension-firefox-ownership-red.txt",
+    "v9-firefox-red.txt",
+    "v9-firefox-green.txt",
+    "v9-firefox-scoped.txt",
+    "v9-firefox-e2e-red.txt",
+    "v9-firefox-e2e-ack-first.txt",
+    "credential-rebind-chromium-red.txt",
+    "credential-rebind-chromium-green.txt"
+  ],
+  "evidenceRedaction": {
+    "expiredFixtureNonceAndHeaderValuesRemovedFromDiagnosticLogs": [
+      "v9-credential-bridge-red.txt"
+    ]
+  }
+}

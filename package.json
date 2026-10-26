@@ -1,6 +1,6 @@
 {
   "name": "flowdm",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Cross-platform HTTP/HTTPS download manager",
   "main": "src/main.cjs",
   "private": true,

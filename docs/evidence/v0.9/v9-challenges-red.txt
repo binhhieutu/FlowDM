@@ -1,0 +1,195 @@
+✖ only desktop initiation exposes bounded same-origin requests, clones DTOs and supersedes old nonce (36.6619ms)
+  AssertionError [ERR_ASSERTION]: Desktop credential request service is missing
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at fixture (I:\dich_nguoc\FlowDM\tests\browser\credential-challenges.test.cjs:30:10)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\credential-challenges.test.cjs:37:13)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual'
+  }
+
+✖ prepare never authorizes resume, commit consumes exact binding and leaves the job paused (21.2456ms)
+  AssertionError [ERR_ASSERTION]: Desktop credential request service is missing
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at fixture (I:\dich_nguoc\FlowDM\tests\browser\credential-challenges.test.cjs:30:10)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\credential-challenges.test.cjs:51:13)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual'
+  }
+
+✖ wrong task or origin, expired nonce and changed source cannot install credentials (18.8896ms)
+  AssertionError [ERR_ASSERTION]: Desktop credential request service is missing
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at fixture (I:\dich_nguoc\FlowDM\tests\browser\credential-challenges.test.cjs:30:10)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\credential-challenges.test.cjs:60:37)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual'
+  }
+
+✖ cancel and application shutdown discard prepared headers and reject late commits (18.8864ms)
+  AssertionError [ERR_ASSERTION]: Desktop credential request service is missing
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at fixture (I:\dich_nguoc\FlowDM\tests\browser\credential-challenges.test.cjs:30:10)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\credential-challenges.test.cjs:69:13)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual'
+  }
+
+✖ aborted preflight and failed commit journal never create late credential binding (19.8937ms)
+  AssertionError [ERR_ASSERTION]: Desktop credential request service is missing
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at fixture (I:\dich_nguoc\FlowDM\tests\browser\credential-challenges.test.cjs:30:10)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\credential-challenges.test.cjs:77:13)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual'
+  }
+
+ℹ tests 5
+ℹ suites 0
+ℹ pass 0
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 195.9106
+
+✖ failing tests:
+
+test at tests\browser\credential-challenges.test.cjs:36:1
+✖ only desktop initiation exposes bounded same-origin requests, clones DTOs and supersedes old nonce (36.6619ms)
+  AssertionError [ERR_ASSERTION]: Desktop credential request service is missing
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at fixture (I:\dich_nguoc\FlowDM\tests\browser\credential-challenges.test.cjs:30:10)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\credential-challenges.test.cjs:37:13)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual'
+  }
+
+test at tests\browser\credential-challenges.test.cjs:50:1
+✖ prepare never authorizes resume, commit consumes exact binding and leaves the job paused (21.2456ms)
+  AssertionError [ERR_ASSERTION]: Desktop credential request service is missing
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at fixture (I:\dich_nguoc\FlowDM\tests\browser\credential-challenges.test.cjs:30:10)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\credential-challenges.test.cjs:51:13)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual'
+  }
+
+test at tests\browser\credential-challenges.test.cjs:59:1
+✖ wrong task or origin, expired nonce and changed source cannot install credentials (18.8896ms)
+  AssertionError [ERR_ASSERTION]: Desktop credential request service is missing
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at fixture (I:\dich_nguoc\FlowDM\tests\browser\credential-challenges.test.cjs:30:10)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\credential-challenges.test.cjs:60:37)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual'
+  }
+
+test at tests\browser\credential-challenges.test.cjs:68:1
+✖ cancel and application shutdown discard prepared headers and reject late commits (18.8864ms)
+  AssertionError [ERR_ASSERTION]: Desktop credential request service is missing
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at fixture (I:\dich_nguoc\FlowDM\tests\browser\credential-challenges.test.cjs:30:10)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\credential-challenges.test.cjs:69:13)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual'
+  }
+
+test at tests\browser\credential-challenges.test.cjs:76:1
+✖ aborted preflight and failed commit journal never create late credential binding (19.8937ms)
+  AssertionError [ERR_ASSERTION]: Desktop credential request service is missing
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at fixture (I:\dich_nguoc\FlowDM\tests\browser\credential-challenges.test.cjs:30:10)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\credential-challenges.test.cjs:77:13)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual'
+  }

@@ -1,0 +1,30 @@
+✔ native rebind operations validate exact origin, task binding and allowlisted bounded headers (10.4728ms)
+✔ private bridge prepares and commits same task, redacts replies and keys replay cache by operation (78.0053ms)
+✔ bridge deadline aborts preflight and never binds headers after returning timeout (251.1566ms)
+✔ native client disconnect aborts outstanding preparation and clears the desktop nonce (282.6794ms)
+✔ only desktop initiation exposes bounded same-origin requests, clones DTOs and supersedes old nonce (62.8425ms)
+✔ prepare never authorizes resume, commit consumes exact binding and leaves the job paused (39.898ms)
+✔ wrong task or origin, expired nonce and changed source cannot install credentials (32.1338ms)
+✔ cancel and application shutdown discard prepared headers and reject late commits (24.5277ms)
+✔ aborted preflight and failed commit journal never create late credential binding (23.7157ms)
+✔ lost browser credentials rebind to the same HTTP task without replaying retained byte ranges (1613.0409ms)
+✔ prepared credentials remain unusable until commit and cannot commit after task source/state changes (123.1834ms)
+✔ rebind rejects login HTML, changed identity, unsupported headers and cross-origin redirects while preserving bytes (360.8612ms)
+✔ abort never installs staged credentials or discards HTTP bytes (115.0066ms)
+✔ zero-byte browser jobs refuse login HTML and invalid or adapter-blocked header envelopes (24.7847ms)
+✔ HLS browser rebind resumes retained resources after restart without fetching completed fragments again (436.1372ms)
+✔ HTTP resume requires the same strong validator, size, range and representation (1.7153ms)
+✔ saved metadata must meet the same contract; legacy identity encoding is supported (0.2393ms)
+✔ probe reads the one-byte range and returns representation metadata (25.7729ms)
+✔ probe refuses malformed ranges, lengths, truncation, encodings and error statuses (28.3407ms)
+✔ weak or malformed ETags never become strong validators (3.8827ms)
+✔ probe rejects a socket closing before the declared range byte arrives (2.2742ms)
+✔ Content-Length parser rejects non-decimal syntax (0.2288ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2773.9345

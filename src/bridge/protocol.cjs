@@ -57,7 +57,23 @@ function normalizePayload(payload) {
 function validRequest(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   if (Object.keys(value).sort().join(',') !== 'op,payload,request_id,schema') return false;
-  if (value.schema !== 1 || value.op !== 'add' || typeof value.request_id !== 'string' || !/^[A-Za-z0-9_-]{1,128}$/.test(value.request_id)) return false;
-  return normalizePayload(value.payload)!==null;
+  if (value.schema !== 1 || typeof value.request_id !== 'string' || !/^[A-Za-z0-9_-]{1,128}$/.test(value.request_id)) return false;
+  return normalizeOperationPayload(value.op, value.payload)!==null;
 }
-module.exports={MAX_FRAME,encodeFrame,FrameDecoder,validRequest,normalizePayload};
+function normalizeOperationPayload(op, payload) {
+  if (op === 'add') return normalizePayload(payload);
+  if (!plainObject(payload)) return null;
+  if (!['credentialRequests', 'rebindCredentials', 'commitCredentials', 'cancelCredentials'].includes(op)) return null;
+  const fields = op === 'credentialRequests' ? ['origin'] : ['taskId', 'origin', 'requestId', ...(op === 'rebindCredentials' ? ['headers'] : [])];
+  if (Object.keys(payload).length !== fields.length || Object.keys(payload).some(key => !fields.includes(key))) return null;
+  const normalized = normalizePayload({ url: payload.origin });
+  if (!normalized || new URL(normalized.url).origin !== payload.origin) return null;
+  if (op === 'credentialRequests') return { origin: payload.origin };
+  if (!['taskId', 'requestId'].every(key => typeof payload[key] === 'string' && /^[A-Za-z0-9_-]{1,128}$/.test(payload[key]))) return null;
+  const binding = { taskId: payload.taskId, origin: payload.origin, requestId: payload.requestId };
+  if (op !== 'rebindCredentials') return binding;
+  const withHeaders = normalizePayload({ url: payload.origin, headers: payload.headers });
+  if (!withHeaders || (!withHeaders.headers?.cookie?.trim() && !withHeaders.headers?.authorization?.trim())) return null;
+  return { ...binding, headers: withHeaders.headers };
+}
+module.exports={MAX_FRAME,encodeFrame,FrameDecoder,validRequest,normalizePayload,normalizeOperationPayload};

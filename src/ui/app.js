@@ -64,6 +64,19 @@ function render() {
       const update = element('button', '', 'Cập nhật liên kết'); update.type = 'button';
       update.addEventListener('click', event => { event.stopPropagation(); refreshingId = task.id; $('refresh-url').value = ''; $('refresh-error').hidden = true; $('refresh-dialog').showModal(); $('refresh-url').focus(); });
       buttons.append(update);
+      if (['direct', 'hls'].includes(task.mediaType || 'direct')) {
+        const reconnect = element('button', '', 'Kết nối lại từ trình duyệt'); reconnect.type = 'button';
+        reconnect.addEventListener('click', async event => {
+          event.stopPropagation(); reconnect.disabled = true;
+          try {
+            const result = await window.flow.requestCredentials(task.id);
+            if (!result.ok) throw Error(result.error);
+            toast(`Mở trang ${result.data.origin}, bật quyền đăng nhập trong tiện ích FlowDM rồi chọn Tìm tác vụ cần kết nối lại. Yêu cầu có hiệu lực 2 phút.`);
+          } catch (error) { toast(error.message); }
+          finally { reconnect.disabled = false; }
+        });
+        buttons.append(reconnect);
+      }
     }
     if (task.status === 'completed') buttons.append(taskButton(task, 'reveal', 'Mở vị trí'));
     if (['downloading', 'queued', 'paused'].includes(task.status)) buttons.append(taskButton(task, 'cancel', 'Hủy', 'danger'));
