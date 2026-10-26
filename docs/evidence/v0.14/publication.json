@@ -1,0 +1,41 @@
+{
+  "repo": "binhhieutu/FlowDM",
+  "url": "https://github.com/binhhieutu/FlowDM",
+  "visibility": "public",
+  "branch": "main",
+  "commit": "2904cc68412399eebd50aa6bd7a5248a4ffa477a",
+  "release": "https://github.com/binhhieutu/FlowDM/releases/tag/v0.14.0",
+  "tag": "v0.14.0",
+  "prerelease": true,
+  "assets": [
+    {
+      "name": "FlowDM-0.14.0-source.zip",
+      "bytes": 633000,
+      "sha256": "d53c2c5b7d69cc58a687531cb92369fc6022f3562d9fbb128ae9c20feb1909d9",
+      "url": "https://github.com/binhhieutu/FlowDM/releases/download/v0.14.0/FlowDM-0.14.0-source.zip",
+      "verifiedPublicDownload": true
+    },
+    {
+      "name": "FlowDM-0.14.0-extension.zip",
+      "bytes": 18021,
+      "sha256": "905da42afa54a6d936a5b24c8a0bf9905371aa12164e6377298efd68c8e20c13",
+      "url": "https://github.com/binhhieutu/FlowDM/releases/download/v0.14.0/FlowDM-0.14.0-extension.zip",
+      "verifiedPublicDownload": true
+    },
+    {
+      "name": "FlowDM-0.14.0-source-SHA256SUMS.txt",
+      "bytes": 185,
+      "sha256": "9629cfc43dbf5c4aee16266a33479f962719317acbc79ed5b9440d740183311d",
+      "url": "https://github.com/binhhieutu/FlowDM/releases/download/v0.14.0/FlowDM-0.14.0-source-SHA256SUMS.txt",
+      "verifiedPublicDownload": true
+    }
+  ],
+  "pushWorkflowRuns": 0,
+  "at": "2026-10-26T09:26:49.543Z",
+  "publicAssetsScope": "source/extension/checksum only; no executable archives",
+  "secretScan": {
+    "tool": "gitleaks8.30.1",
+    "commitsScannedBeforePush": 22,
+    "findings": 0
+  }
+}
