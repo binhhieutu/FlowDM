@@ -92,12 +92,21 @@ test('real Chromium extension auto capture, video/HLS, cookie consent and host-d
     const target = path.join(profile, 'NativeMessagingHosts'); await fs.mkdir(target, { recursive: true }); await fs.writeFile(path.join(target, 'local.flowdm.bridge.json'), state.browsers.chromium.current);
   }
   popup = await context.newPage(); await popup.goto(`chrome-extension://${extensionId}/popup.html`);
+  const popupExceptions = [];
+  const redact = text => String(text || '').replace(/https?:\/\/[^\s"<>]+/gi, '[URL]');
+  popup.on('pageerror', error => popupExceptions.push(redact(error.message)));
   const probe = await popup.evaluate(() => new Promise(resolve => chrome.runtime.sendNativeMessage('local.flowdm.bridge', { schema: 1, request_id: 'probe', op: 'unsupported', payload: { url: 'https://example.com/' } }, response => resolve({ response, error: chrome.runtime.lastError?.message }))));
   assert.equal(probe.response?.error, 'INVALID_REQUEST', JSON.stringify(probe));
   t.diagnostic('Native messaging launches the generated host successfully');
   const page = await context.newPage(); await page.goto(origin);
   await worker.evaluate(() => {
     globalThis.flowTestCreated = []; globalThis.flowTestTrace = [];
+    globalThis.flowTestNative = [];
+    const sendNative = chrome.runtime.sendNativeMessage.bind(chrome.runtime);
+    chrome.runtime.sendNativeMessage = (host, request, callback) => sendNative(host, request, response => {
+      globalThis.flowTestNative.push({ op: request.op, mediaType: request.payload?.mediaType, ok: response?.ok, error: response?.error, runtimeError: chrome.runtime.lastError?.message });
+      callback(response);
+    });
     globalThis.flowTestHeaders = []; const remember = capture.remember;
     capture.remember = details => { if (details.url.endsWith('/auth.bin')) globalThis.flowTestHeaders.push({ url: details.url, method: details.method, names: (details.requestHeaders || []).map(header => header.name) }); return remember(details); };
     chrome.downloads.onCreated.addListener(item => globalThis.flowTestCreated.push({ id: item.id, url: item.url, state: item.state, danger: item.danger, filename: item.filename }));
@@ -149,7 +158,20 @@ test('real Chromium extension auto capture, video/HLS, cookie consent and host-d
   assert.deepEqual(await fs.readFile(hlsTasks[0].path), expectedTs); assert.deepEqual(await fs.readFile(hlsTasks[1].path), expectedMp4);
   assert.ok(hlsTasks.every(item => item.connections === 8));
   await popup.locator('.media').filter({ hasText: 'manifest.mpd' }).getByTestId('download-media').click();
-  const dash = await until(async () => (await tasks()).find(item => item.mediaType === 'dash' && ['completed', 'failed'].includes(item.status)), 'DASH download');
+  let dash;
+  try { dash = await until(async () => (await tasks()).find(item => item.mediaType === 'dash' && ['completed', 'failed'].includes(item.status)), 'DASH download'); }
+  catch (error) {
+    const diagnostic = {
+      at: new Date().toISOString(), packaged: !!process.env.FLOWDM_EXECUTABLE,
+      tasks: (await tasks()).map(item => ({ id: item.id, status: item.status, mediaType: item.mediaType, error: redact(item.error), downloadedBytes: item.downloadedBytes })),
+      popup: { status: redact(await popup.getByTestId('capture-status').textContent()), buttons: await popup.locator('.media').evaluateAll(rows => rows.map(row => ({ mediaType: row.dataset.mediaType, disabled: row.querySelector('button')?.disabled, buttonText: row.querySelector('button')?.textContent }))) },
+      popupExceptions,
+      native: (await worker.evaluate(() => globalThis.flowTestNative)).map(item => ({ ...item, error: redact(item.error), runtimeError: redact(item.runtimeError) })),
+    };
+    await fs.mkdir('.tmp', { recursive: true });
+    await fs.writeFile('.tmp/v10-browser-legacy-diagnostic.json', JSON.stringify(diagnostic, null, 2));
+    throw error;
+  }
   assert.equal(dash.status, 'completed', JSON.stringify(dash));
   assert.equal(dash.connections, 8);
   const dashProbe = spawnSync('ffprobe', ['-v', 'error', '-show_streams', '-of', 'json', dash.path], { encoding: 'utf8', windowsHide: true });

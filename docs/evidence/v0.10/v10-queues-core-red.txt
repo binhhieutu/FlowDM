@@ -1,0 +1,146 @@
+✖ queues preserve move/order/caps across app restart and finish exact data (25.0947ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:30:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual'
+  }
+
+✖ schema6 migrates to a default queue with exact backup before schema7 write (22.9123ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  6 !== 7
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:50:73)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 6,
+    expected: 7,
+    operator: 'strictEqual'
+  }
+
+✖ scheduled holds survive stop and clock rollback; manual pause stays manual next window (8.421ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:57:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual'
+  }
+
+✖ queue bandwidth reservations cap aggregate sustained transfer and preserve task rate settings (8.9732ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:69:75)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual'
+  }
+
+ℹ tests 4
+ℹ suites 0
+ℹ pass 0
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 141.2202
+
+✖ failing tests:
+
+test at tests\core\queues-integration.test.cjs:28:1
+✖ queues preserve move/order/caps across app restart and finish exact data (25.0947ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:30:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual'
+  }
+
+test at tests\core\queues-integration.test.cjs:45:1
+✖ schema6 migrates to a default queue with exact backup before schema7 write (22.9123ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  6 !== 7
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:50:73)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 6,
+    expected: 7,
+    operator: 'strictEqual'
+  }
+
+test at tests\core\queues-integration.test.cjs:55:1
+✖ scheduled holds survive stop and clock rollback; manual pause stays manual next window (8.421ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:57:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual'
+  }
+
+test at tests\core\queues-integration.test.cjs:68:1
+✖ queue bandwidth reservations cap aggregate sustained transfer and preserve task rate settings (8.9732ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:69:75)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual'
+  }

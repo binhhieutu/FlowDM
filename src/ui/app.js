@@ -37,7 +37,7 @@ function render() {
   const active = tasks.filter(t => t.status === 'downloading').length;
   const queued = tasks.filter(t => t.status === 'queued').length;
   $('queue-summary').textContent = active || queued ? `${active} đang tải · ${queued} đang chờ` : 'Không có lượt tải đang chạy';
-  const shown = tasks.filter(matches);
+  const shown = window.queueUI?.filterTasks(tasks.filter(matches)) || tasks.filter(matches);
   $('visible-count').textContent = `${shown.length} tệp`;
   $('empty').hidden = shown.length > 0;
   $('tasks').replaceChildren(...shown.map(task => {
@@ -81,7 +81,7 @@ function render() {
     if (task.status === 'completed') buttons.append(taskButton(task, 'reveal', 'Mở vị trí'));
     if (['downloading', 'queued', 'paused'].includes(task.status)) buttons.append(taskButton(task, 'cancel', 'Hủy', 'danger'));
     else buttons.append(taskButton(task, 'remove', 'Xóa khỏi danh sách', 'remove'));
-    row.append(info, progress, buttons); return row;
+    row.append(info, progress, buttons); window.queueUI?.decorateTask(row, task); return row;
   }));
   const task = tasks.find(t => t.id === selected);
   $('details').hidden = !task;
@@ -143,7 +143,7 @@ $('add-form').addEventListener('submit', async event => {
   event.preventDefault(); if ($('add-form').dataset.busy === 'true') return;
   $('add-form').dataset.busy = 'true'; $('form-error').hidden = true; $('submit-download').disabled = true;
   try {
-    const input = { url: $('url').value.trim(), connections: Number($('connections').value), speedLimit: Number($('speed-limit').value) * 1024 };
+    const input = { url: $('url').value.trim(), queueId: $('add-queue')?.value || 'default', connections: Number($('connections').value), speedLimit: Number($('speed-limit').value) * 1024 };
     if ($('media-type').value !== 'auto') input.mediaType = $('media-type').value;
     if ($('filename').value.trim()) input.filename = $('filename').value.trim();
     if ($('directory').value) input.directory = $('directory').value;
@@ -151,7 +151,7 @@ $('add-form').addEventListener('submit', async event => {
     const media = window.mediaChoice?.optionsForUrl(input.url) || {};
     let result;
     if (media.playlist) {
-      const batch = await window.flow.addPlaylist({ catalogId: media.catalogId, entryIds: media.entryIds, connections: input.connections, speedLimit: input.speedLimit, ...(input.directory ? { directory: input.directory } : {}) });
+      const batch = await window.flow.addPlaylist({ catalogId: media.catalogId, entryIds: media.entryIds, queueId: input.queueId, connections: input.connections, speedLimit: input.speedLimit, ...(input.directory ? { directory: input.directory } : {}) });
       if (!batch.ok) throw Error(batch.error);
       if (!batch.data.created.length) throw Error(batch.data.errors[0]?.error || 'Không tạo được tác vụ playlist.');
       toast(`Đã thêm ${batch.data.created.length} video${batch.data.errors.length ? `; ${batch.data.errors.length} mục lỗi` : ''}.`);

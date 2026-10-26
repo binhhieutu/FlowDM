@@ -1,0 +1,53 @@
+✔ legacy load assigns default queue in durable task order without reviving paused tasks (2.1597ms)
+✔ v7 rejects unknown queues and ambiguous ownership (0.5779ms)
+✔ create/reorder/move persist order and refuse live transfer moves (1.5213ms)
+✔ failed persistence rolls back configuration and releases admission block (0.5599ms)
+✔ scheduler enforces global queue host bounds and skips pending or unavailable credentials (1.1177ms)
+✔ reconcile releases only queue-held paused work preserving one-shot time (0.5515ms)
+✔ stop window pauses running work with queue provenance (1.0289ms)
+✔ completion deduplicates after durable key; incomplete or active other work blocks destructive actions (0.8841ms)
+✔ failed move restores task ownership and exact order without deleting task data (0.6549ms)
+✔ v7 requires every stored task to have an explicit owner (0.4154ms)
+✔ running queue limits are immutable while enabled changes remain available (0.5657ms)
+✔ failed schedule release remains held and does not synchronously retry pumping (0.2222ms)
+✔ notification allows unrelated work and changing settings cancels a pending destructive intent (0.4197ms)
+✔ v7 roundtrip preserves explicit ownership, held state and completion receipt (0.2099ms)
+✔ exact reorder, insertion move and empty deletion reject invalid inputs (0.5264ms)
+✔ resume queue releases held workers but invalid completion events cannot arm power (0.3441ms)
+✔ manual queue pause wins a late publication completion callback and final power check (0.65ms)
+✔ durable destructive receipt waits in RAM for other queues to finish and arms once (0.3994ms)
+✔ pending destructive completion is canceled by new work and never restored from journal (0.3198ms)
+✔ transient completion receipt write retries in reconcile without replaying startup history (0.647ms)
+✔ new work cancels both pending destructive intent and undurable receipt retry (0.611ms)
+✔ first destructive completion wins when several queues become idle together (0.4173ms)
+✔ synchronous cancellation invalidates a receipt continuation already awaiting persistence (0.2488ms)
+✔ cancellation during a failed receipt write prevents later reconciliation retry (0.2873ms)
+✔ queues preserve move/order/caps across app restart and finish exact data (1235.4948ms)
+✔ schema6 migrates to a default queue with exact backup before schema7 write (21.2313ms)
+✔ scheduled holds survive stop and clock rollback; manual pause stays manual next window (269.5694ms)
+✔ queue bandwidth reservations cap aggregate sustained transfer and preserve task rate settings (2055.4688ms)
+▶ public mutations cancel power immediately while final validation is blocked
+  ✔ add (9.7929ms)
+  ✔ resume (7.0484ms)
+  ✔ createQueue (10.2001ms)
+  ✔ updateQueue (10.7653ms)
+  ✔ deleteQueue (7.2969ms)
+  ✔ reorderQueue (9.0133ms)
+  ✔ moveTask (6.7648ms)
+  ✔ pauseQueue (15.304ms)
+  ✔ resumeQueue (12.5048ms)
+  ✔ remove (11.8657ms)
+✔ public mutations cancel power immediately while final validation is blocked (101.9047ms)
+▶ scheduled running downloads keep automatic provenance across close or interrupted journal restore
+  ✔ close-inside (1003.5069ms)
+  ✔ close-outside (1059.4809ms)
+  ✔ interrupted (941.9244ms)
+✔ scheduled running downloads keep automatic provenance across close or interrupted journal restore (3005.3469ms)
+ℹ tests 43
+ℹ suites 0
+ℹ pass 43
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6772.9479

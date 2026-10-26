@@ -1,0 +1,78 @@
+{
+  "at": "2026-10-26T02:31:22.916Z",
+  "version": "0.10.0",
+  "baseline": "3c294f7",
+  "task": 6,
+  "artifact": {
+    "version": "0.10.0",
+    "artifact": "dist/FlowDM 0.10.0.exe",
+    "bytes": 263192793,
+    "sha256": "9e0088b629b6f6cf791a2785284e27094ef7d4676bc2b7cbafe11f07e707ed21",
+    "asarSha256": "55fb623ec92fe3b5381afc1a3b591f8a09be72b312811d76f6de18053b034224",
+    "linux": "directory build and integrity only",
+    "macOS": "not built or run"
+  },
+  "unit": {
+    "pass": 354,
+    "fail": 0,
+    "skip": 0
+  },
+  "coverage": {
+    "lines": 95.77,
+    "statements": 95.77,
+    "branches": 86.64,
+    "functions": 91.31
+  },
+  "auditVulnerabilities": 0,
+  "gates": {
+    "sourceQueueInitial": {
+      "pass": 2,
+      "beforeFinalReviewFixes": true,
+      "seconds": 133.54
+    },
+    "sourceQueueCrudVersion": "0.10.0",
+    "packagedQueue": {
+      "pass": 2,
+      "seconds": 133.454,
+      "powerAdapter": "fake only; actual OS never called"
+    },
+    "packagedMedia": {
+      "pass": 5,
+      "skip": 5,
+      "reason": "YouTube/playlist Internet opt-in not rerun"
+    },
+    "packagedChromiumRebind": {
+      "exitCode": 0
+    },
+    "packagedFirefoxRebind": {
+      "exitCode": 0
+    },
+    "packagedLegacyBrowser": {
+      "exitCode": 0,
+      "initialFailure": "runner set FLOWDM_FFMPEG; packaged tools correctly rejected override",
+      "resolution": "clear tool overrides in child runner; unchanged timeout/assertions/runtime"
+    },
+    "portableSmoke": {
+      "exitCode": 0,
+      "httpBytes": 2097152,
+      "toolsVerified": true
+    },
+    "integrity": {
+      "filesPerPlatform": 54,
+      "windowsPinnedTools": 3
+    }
+  },
+  "platforms": {
+    "windows": "actual packaged GUI/browser/portable",
+    "linux": "directory build/integrity only",
+    "macOS": "not built or tested"
+  },
+  "provenance": "Harness v6/v7/v8/v9 filenames retained. Current reports mapped by timestamp, runner log, executable and ASAR. Source full run predated final fixes; final packaged follows fixes. Original browser failures preserved with corrected runner evidence.",
+  "remainingTasks": [
+    7,
+    8,
+    9,
+    10
+  ],
+  "published": false
+}

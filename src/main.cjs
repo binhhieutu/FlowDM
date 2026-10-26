@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, shell, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell, Menu, Notification, powerMonitor } = require('electron');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const { DownloadManager } = require('./core/download-manager.cjs');
@@ -7,6 +7,7 @@ const { createBrowserSetup } = require('./browser/setup.cjs');
 const { createBrowserAdmission } = require('./browser/admission.cjs');
 const { createCredentialRebind } = require('./browser/credential-rebind.cjs');
 const { mediaToolStatus } = require('./tools/media-tools.cjs');
+const { SystemPowerAdapter } = require('./core/power-actions.cjs');
 
 const dataDir = process.env.FLOWDM_DATA_DIR || path.join(app.getPath('userData'), 'state');
 if (process.env.FLOWDM_DATA_DIR) app.setPath('userData', path.dirname(dataDir));
@@ -18,7 +19,11 @@ if (!app.requestSingleInstanceLock()) app.quit();
 else {
   app.on('second-instance', () => { if (win) { if (win.isMinimized()) win.restore(); win.show(); win.focus(); } });
   app.whenReady().then(async () => {
-    manager = new DownloadManager({ dataDir, downloadDir, maxConcurrent: 3 });
+    const powerAdapter = new SystemPowerAdapter({ notify: message => {
+      if (!Notification.isSupported()) throw Error('Thông báo desktop chưa được hệ điều hành hỗ trợ.');
+      new Notification(message).show();
+    } });
+    manager = new DownloadManager({ dataDir, downloadDir, maxConcurrent: 3, powerAdapter });
     await manager.init();
     credentialRebind = createCredentialRebind(manager);
     browserSetup = createBrowserSetup({ appDir: app.getAppPath(), dataDir, userDataDir: app.getPath('userData'), executablePath: process.execPath });
@@ -30,6 +35,9 @@ else {
     }).catch(error => { bridgeError = error.message; return null; });
     installHandlers(); createWindow();
     manager.on('change', tasks => { if (win && !win.isDestroyed()) win.webContents.send('flow:changed', tasks); });
+    manager.on('queues', queues => { if (win && !win.isDestroyed()) win.webContents.send('flow:queues', queues); });
+    manager.on('power', value => { if (win && !win.isDestroyed()) win.webContents.send('flow:power', value); });
+    for (const event of ['suspend', 'resume']) powerMonitor.on(event, () => { manager.cancelPower(); if (event === 'resume') manager._pump(); });
     app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
   }).catch(error => { dialog.showErrorBox('FlowDM không thể khởi động', error.message); app.exit(1); });
 }
@@ -60,6 +68,18 @@ function installHandlers() {
   handle('browserConnect', input => browserSetup.connect(input || {}));
   handle('browserDisconnect', browser => browserSetup.disconnect(browser));
   handle('list', () => manager.list());
+  const queueInput = (input, keys) => {
+    if (!input || typeof input !== 'object' || Array.isArray(input) || Object.keys(input).some(key => !keys.includes(key)) || typeof input.id !== 'string') throw Error('Thông tin hàng đợi không hợp lệ.');
+    return input;
+  };
+  handle('listQueues', () => manager.listQueues());
+  handle('createQueue', input => manager.createQueue(input));
+  handle('updateQueue', input => { queueInput(input, ['id', 'patch']); return manager.updateQueue(input.id, input.patch); });
+  for (const method of ['deleteQueue', 'pauseQueue', 'resumeQueue']) handle(method, input => { queueInput(input, ['id']); return manager[method](input.id); });
+  handle('reorderQueue', input => { queueInput(input, ['id', 'taskIds']); return manager.reorderQueue(input.id, input.taskIds); });
+  handle('moveTask', input => { queueInput(input, ['id', 'queueId', 'beforeTaskId']); return manager.moveTask(input.id, input.queueId, input.beforeTaskId); });
+  handle('powerInfo', () => manager.powerInfo());
+  handle('cancelPower', () => manager.cancelPower());
   handle('requestCredentials', input => {
     if (!input || typeof input !== 'object' || Array.isArray(input) || Object.keys(input).join(',') !== 'id' || typeof input.id !== 'string') throw Error('Thông tin kết nối lại không hợp lệ.');
     if (!bridge) throw Error('Cầu nối trình duyệt chưa sẵn sàng.');
@@ -67,7 +87,7 @@ function installHandlers() {
   });
   handle('add', input => {
     if (!input || typeof input !== 'object' || Array.isArray(input)) throw new Error('Thông tin tải không hợp lệ.');
-    const allowed = ['url', 'filename', 'connections', 'directory', 'startAt', 'speedLimit', 'mediaType', 'selection', 'catalogId'];
+    const allowed = ['url', 'filename', 'connections', 'directory', 'startAt', 'speedLimit', 'mediaType', 'selection', 'catalogId', 'queueId'];
     if (Object.keys(input).some(key => !allowed.includes(key))) throw new Error('Tham số không được hỗ trợ.');
     return manager.add(input);
   });

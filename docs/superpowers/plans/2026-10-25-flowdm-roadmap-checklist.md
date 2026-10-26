@@ -4,7 +4,7 @@
 
 **Ngày:** 2026-10-25. **Trạng thái:** kế hoạch; chưa triển khai các mục chưa đánh dấu.
 
-**Tiến độ 2026-10-26:** Task 1–2 hoàn tất ở 0.6.0, Task 3 hoàn tất ở 0.7.0. Task 4 và đổi N khi tải media đã qua kiểm thử nguồn và review trong phạm vi 0.8; final coverage/audit đã đạt; build/artifact cuối đang chờ. Task 5 hoàn tất ở 0.9.0; Task 6–10 chưa triển khai. Xem [VERIFICATION_V9.md](../../VERIFICATION_V9.md) và [review Task5](../../browser-rebind-v9-review.md). Xem [VERIFICATION_V8.md](../../VERIFICATION_V8.md) và [review 0.8](../../media-selection-v8-review.md). Xem [VERIFICATION_V7.md](../../VERIFICATION_V7.md) và [review Task 3](../../dynamic-ranges-v7-review.md). Xem [VERIFICATION_V6.md](../../VERIFICATION_V6.md) và [review](../../source-refresh-v6-review.md). External HTTP fallback thiếu validator vẫn bị từ chối; legacy DASH thiếu base hash được giữ nguyên nhưng không resume an toàn.
+**Tiến độ 2026-10-26:** Task 1–2 hoàn tất ở 0.6.0, Task 3 hoàn tất ở 0.7.0. Task 4 và đổi N khi tải media hoàn tất ở 0.8.0, Task 5 hoàn tất ở 0.9.0, Task 6 hoàn tất ở 0.10.0. Task 7–10 chưa triển khai. Xem [VERIFICATION_V10.md](../../VERIFICATION_V10.md) và [review Task 6](../../queues-v10-review.md). Xem [VERIFICATION_V9.md](../../VERIFICATION_V9.md) và [review Task5](../../browser-rebind-v9-review.md). Xem [VERIFICATION_V8.md](../../VERIFICATION_V8.md) và [review 0.8](../../media-selection-v8-review.md). Xem [VERIFICATION_V7.md](../../VERIFICATION_V7.md) và [review Task 3](../../dynamic-ranges-v7-review.md). Xem [VERIFICATION_V6.md](../../VERIFICATION_V6.md) và [review](../../source-refresh-v6-review.md). External HTTP fallback thiếu validator vẫn bị từ chối; legacy DASH thiếu base hash được giữ nguyên nhưng không resume an toàn.
 
 **Goal:** Hoàn thiện những khả năng tải xuống còn thiếu theo hướng sử dụng tương tự IDM, giữ được dữ liệu tải dở và kiểm chứng thực tế trên Windows/Linux/macOS.
 
@@ -143,11 +143,13 @@ Các task tùy chọn 7–8 không chặn bản phát hành A/B. Không mở t�
 
 **Interface mới:** `evaluateQueues({ queues, tasks, now, timezone }) -> { runnableIds, pauseIds, nextWakeAt }` thuần. Queue cấu hình concurrency, order, speed cap, start/stop window, weekday và timezone IANA; injected clock để test. Mặc định một queue tương đương hành vi cũ.
 
-- [ ] RED: test migration, đổi thứ tự, cap queue/per-host, app ngủ quá giờ chạy, DST và clock lùi; missed schedule chỉ chạy một lần khi trở lại trong cửa sổ hợp lệ, không replay mọi lần đã lỡ.
-- [ ] Chạy `node --test tests/core/queue-scheduler.test.cjs`; xác nhận FAIL.
-- [ ] Implement CRUD queue và UI lịch; tới stop time pause an toàn. Shutdown/sleep chỉ opt-in theo queue, có đếm ngược 60 giây và nút hủy; không shell interpolation từ input.
-- [ ] GREEN: unit + `node --test tests/e2e/queues.test.cjs`; app relaunch giữ queue/order, lịch không nhân đôi. Test power adapter bằng fake, chỉ thử shutdown thật khi chủ máy yêu cầu riêng.
-- [ ] Review rồi commit `feat: add persistent queues and recurring schedules`.
+- [x] RED: test migration, đổi thứ tự, cap queue/per-host, app ngủ quá giờ chạy, DST và clock lùi; missed schedule chỉ chạy một lần khi trở lại trong cửa sổ hợp lệ, không replay mọi lần đã lỡ.
+- [x] Chạy `node --test tests/core/queue-scheduler.test.cjs`; xác nhận FAIL.
+- [x] Implement CRUD queue và UI lịch; tới stop time pause an toàn. Shutdown/sleep chỉ opt-in theo queue, có đếm ngược 60 giây và nút hủy; không shell interpolation từ input.
+- [x] GREEN: unit + `node --test tests/e2e/queues.test.cjs`; app relaunch giữ queue/order, lịch không nhân đôi. Test power adapter bằng fake, chỉ thử shutdown thật khi chủ máy yêu cầu riêng.
+- [x] Review rồi commit `feat: add persistent queues and recurring schedules`.
+
+**Bằng chứng 0.10.0:** [VERIFICATION_V10](../../VERIFICATION_V10.md), [review](../../queues-v10-review.md), [summary](../../evidence/v0.10/summary.json). Full 354/354; coverage 95,77/86,64/91,31; audit 0. Windows packaged queue 2/2, media 5/5 (5 Internet opt-in skip), Chrome/Firefox/legacy mỗi 1/1; portable HTTP 2 MiB/tools; 54 tệp ASAR khớp Windows/Linux. Đếm ngược 60 giây và hủy được thử với fake OS, không tắt/ngủ thật. Linux native/macOS vẫn thuộc Task 9.
 
 ## Task 7 — Import hàng loạt, tải link trên trang, Site Grabber giới hạn
 

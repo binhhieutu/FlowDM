@@ -1,0 +1,20 @@
+▶ public mutations cancel power immediately while final validation is blocked
+  ✔ add (27.1989ms)
+  ✔ resume (9.4833ms)
+  ✔ createQueue (10.9648ms)
+  ✔ updateQueue (14.1345ms)
+  ✔ deleteQueue (7.5201ms)
+  ✔ reorderQueue (15.1944ms)
+  ✔ moveTask (8.1326ms)
+  ✔ pauseQueue (12.2934ms)
+  ✔ resumeQueue (15.7367ms)
+  ✔ remove (7.364ms)
+✔ public mutations cancel power immediately while final validation is blocked (129.9973ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 206.2775

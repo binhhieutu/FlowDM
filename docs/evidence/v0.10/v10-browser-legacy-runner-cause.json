@@ -1,0 +1,7 @@
+{
+  "proof": "src/tools/media-tools.cjs rejects FLOWDM_YTDLP/FLOWDM_FFMPEG/FLOWDM_ARIA2C in packaged Windows",
+  "nativeError": "ADD_FAILED",
+  "at": "2026-10-26T09:29:51.7176043+07:00",
+  "correction": "Removed only current runner process overrides; no runtime or harness filter change",
+  "cause": "Runner supplied FLOWDM_FFMPEG; packaged Windows correctly rejects media tool overrides"
+}

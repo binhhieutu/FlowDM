@@ -1,0 +1,69 @@
+Packaged browser regressions 2026-10-26T09:25:14.9381661+07:00
+START tests/e2e/credential-rebind.test.cjs 2026-10-26T09:25:14.9524827+07:00
+✔ real Chromium rebinds rotated HTTP/HLS cookies after app restart and resumes exact retained data (26008.028ms)
+ℹ {"rows":[{"kind":"direct","taskId":"a7c40bc6-4cd3-4209-88e4-fa2601d870e9","pausedBytes":81920,"restoredBytes":81920,"connections":1,"bytes":2097152,"sha256":"411e416f231a38296893d772490a30eaf07fcb6026a714934db87e95a30544db","sameTaskPreserved":true,"completedDataNotRequestedAgain":true,"rotatedCookieAccepted":true,"wholeFileDecoded":true},{"kind":"hls","taskId":"0014af6e-50d2-4288-a596-b8e0004fd9d4","pausedBytes":15416,"restoredBytes":15416,"connections":1,"bytes":47188,"sha256":"8fd49049fe73583d0e179541f59b57090178a412cd8676250cabbcb6f0bfbc4e","sameTaskPreserved":true,"completedDataNotRequestedAgain":true,"rotatedCookieAccepted":true,"wholeFileDecoded":true}],"hostDownFallback":true}
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 26335.9306
+EXIT tests/e2e/credential-rebind.test.cjs 0 2026-10-26T09:25:41.3422607+07:00
+START tests/e2e/firefox.test.cjs 2026-10-26T09:25:41.3434155+07:00
+✔ real Firefox captures authenticated HTTP/HLS, rebinds after app restart and restores native registration (27766.0285ms)
+ℹ {"at":"2026-10-26T02:25:41.902Z","packaged":true,"rows":[{"type":"direct","transitions":["capture","pause","close","relaunch","rebind","resume"],"pausedBytes":65536,"restoredBytes":65536,"bytes":2097152,"sha256":"411e416f231a38296893d772490a30eaf07fcb6026a714934db87e95a30544db","connections":1,"committedReplay":false,"wholeFileDecoded":true},{"type":"hls","transitions":["capture","pause","close","relaunch","rebind","resume"],"pausedBytes":15416,"restoredBytes":15416,"bytes":47188,"sha256":"8fd49049fe73583d0e179541f59b57090178a412cd8676250cabbcb6f0bfbc4e","connections":1,"committedReplay":false,"wholeFileDecoded":true}],"firefoxBrowserHandoff":"ack-before-cancel","fixturesPregrantCookieApi":true,"scope":"private Firefox profile, temporary unsigned addon, authenticated local actual video fixtures","version":"0.10.0","firefoxVersion":"149.0.2","automaticBrowserDownloadCanceled":true,"nativeMessaging":true,"cookieConsent":true,"hostDownFallback":true,"status":"passed"}
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 28173.1389
+EXIT tests/e2e/firefox.test.cjs 0 2026-10-26T09:26:09.5795408+07:00
+START tests/e2e/browser.test.cjs 2026-10-26T09:26:09.5802792+07:00
+✖ real Chromium extension auto capture, video/HLS, cookie consent and host-down fallback (35857.3205ms)
+  Error: Timeout: DASH download
+      at until (I:\dich_nguoc\FlowDM\tests\e2e\browser.test.cjs:16:9)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\e2e\browser.test.cjs:152:16)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3)
+
+ℹ Loaded real extension hllbpadfdcapedbnphoaapdddnlkcdle
+ℹ Native messaging launches the generated host successfully
+ℹ Auto capture completed exact bytes and original browser download was canceled after ACK
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 36223.6304
+
+✖ failing tests:
+
+test at tests\e2e\browser.test.cjs:18:1
+✖ real Chromium extension auto capture, video/HLS, cookie consent and host-down fallback (35857.3205ms)
+  Error: Timeout: DASH download
+      at until (I:\dich_nguoc\FlowDM\tests\e2e\browser.test.cjs:16:9)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\e2e\browser.test.cjs:152:16)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3)
+EXIT tests/e2e/browser.test.cjs 1 2026-10-26T09:26:45.8551926+07:00
+CORRECTION: Original legacy failures were runner configuration: FLOWDM_FFMPEG leaked to packaged app, which correctly rejects media tool overrides. No runtime changes. Final clean-env rerun follows.
+✔ real Chromium extension auto capture, video/HLS, cookie consent and host-down fallback (19019.2241ms)
+ℹ Loaded real extension dnlcicimbcaaeengechkebiglogfemel
+ℹ Native messaging launches the generated host successfully
+ℹ Auto capture completed exact bytes and original browser download was canceled after ACK
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 19343.4142
+FINAL EXIT tests/e2e/browser.test.cjs 0; all 3 requested browser scenarios now passed; original failed attempts preserved above and in separate diagnostic logs.

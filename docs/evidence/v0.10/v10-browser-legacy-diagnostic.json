@@ -1,0 +1,96 @@
+{
+  "at": "2026-10-26T02:29:15.123Z",
+  "packaged": true,
+  "tasks": [
+    {
+      "id": "ebac9322-2b6d-437f-afea-74a99bc9c308",
+      "status": "completed",
+      "mediaType": "direct",
+      "error": "",
+      "downloadedBytes": 2097152
+    },
+    {
+      "id": "cfd38a69-5b7e-454f-a991-ebd74c8fa3a3",
+      "status": "completed",
+      "mediaType": "direct",
+      "error": "",
+      "downloadedBytes": 41899
+    },
+    {
+      "id": "97397f72-526b-4aea-add1-1b277e6f202b",
+      "status": "completed",
+      "mediaType": "hls",
+      "error": "",
+      "downloadedBytes": 47188
+    },
+    {
+      "id": "44513646-f2ce-49bd-acb0-c9c5ff0fe8b1",
+      "status": "completed",
+      "mediaType": "hls",
+      "error": "",
+      "downloadedBytes": 42313
+    }
+  ],
+  "popup": {
+    "status": "Chưa chuyển được. Mở FlowDM và kiểm tra cầu nối.",
+    "buttons": [
+      {
+        "mediaType": "direct",
+        "disabled": false,
+        "buttonText": "Tải bằng FlowDM"
+      },
+      {
+        "mediaType": "hls",
+        "disabled": false,
+        "buttonText": "Tải bằng FlowDM"
+      },
+      {
+        "mediaType": "hls",
+        "disabled": false,
+        "buttonText": "Tải bằng FlowDM"
+      },
+      {
+        "mediaType": "dash",
+        "disabled": false,
+        "buttonText": "Tải bằng FlowDM"
+      }
+    ]
+  },
+  "popupExceptions": [],
+  "native": [
+    {
+      "op": "add",
+      "ok": true,
+      "error": "",
+      "runtimeError": ""
+    },
+    {
+      "op": "add",
+      "mediaType": "direct",
+      "ok": true,
+      "error": "",
+      "runtimeError": ""
+    },
+    {
+      "op": "add",
+      "mediaType": "hls",
+      "ok": true,
+      "error": "",
+      "runtimeError": ""
+    },
+    {
+      "op": "add",
+      "mediaType": "hls",
+      "ok": true,
+      "error": "",
+      "runtimeError": ""
+    },
+    {
+      "op": "add",
+      "mediaType": "dash",
+      "ok": false,
+      "error": "ADD_FAILED",
+      "runtimeError": ""
+    }
+  ]
+}

@@ -1,0 +1,442 @@
+▶ public mutations cancel power immediately while final validation is blocked
+  ✖ add (33.2798ms)
+    AssertionError [ERR_ASSERTION]: add must fence OS dispatch at public API entry
+    + actual - expected
+
+    + [
+    +   'shutdown'
+    + ]
+    - []
+
+        at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:101:12)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:90:57)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+      generatedMessage: false,
+      code: 'ERR_ASSERTION',
+      actual: [ 'shutdown' ],
+      expected: [],
+      operator: 'deepStrictEqual'
+    }
+
+  ✖ resume (14.055ms)
+    AssertionError [ERR_ASSERTION]: resume must fence OS dispatch at public API entry
+    + actual - expected
+
+    + [
+    +   'shutdown'
+    + ]
+    - []
+
+        at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:101:12)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:90:57)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+      generatedMessage: false,
+      code: 'ERR_ASSERTION',
+      actual: [ 'shutdown' ],
+      expected: [],
+      operator: 'deepStrictEqual'
+    }
+
+  ✖ createQueue (20.3454ms)
+    AssertionError [ERR_ASSERTION]: createQueue must fence OS dispatch at public API entry
+    + actual - expected
+
+    + [
+    +   'shutdown'
+    + ]
+    - []
+
+        at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:101:12)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:90:57)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+      generatedMessage: false,
+      code: 'ERR_ASSERTION',
+      actual: [ 'shutdown' ],
+      expected: [],
+      operator: 'deepStrictEqual'
+    }
+
+  ✖ updateQueue (13.408ms)
+    AssertionError [ERR_ASSERTION]: updateQueue must fence OS dispatch at public API entry
+    + actual - expected
+
+    + [
+    +   'shutdown'
+    + ]
+    - []
+
+        at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:101:12)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:90:57)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+      generatedMessage: false,
+      code: 'ERR_ASSERTION',
+      actual: [ 'shutdown' ],
+      expected: [],
+      operator: 'deepStrictEqual'
+    }
+
+  ✖ deleteQueue (9.7685ms)
+    AssertionError [ERR_ASSERTION]: deleteQueue must fence OS dispatch at public API entry
+    + actual - expected
+
+    + [
+    +   'shutdown'
+    + ]
+    - []
+
+        at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:101:12)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:90:57)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+      generatedMessage: false,
+      code: 'ERR_ASSERTION',
+      actual: [ 'shutdown' ],
+      expected: [],
+      operator: 'deepStrictEqual'
+    }
+
+  ✖ reorderQueue (12.2531ms)
+    AssertionError [ERR_ASSERTION]: reorderQueue must fence OS dispatch at public API entry
+    + actual - expected
+
+    + [
+    +   'shutdown'
+    + ]
+    - []
+
+        at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:101:12)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:90:57)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+      generatedMessage: false,
+      code: 'ERR_ASSERTION',
+      actual: [ 'shutdown' ],
+      expected: [],
+      operator: 'deepStrictEqual'
+    }
+
+  ✖ moveTask (8.6173ms)
+    AssertionError [ERR_ASSERTION]: moveTask must fence OS dispatch at public API entry
+    + actual - expected
+
+    + [
+    +   'shutdown'
+    + ]
+    - []
+
+        at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:101:12)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:90:57)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+      generatedMessage: false,
+      code: 'ERR_ASSERTION',
+      actual: [ 'shutdown' ],
+      expected: [],
+      operator: 'deepStrictEqual'
+    }
+
+  ✖ pauseQueue (12.7967ms)
+    AssertionError [ERR_ASSERTION]: pauseQueue must fence OS dispatch at public API entry
+    + actual - expected
+
+    + [
+    +   'shutdown'
+    + ]
+    - []
+
+        at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:101:12)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:90:57)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+      generatedMessage: false,
+      code: 'ERR_ASSERTION',
+      actual: [ 'shutdown' ],
+      expected: [],
+      operator: 'deepStrictEqual'
+    }
+
+  ✖ resumeQueue (13.5885ms)
+    AssertionError [ERR_ASSERTION]: resumeQueue must fence OS dispatch at public API entry
+    + actual - expected
+
+    + [
+    +   'shutdown'
+    + ]
+    - []
+
+        at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:101:12)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:90:57)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+      generatedMessage: false,
+      code: 'ERR_ASSERTION',
+      actual: [ 'shutdown' ],
+      expected: [],
+      operator: 'deepStrictEqual'
+    }
+
+  ✖ remove (9.4655ms)
+    AssertionError [ERR_ASSERTION]: remove must fence OS dispatch at public API entry
+    + actual - expected
+
+    + [
+    +   'shutdown'
+    + ]
+    - []
+
+        at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:101:12)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:90:57)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+      generatedMessage: false,
+      code: 'ERR_ASSERTION',
+      actual: [ 'shutdown' ],
+      expected: [],
+      operator: 'deepStrictEqual'
+    }
+
+✖ public mutations cancel power immediately while final validation is blocked (150.6676ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 0
+ℹ fail 11
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 248.2584
+
+✖ failing tests:
+
+test at tests\core\queues-integration.test.cjs:90:65
+✖ add (33.2798ms)
+  AssertionError [ERR_ASSERTION]: add must fence OS dispatch at public API entry
+  + actual - expected
+
+  + [
+  +   'shutdown'
+  + ]
+  - []
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:101:12)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:90:57)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: [ 'shutdown' ],
+    expected: [],
+    operator: 'deepStrictEqual'
+  }
+
+test at tests\core\queues-integration.test.cjs:90:65
+✖ resume (14.055ms)
+  AssertionError [ERR_ASSERTION]: resume must fence OS dispatch at public API entry
+  + actual - expected
+
+  + [
+  +   'shutdown'
+  + ]
+  - []
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:101:12)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:90:57)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: [ 'shutdown' ],
+    expected: [],
+    operator: 'deepStrictEqual'
+  }
+
+test at tests\core\queues-integration.test.cjs:90:65
+✖ createQueue (20.3454ms)
+  AssertionError [ERR_ASSERTION]: createQueue must fence OS dispatch at public API entry
+  + actual - expected
+
+  + [
+  +   'shutdown'
+  + ]
+  - []
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:101:12)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:90:57)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: [ 'shutdown' ],
+    expected: [],
+    operator: 'deepStrictEqual'
+  }
+
+test at tests\core\queues-integration.test.cjs:90:65
+✖ updateQueue (13.408ms)
+  AssertionError [ERR_ASSERTION]: updateQueue must fence OS dispatch at public API entry
+  + actual - expected
+
+  + [
+  +   'shutdown'
+  + ]
+  - []
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:101:12)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:90:57)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: [ 'shutdown' ],
+    expected: [],
+    operator: 'deepStrictEqual'
+  }
+
+test at tests\core\queues-integration.test.cjs:90:65
+✖ deleteQueue (9.7685ms)
+  AssertionError [ERR_ASSERTION]: deleteQueue must fence OS dispatch at public API entry
+  + actual - expected
+
+  + [
+  +   'shutdown'
+  + ]
+  - []
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:101:12)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:90:57)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: [ 'shutdown' ],
+    expected: [],
+    operator: 'deepStrictEqual'
+  }
+
+test at tests\core\queues-integration.test.cjs:90:65
+✖ reorderQueue (12.2531ms)
+  AssertionError [ERR_ASSERTION]: reorderQueue must fence OS dispatch at public API entry
+  + actual - expected
+
+  + [
+  +   'shutdown'
+  + ]
+  - []
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:101:12)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:90:57)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: [ 'shutdown' ],
+    expected: [],
+    operator: 'deepStrictEqual'
+  }
+
+test at tests\core\queues-integration.test.cjs:90:65
+✖ moveTask (8.6173ms)
+  AssertionError [ERR_ASSERTION]: moveTask must fence OS dispatch at public API entry
+  + actual - expected
+
+  + [
+  +   'shutdown'
+  + ]
+  - []
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:101:12)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:90:57)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: [ 'shutdown' ],
+    expected: [],
+    operator: 'deepStrictEqual'
+  }
+
+test at tests\core\queues-integration.test.cjs:90:65
+✖ pauseQueue (12.7967ms)
+  AssertionError [ERR_ASSERTION]: pauseQueue must fence OS dispatch at public API entry
+  + actual - expected
+
+  + [
+  +   'shutdown'
+  + ]
+  - []
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:101:12)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:90:57)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: [ 'shutdown' ],
+    expected: [],
+    operator: 'deepStrictEqual'
+  }
+
+test at tests\core\queues-integration.test.cjs:90:65
+✖ resumeQueue (13.5885ms)
+  AssertionError [ERR_ASSERTION]: resumeQueue must fence OS dispatch at public API entry
+  + actual - expected
+
+  + [
+  +   'shutdown'
+  + ]
+  - []
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:101:12)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:90:57)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: [ 'shutdown' ],
+    expected: [],
+    operator: 'deepStrictEqual'
+  }
+
+test at tests\core\queues-integration.test.cjs:90:65
+✖ remove (9.4655ms)
+  AssertionError [ERR_ASSERTION]: remove must fence OS dispatch at public API entry
+  + actual - expected
+
+  + [
+  +   'shutdown'
+  + ]
+  - []
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:101:12)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:90:57)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: [ 'shutdown' ],
+    expected: [],
+    operator: 'deepStrictEqual'
+  }

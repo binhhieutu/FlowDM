@@ -1,0 +1,316 @@
+{
+  "at": "2026-10-26T02:25:35.085Z",
+  "packaged": true,
+  "fixture": {
+    "description": "Real short MP4 plus ISO-BMFF free padding; full FFmpeg decode",
+    "originalBytes": 41899,
+    "bytes": 4194304,
+    "sha256": "d6081daf4fa5aba1f01aa25d510439301b6ef798eb05b21875e50602a53dff0f"
+  },
+  "live": {
+    "transitions": [
+      1,
+      4,
+      1
+    ],
+    "initialBytes": 65536,
+    "pausedBytes": 237568,
+    "restoredBytes": 237568,
+    "restoredConnections": 1,
+    "peakServerConnections": 4,
+    "capSamples": [
+      {
+        "configured": 1,
+        "active": 1,
+        "server": 1
+      },
+      {
+        "configured": 1,
+        "active": 1,
+        "server": 1
+      },
+      {
+        "configured": 1,
+        "active": 1,
+        "server": 1
+      },
+      {
+        "configured": 1,
+        "active": 1,
+        "server": 1
+      },
+      {
+        "configured": 1,
+        "active": 1,
+        "server": 1
+      },
+      {
+        "configured": 1,
+        "active": 1,
+        "server": 1
+      },
+      {
+        "configured": 1,
+        "active": 1,
+        "server": 1
+      },
+      {
+        "configured": 1,
+        "active": 1,
+        "server": 1
+      },
+      {
+        "configured": 1,
+        "active": 1,
+        "server": 1
+      },
+      {
+        "configured": 1,
+        "active": 1,
+        "server": 1
+      }
+    ],
+    "committedReplay": false,
+    "wholeFileDecoded": true
+  },
+  "benchmark": {
+    "slowFirstQuarterChunkBytes": 8192,
+    "slowChunkDelayMs": 40,
+    "fastChunkBytes": 65536,
+    "fastChunkDelayMs": 5,
+    "baseline": {
+      "milliseconds": 5998,
+      "bytes": 4194304,
+      "sha256": "d6081daf4fa5aba1f01aa25d510439301b6ef798eb05b21875e50602a53dff0f",
+      "connections": 4,
+      "peakServerConnections": 4
+    },
+    "dynamic": {
+      "milliseconds": 3279,
+      "connections": 4,
+      "peakServerConnections": 4,
+      "bytes": 4194304,
+      "sha256": "d6081daf4fa5aba1f01aa25d510439301b6ef798eb05b21875e50602a53dff0f",
+      "wholeFileDecoded": true
+    },
+    "speedup": 1.8292162244586765
+  },
+  "requests": [
+    {
+      "route": "/interactive.mp4",
+      "start": 0,
+      "end": 0,
+      "probe": true,
+      "bytesSent": 1,
+      "completed": true,
+      "at": 1792981508870
+    },
+    {
+      "route": "/interactive.mp4",
+      "start": 0,
+      "end": 4194303,
+      "probe": false,
+      "bytesSent": 81920,
+      "completed": false,
+      "at": 1792981508878
+    },
+    {
+      "route": "/interactive.mp4",
+      "start": 81920,
+      "end": 1110015,
+      "probe": false,
+      "bytesSent": 8192,
+      "completed": false,
+      "at": 1792981509210
+    },
+    {
+      "route": "/interactive.mp4",
+      "start": 1110016,
+      "end": 2138111,
+      "probe": false,
+      "bytesSent": 8192,
+      "completed": false,
+      "at": 1792981509210
+    },
+    {
+      "route": "/interactive.mp4",
+      "start": 2138112,
+      "end": 3166207,
+      "probe": false,
+      "bytesSent": 8192,
+      "completed": false,
+      "at": 1792981509210
+    },
+    {
+      "route": "/interactive.mp4",
+      "start": 3166208,
+      "end": 4194303,
+      "probe": false,
+      "bytesSent": 8192,
+      "completed": false,
+      "at": 1792981509211
+    },
+    {
+      "route": "/interactive.mp4",
+      "start": 90112,
+      "end": 1110015,
+      "probe": false,
+      "bytesSent": 122880,
+      "completed": false,
+      "at": 1792981509264
+    },
+    {
+      "route": "/interactive.mp4",
+      "start": 0,
+      "end": 0,
+      "probe": true,
+      "bytesSent": 1,
+      "completed": true,
+      "at": 1792981510463
+    },
+    {
+      "route": "/interactive.mp4",
+      "start": 212992,
+      "end": 1110015,
+      "probe": false,
+      "bytesSent": 897024,
+      "completed": true,
+      "at": 1792981510469
+    },
+    {
+      "route": "/interactive.mp4",
+      "start": 1118208,
+      "end": 2138111,
+      "probe": false,
+      "bytesSent": 1019904,
+      "completed": true,
+      "at": 1792981513908
+    },
+    {
+      "route": "/interactive.mp4",
+      "start": 2146304,
+      "end": 3166207,
+      "probe": false,
+      "bytesSent": 1019904,
+      "completed": true,
+      "at": 1792981517808
+    },
+    {
+      "route": "/interactive.mp4",
+      "start": 3174400,
+      "end": 4194303,
+      "probe": false,
+      "bytesSent": 1019904,
+      "completed": true,
+      "at": 1792981521725
+    },
+    {
+      "route": "/baseline.mp4",
+      "start": 0,
+      "end": 1048575,
+      "probe": false,
+      "bytesSent": 1048576,
+      "completed": true,
+      "at": 1792981525748
+    },
+    {
+      "route": "/baseline.mp4",
+      "start": 2097152,
+      "end": 3145727,
+      "probe": false,
+      "bytesSent": 1048576,
+      "completed": true,
+      "at": 1792981525748
+    },
+    {
+      "route": "/baseline.mp4",
+      "start": 1048576,
+      "end": 2097151,
+      "probe": false,
+      "bytesSent": 1048576,
+      "completed": true,
+      "at": 1792981525748
+    },
+    {
+      "route": "/baseline.mp4",
+      "start": 3145728,
+      "end": 4194303,
+      "probe": false,
+      "bytesSent": 1048576,
+      "completed": true,
+      "at": 1792981525749
+    },
+    {
+      "route": "/dynamic.mp4",
+      "start": 0,
+      "end": 0,
+      "probe": true,
+      "bytesSent": 1,
+      "completed": true,
+      "at": 1792981531850
+    },
+    {
+      "route": "/dynamic.mp4",
+      "start": 0,
+      "end": 1048575,
+      "probe": false,
+      "bytesSent": 32768,
+      "completed": false,
+      "at": 1792981531858
+    },
+    {
+      "route": "/dynamic.mp4",
+      "start": 1048576,
+      "end": 2097151,
+      "probe": false,
+      "bytesSent": 1048576,
+      "completed": true,
+      "at": 1792981531859
+    },
+    {
+      "route": "/dynamic.mp4",
+      "start": 2097152,
+      "end": 3145727,
+      "probe": false,
+      "bytesSent": 1048576,
+      "completed": true,
+      "at": 1792981531859
+    },
+    {
+      "route": "/dynamic.mp4",
+      "start": 3145728,
+      "end": 4194303,
+      "probe": false,
+      "bytesSent": 1048576,
+      "completed": true,
+      "at": 1792981531859
+    },
+    {
+      "route": "/dynamic.mp4",
+      "start": 32768,
+      "end": 540671,
+      "probe": false,
+      "bytesSent": 507904,
+      "completed": true,
+      "at": 1792981532082
+    },
+    {
+      "route": "/dynamic.mp4",
+      "start": 540672,
+      "end": 1048575,
+      "probe": false,
+      "bytesSent": 507904,
+      "completed": true,
+      "at": 1792981532082
+    },
+    {
+      "route": "/dynamic.mp4",
+      "start": 4128768,
+      "end": 4194303,
+      "probe": false,
+      "bytesSent": 65536,
+      "completed": true,
+      "at": 1792981532083
+    }
+  ]
+}

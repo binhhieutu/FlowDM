@@ -17,6 +17,9 @@ const { MediaCatalogService, playlistFilename } = require('./media-catalog-servi
 const { assessHttpResume } = require('./http-resume.cjs');
 const { prepareSourceReplacement } = require('./source-refresh.cjs');
 const { prepareHeaderRebind } = require('./header-rebind.cjs');
+const { QueueCoordinator } = require('./queue-manager.cjs');
+const { effectiveQueueRate } = require('./queue-scheduler.cjs');
+const { PowerActionController, SystemPowerAdapter } = require('./power-actions.cjs');
 
 const clone = value => structuredClone(value);
 const STATES = ['queued', 'downloading', 'paused', 'completed', 'failed', 'canceled'];
@@ -26,7 +29,7 @@ function plan(total, connections, ranges) {
 }
 
 class DownloadManager extends EventEmitter {
-  constructor({ dataDir, downloadDir, maxConcurrent = 3, maxBytes = 100 * 1024 ** 3, maxPerHost = 3, externalDownloader = downloadExternal, mediaInspector = inspectMedia }) {
+  constructor({ dataDir, downloadDir, maxConcurrent = 3, maxBytes = 100 * 1024 ** 3, maxPerHost = 3, externalDownloader = downloadExternal, mediaInspector = inspectMedia, clock = Date.now, powerAdapter = new SystemPowerAdapter(), monotonicClock }) {
     super();
     if (![dataDir, downloadDir].every(value => typeof value === 'string' && path.isAbsolute(value))) throw Error('Data and download directories must be absolute');
     this.dataDir = path.resolve(dataDir); this.downloadDir = path.resolve(downloadDir);
@@ -40,6 +43,11 @@ class DownloadManager extends EventEmitter {
     this.tasks = new Map(); this.secrets = new Map(); this.running = new Map(); this.pendingAdds = new Set();
     this.journal = path.join(this.dataDir, 'downloads.json');
     this.persistence = Promise.resolve(); this.mutations = Promise.resolve(); this.closed = false; this.initialized = false;
+    if (typeof clock !== 'function') throw Error('Scheduler clock must be a function');
+    this.powerController = new PowerActionController({ adapter: powerAdapter, ...(monotonicClock ? { monotonicNow: monotonicClock } : {}), beforeDispatch: intent => this._mutate(() => { this._ready(); return this.queueState.beforePowerDispatch(intent); }) });
+    this.powerController.on('state', value => this.emit('power', value));
+    this.queueState = new QueueCoordinator(this, { clock, powerController: this.powerController });
+    this.queueTick = null; this.queueRetryAt = 0; this.queueError = null;
   }
 
   async init() {
@@ -49,10 +57,12 @@ class DownloadManager extends EventEmitter {
     let saved;
     try { saved = JSON.parse(await fs.readFile(this.journal, 'utf8')); } catch (error) { if (error.code !== 'ENOENT') throw Error(`Cannot read download journal: ${error.message}`); }
     if (saved) {
-      if (![1, 2, 3, 4, 5, 6].includes(saved.version) || !Array.isArray(saved.tasks)) throw Error('Unsupported download journal');
+      if (![1, 2, 3, 4, 5, 6, 7].includes(saved.version) || !Array.isArray(saved.tasks)) throw Error('Unsupported download journal');
       for (const task of saved.tasks) this._validateStored(task, saved.version);
-      if (saved.version < 6) await backupJournal(this.journal, saved.version);
-      for (const task of saved.tasks) {
+      const restoredTasks = this.queueState.load(saved);
+      if (saved.version < 7) await backupJournal(this.journal, saved.version);
+      for (const task of restoredTasks) {
+        if (task.status === 'downloading' && this.queueState.require(task.queueId).schedule) task.queueHold = true;
         const needsPause = task.status === 'downloading' || (task.status === 'queued' && task.requiresHeaders);
         const restored = { ...task, ...(task.activeConnections === undefined ? {} : { activeConnections: 0 }), status: needsPause ? 'paused' : task.status, speed: 0 };
         await this._recoverPublished(restored);
@@ -88,6 +98,17 @@ class DownloadManager extends EventEmitter {
   }
 
   list() { return clone([...this.tasks.values()]); }
+  listQueues() { return this.queueState.snapshot().map(queue => ({ ...queue, error: this.queueError })); }
+  _queueCall(method, ...args) { this.cancelPower(); return this._mutate(() => { this._ready(); return this.queueState[method](...args); }); }
+  createQueue(input) { return this._queueCall('createQueue', input); }
+  updateQueue(id, patch) { return this._queueCall('updateQueue', id, patch); }
+  deleteQueue(id) { return this._queueCall('deleteQueue', id); }
+  reorderQueue(id, taskIds) { return this._queueCall('reorderQueue', id, taskIds); }
+  moveTask(id, queueId, beforeTaskId) { return this._queueCall('moveTask', id, queueId, beforeTaskId); }
+  pauseQueue(id) { return this._queueCall('pauseQueue', id); }
+  resumeQueue(id) { return this._queueCall('resumeQueue', id); }
+  powerInfo() { return this.powerController.snapshot(); }
+  cancelPower() { this.queueState.cancelPower(); return this.powerController.cancel('user-cancelled'); }
   _require(id) { const task = this.tasks.get(id); if (!task) throw Error('Download not found'); return task; }
   _ready() { if (!this.initialized || this.closed) throw Error('Download manager is not running'); }
   _partial(id) { return path.join(this.dataDir, `${id}.part`); }
@@ -125,10 +146,15 @@ class DownloadManager extends EventEmitter {
       await fs.rm(directory, { recursive: true, force: true });
     } catch (error) { if (error.code !== 'ENOENT') throw error; }
   }
-  _notify() { this.emit('change', this.list()); }
+  _notify() {
+    this.emit('change', this.list());
+    const queues = this.listQueues(), signature = JSON.stringify(queues);
+    if (signature !== this.lastQueueSignature) { this.lastQueueSignature = signature; this.emit('queues', queues); }
+  }
   _persist() {
     const snapshot = this.list();
-    const write = this.persistence.catch(() => {}).then(() => atomicJournal(this.journal, snapshot, 6));
+    const queues = this.queueState.snapshot();
+    const write = this.persistence.catch(() => {}).then(() => atomicJournal(this.journal, snapshot, 7, { queues }));
     this.persistence = write; return write;
   }
   _mutate(operation) {
@@ -141,32 +167,35 @@ class DownloadManager extends EventEmitter {
   async inspectMedia(input) { this._ready(); const result = await this.mediaCatalog.inspect(input); this._ready(); return result; }
   async addPlaylist(input) {
     this._ready();
-    if (!input || typeof input !== 'object' || Array.isArray(input) || Object.keys(input).some(key => !['catalogId', 'entryIds', 'connections', 'speedLimit', 'directory'].includes(key))) throw Error('Invalid playlist options');
+    if (!input || typeof input !== 'object' || Array.isArray(input) || Object.keys(input).some(key => !['catalogId', 'entryIds', 'connections', 'speedLimit', 'directory', 'queueId'].includes(key))) throw Error('Invalid playlist options');
     const entries = this.mediaCatalog.playlist(input.catalogId, input.entryIds);
     integer(input.connections ?? 4, 1, 16, 'Connections'); integer(input.speedLimit ?? 0, 0, Number.MAX_SAFE_INTEGER, 'Speed limit');
     const created = [], errors = [];
     for (const entry of entries) {
-      try { created.push(await this.add({ url: entry.url, mediaType: 'youtube', filename: playlistFilename(entry), connections: input.connections, speedLimit: input.speedLimit, directory: input.directory })); }
+      try { created.push(await this.add({ url: entry.url, mediaType: 'youtube', filename: playlistFilename(entry), connections: input.connections, speedLimit: input.speedLimit, directory: input.directory, queueId: input.queueId })); }
       catch (error) { errors.push({ id: entry.id, error: this._safeError(error) }); }
     }
     return { created, errors };
   }
 
   add(input) {
+    this.cancelPower();
     return this._mutate(async () => {
       this._ready();
       const options = inputOptions(input, this.downloadDir);
+      this.queueState.require(input.queueId ?? 'default');
       const selected = options.selection === undefined ? null : this.mediaCatalog.resolve({ url: options.url, mediaType: options.mediaType, selection: options.selection, catalogId: input.catalogId });
       if (selected) options.filename = `${path.parse(options.filename).name}.${selected.extension}`;
       const destination = await uniqueDestination(options.directory, options.filename, new Set(this.list().map(task => task.path.toLowerCase())));
       const task = { id: crypto.randomUUID(), url: options.url, ...destination, status: 'queued', totalBytes: null, downloadedBytes: 0, speed: 0, error: null, connections: options.connections, segments: [], createdAt: new Date().toISOString(), startAt: options.startAt, speedLimit: options.speedLimit, finalUrl: null, sha256: null, validator: null, ranges: false, requiresHeaders: Object.keys(options.headers).length > 0 };
       task.mediaType = options.mediaType;
       if (selected) { task.selection = selected.selection; task.media = { selectionExtension: selected.extension, format: selected.extension }; }
+      this.queueState.attach(task, input.queueId ?? 'default');
       this.pendingAdds.add(task.id);
       this.tasks.set(task.id, task); this.secrets.set(task.id, options.headers);
       try { await this._persist(); }
       catch (error) {
-        this.tasks.delete(task.id); this.secrets.delete(task.id);
+        this.tasks.delete(task.id); this.secrets.delete(task.id); this.queueState.detach(task.id);
         // A running download may have queued a snapshot while this add was pending.
         // Queue its removal after those snapshots; retain the original add failure.
         await this._persist().catch(() => {});
@@ -176,12 +205,13 @@ class DownloadManager extends EventEmitter {
     });
   }
 
-  pause(id) { return this._mutate(() => this._pause(id)); }
+  pause(id) { this.cancelPower(); return this._mutate(() => this._pause(id)); }
   async _commitConnections(task, connections) {
     this._ready(); const previous = task.connections; task.connections = connections;
     try { await this._persist(); } catch (error) { task.connections = previous; throw error; }
   }
   setConnections(id, value) {
+    this.cancelPower();
     return this._mutate(async () => {
       this._ready(); const connections = integer(value, 1, 16, 'Connections'); const task = this._require(id);
       if (!['queued', 'downloading', 'paused', 'failed'].includes(task.status)) throw Error('This download cannot change connections');
@@ -205,6 +235,7 @@ class DownloadManager extends EventEmitter {
   prepareHeaderRebind(id, headers, options) { return this._mutate(() => prepareHeaderRebind(this, id, headers, options)); }
   rebindHeaders(id, headers, options) { return this.prepareHeaderRebind(id, headers, options).then(prepared => prepared.commit()); }
   refreshSource(id, input) {
+    this.cancelPower();
     return this._mutate(async () => {
       this._ready(); const task = this._require(id);
       if (!['paused', 'failed'].includes(task.status) || this.running.has(id)) throw Error('Pause the download before updating its source');
@@ -223,25 +254,27 @@ class DownloadManager extends EventEmitter {
       this._notify(); return clone(updated);
     });
   }
-  async _pause(id) {
+  async _pause(id, { queueHold = false } = {}) {
     this._ready(); const task = this._require(id);
-    if (['completed', 'canceled', 'paused'].includes(task.status)) return clone(task);
+    if (['completed', 'canceled'].includes(task.status)) return clone(task);
+    const changedHold = task.queueHold !== queueHold; task.queueHold = queueHold;
+    if (task.status === 'paused') { if (changedHold) { await this._persist(); this._notify(); } return clone(task); }
     task.status = 'paused'; task.speed = 0;
     const runtime = this.running.get(id); runtime?.controller.abort();
     if (runtime) await runtime.promise;
     task.speed = 0;
     await this._persist(); this._notify(); return clone(task);
   }
-  resume(id) { return this._mutate(() => this._resume(id)); }
+  resume(id) { this.cancelPower(); return this._mutate(() => this._resume(id)); }
   async _resume(id) {
     this._ready(); const task = this._require(id);
     if (!['paused', 'failed'].includes(task.status)) return clone(task);
     if (await this._recoverPublished(task)) { await this._persist(); this._notify(); return clone(task); }
     if (task.requiresHeaders && !this.secrets.has(id)) throw Error('Request headers are not persisted. Reconnect the browser session for this download before resuming.');
-    task.status = 'queued'; task.error = null; task.startAt = null;
+    this.powerController.cancel('new-work'); task.status = 'queued'; task.queueHold = false; task.error = null; task.startAt = null;
     await this._persist(); this._notify(); this._pump(); return clone(task);
   }
-  cancel(id) { return this._mutate(() => this._cancel(id)); }
+  cancel(id) { this.cancelPower(); return this._mutate(() => this._cancel(id)); }
   async _cancel(id) {
     this._ready(); const task = this._require(id);
     if (['completed', 'canceled'].includes(task.status)) return clone(task);
@@ -252,18 +285,23 @@ class DownloadManager extends EventEmitter {
     await this._clearCheckpoint(task);
     await this._persist(); this._notify(); return clone(task);
   }
-  remove(id) { return this._mutate(() => this._remove(id)); }
+  remove(id) { this.cancelPower(); return this._mutate(() => this._remove(id)); }
   async _remove(id) {
     this._ready(); if (!this.tasks.has(id)) return false;
-    await this._cancel(id); this.tasks.delete(id); this.secrets.delete(id);
+    await this._cancel(id); this.tasks.delete(id); this.secrets.delete(id); this.queueState.detach(id);
     await this._persist(); this._notify(); return true;
   }
   async close() {
     if (this.closed) { await this.persistence; return; }
     this.closed = true; clearInterval(this.timer);
+    this.powerController.close();
     const closing = [...this.running.entries()];
     for (const [id, runtime] of closing) {
-      const task = this._require(id); if (task.status === 'downloading') task.status = 'paused';
+      const task = this._require(id);
+      if (task.status === 'downloading') {
+        if (this.queueState.require(task.queueId).schedule) task.queueHold = true;
+        task.status = 'paused';
+      }
       task.speed = 0; runtime.controller.abort();
     }
     await this.mediaCatalog.close();
@@ -273,15 +311,29 @@ class DownloadManager extends EventEmitter {
   }
 
   _pump() {
-    if (this.closed || !this.initialized) return;
-    for (const task of this.tasks.values()) {
+    if (this.closed || !this.initialized || this.queueState.blocked || this.queueTick) return;
+    const decision = this.queueState.evaluate();
+    if (this.queueError || decision.queueTransitions.length || decision.pauseIds.length || decision.runnableIds.some(id => this.tasks.get(id)?.queueHold)) {
+      if (Date.now() < this.queueRetryAt) return;
+      this.queueTick = this._mutate(() => this.queueState.reconcile()).catch(() => { this.queueRetryAt = Date.now() + 1000; }).finally(() => { this.queueTick = null; if (!this.queueError) this._pump(); });
+      return;
+    }
+    for (const id of decision.runnableIds) {
+      const task = this.tasks.get(id); if (!task || this.running.has(id)) continue;
       if (this.running.size >= this.maxConcurrent) break;
-      if (task.status !== 'queued' || this.pendingAdds.has(task.id) || this.running.has(task.id) || (task.startAt && task.startAt > Date.now())) continue;
+      if (task.status !== 'queued' || this.pendingAdds.has(task.id)) continue;
+      const queue = this.queueState.require(task.queueId);
+      const slots = queue.speedLimit ? Math.min(queue.concurrency, queue.speedLimit) : queue.concurrency;
+      if ([...this.running.keys()].filter(taskId => this.tasks.get(taskId)?.queueId === queue.id).length >= slots) continue;
       const host = new URL(task.url).host;
       if ([...this.running.values()].filter(runtime => runtime.host === host).length >= this.maxPerHost) continue;
-      const runtime = { controller: new AbortController(), host, transferred: 0, began: Date.now(), lastEvent: 0 };
+      const runtime = { controller: new AbortController(), host, transferred: 0, began: Date.now(), lastEvent: 0, speedLimit: effectiveQueueRate(queue, task) };
       task.status = 'downloading'; this.running.set(task.id, runtime);
-      runtime.promise = this._run(task, runtime).finally(() => { this.running.delete(task.id); this._notify(); this._pump(); });
+      runtime.promise = this._run(task, runtime).finally(() => {
+        this.running.delete(task.id); this._notify();
+        if (!this.closed && task.status === 'completed') void this._mutate(() => this.queueState.completed(task.id)).catch(() => { this.queueError = 'Cannot save queue completion'; this._notify(); });
+        this._pump();
+      });
       this._notify();
     }
   }
@@ -386,7 +438,7 @@ class DownloadManager extends EventEmitter {
   async _transferExternal(task, runtime) {
     const result = await this.externalDownloader({
       url: task.url, mediaType: task.mediaType, headers: this.secrets.get(task.id) || {}, output: this._partial(task.id),
-      checkpointDir: this._mediaDirectory(task.id), signal: runtime.controller.signal, maxBytes: this.maxBytes, speedLimit: task.speedLimit, connections: task.connections,
+      checkpointDir: this._mediaDirectory(task.id), signal: runtime.controller.signal, maxBytes: this.maxBytes, speedLimit: runtime.speedLimit, connections: task.connections,
       checkpointSourceHash: task.media?.checkpointSourceHash,
       selection: task.selection, expectedExtension: task.media?.selectionExtension,
       onControlReady: control => { runtime.externalControl = control; task.media.canResize = !!control && control.eligible !== false; this._notify(); },
@@ -414,7 +466,7 @@ class DownloadManager extends EventEmitter {
   async _transferHls(task, playlist, handle, runtime) {
     runtime.hlsStage = 'transferring';
     let appended = 0;
-    const result = await transferHlsParallel({ playlist, connections: task.connections, tempRoot: this.dataDir, checkpointDir: this._mediaDirectory(task.id), maxBytes: this.maxBytes, speedLimit: task.speedLimit, signal: runtime.controller.signal,
+    const result = await transferHlsParallel({ playlist, connections: task.connections, tempRoot: this.dataDir, checkpointDir: this._mediaDirectory(task.id), maxBytes: this.maxBytes, speedLimit: runtime.speedLimit, signal: runtime.controller.signal,
       onControlReady: control => { runtime.hlsControl = control; task.media.canResize = !!control; this._notify(); },
       append: async chunk => { let written = 0; while (written < chunk.length) { const value = await handle.write(chunk, written, chunk.length - written, appended + written); if (!value.bytesWritten) throw Error('Disk write made no progress'); written += value.bytesWritten; } appended += written; await handle.sync(); },
       onProgress: progress => { task.downloadedBytes = Math.max(task.downloadedBytes, progress.cumulativeBytes ?? appended); task.segments[0].received = task.downloadedBytes; task.media.completedSegments = progress.completedResources || 0; task.media.reusedResources = progress.reusedResources || 0; task.media.networkBytes = progress.networkBytes; task.media.effectiveConnections = Math.min(task.connections, playlist.resources.length); task.activeConnections = progress.activeConnections || 0; runtime.transferred = progress.networkBytes; task.speed = task.status === 'downloading' ? Math.round(runtime.transferred * 1000 / Math.max(1, Date.now() - runtime.began)) : 0; this._persistProgress(runtime); this._notify(); }
@@ -468,7 +520,7 @@ class DownloadManager extends EventEmitter {
         const remaining = segment.end === null ? this.maxBytes - task.downloadedBytes : segment.end - segment.start + 1 - segment.received;
         if (chunk.length > remaining || task.downloadedBytes + chunk.length > this.maxBytes) throw Error('Response exceeds expected size or size limit');
         runtime.transferred += chunk.length;
-        if (task.speedLimit) await delay(Math.max(0, runtime.transferred * 1000 / task.speedLimit - (Date.now() - runtime.began)), undefined, { signal });
+        if (runtime.speedLimit) await delay(Math.max(0, runtime.transferred * 1000 / runtime.speedLimit - (Date.now() - runtime.began)), undefined, { signal });
         let written = 0;
         while (written < chunk.length) {
           const result = await handle.write(chunk, written, chunk.length - written, segment.start + segment.received + written);

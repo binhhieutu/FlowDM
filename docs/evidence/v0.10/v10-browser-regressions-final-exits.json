@@ -1,0 +1,14 @@
+[
+  {
+    "test": "tests/e2e/credential-rebind.test.cjs",
+    "exitCode": 0
+  },
+  {
+    "test": "tests/e2e/firefox.test.cjs",
+    "exitCode": 0
+  },
+  {
+    "test": "tests/e2e/browser.test.cjs",
+    "exitCode": 1
+  }
+]

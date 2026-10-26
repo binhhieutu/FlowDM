@@ -1,0 +1,85 @@
+▶ scheduled running downloads keep automatic provenance across close or interrupted journal restore
+  ✖ close-inside (18857.1013ms)
+    Error: Queue integration timeout
+        at until (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:11:125)
+        at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:126:5)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:106:72)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3)
+
+  ✖ close-outside (139.378ms)
+    AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+    false !== true
+
+        at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:123:55)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:106:72)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+      generatedMessage: true,
+      code: 'ERR_ASSERTION',
+      actual: false,
+      expected: true,
+      operator: 'strictEqual'
+    }
+
+  ✖ interrupted (18818.2237ms)
+    Error: Queue integration timeout
+        at until (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:11:125)
+        at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:126:5)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:106:72)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3)
+
+✖ scheduled running downloads keep automatic provenance across close or interrupted journal restore (37815.953ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 0
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 37895.6077
+
+✖ failing tests:
+
+test at tests\core\queues-integration.test.cjs:106:80
+✖ close-inside (18857.1013ms)
+  Error: Queue integration timeout
+      at until (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:11:125)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:126:5)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:106:72)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3)
+
+test at tests\core\queues-integration.test.cjs:106:80
+✖ close-outside (139.378ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  false !== true
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:123:55)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:106:72)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual'
+  }
+
+test at tests\core\queues-integration.test.cjs:106:80
+✖ interrupted (18818.2237ms)
+  Error: Queue integration timeout
+      at until (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:11:125)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:126:5)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queues-integration.test.cjs:106:72)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3)

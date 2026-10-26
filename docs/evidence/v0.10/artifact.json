@@ -1,0 +1,9 @@
+{
+  "version": "0.10.0",
+  "artifact": "dist/FlowDM 0.10.0.exe",
+  "bytes": 263192793,
+  "sha256": "9e0088b629b6f6cf791a2785284e27094ef7d4676bc2b7cbafe11f07e707ed21",
+  "asarSha256": "55fb623ec92fe3b5381afc1a3b591f8a09be72b312811d76f6de18053b034224",
+  "linux": "directory build and integrity only",
+  "macOS": "not built or run"
+}

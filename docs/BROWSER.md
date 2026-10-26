@@ -83,3 +83,7 @@ Payload còn cho phép `filename`, `headers` giới hạn và `connections` là 
 Host chuyển tới named pipe Windows/Unix socket có secret ngẫu nhiên mỗi phiên; không mở API TCP quản trị. Request ID chống lặp trong bộ nhớ desktop, không phải bảo đảm exactly-once bền vững qua restart. Dùng thư mục dữ liệu riêng của tài khoản, không đặt trên share/public. Không tuyên bố bảo vệ khỏi mã độc chạy cùng tài khoản.
 
 0.9 thêm `credentialRequests` (origin), `rebindCredentials` (taskId/origin/requestId/headers, chỉ chuẩn bị), `commitCredentials` và `cancelCredentials` (cùng binding, không headers). `requestId` của challenge khác `request_id` của từng frame. Cache replay tính cả operation và payload. Preflight được abort khi hết hạn hoặc client ngắt trong lúc chờ; commit kiểm tra binding/state và rollback nếu lưu journal thất bại. Các ACK không chứa headers.
+
+### Nâng cấp 0.10
+
+Journal desktop chuyển schema7 (tasks+queues); sao lưu tự động nguyên byte bản cũ trước ghi. Không mở state mới bằng FlowDM0.9/cũ hơn. Handoff trình duyệt và playlist mặc định vào queue Default; chuyển sang queue khác trong desktop sau khi dừng. Không thêm trường queue vào giao thức extension/native. Xuất/Reload tiện ích và kết nối lại host để dùng cùng bundle0.10. Xem [queue và lịch lặp](VERIFICATION_V10.md).

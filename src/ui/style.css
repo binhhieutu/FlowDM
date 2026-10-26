@@ -9,3 +9,16 @@
 .connection-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:16px}.connection-controls label{margin:0;font-size:11px}.connection-controls select,.connection-controls button{font-size:11px}.connection-controls .hint{flex-basis:100%;margin:0}
 
 #add-dialog{max-height:92vh;overflow-y:auto}.media-catalog{margin:14px 0;padding:14px;background:#f5f9fc;border:1px solid #dbe6ef;border-radius:9px}.media-catalog>strong{font-size:12px;overflow-wrap:anywhere}.media-catalog select{width:100%;font-size:11px}.media-options{max-height:140px;overflow:auto}.media-options label{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:400;margin:8px 0;overflow-wrap:anywhere}.media-options input{flex:0 0 auto}.playlist-options{max-height:230px}
+.queue-tools { display:flex; align-items:center; flex-wrap:wrap; gap:10px; padding:14px 18px; border-bottom:1px solid var(--border,#dce2e9); }
+.queue-tools label { margin:0; font-size:13px; }
+.queue-tools select { width:190px; }
+.queue-tools .hint { flex-basis:100%; margin:0; }
+.task-queue-actions { display:flex; align-items:center; gap:4px; margin-top:6px; }
+.task-queue-actions select { width:130px; font-size:11px; padding:3px 5px; }
+.task-queue-actions button { padding:3px 7px; }
+.power-panel { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 18px; background:#fff0cb; color:#713d00; }
+.power-panel[hidden] { display:none; }
+.check-label { display:inline-flex; align-items:center; gap:6px; margin-right:10px; }
+.check-label input { width:auto; }
+#queue-weekdays { border:1px solid #dce2e9; border-radius:8px; padding:10px; margin:12px 0; }
+#queue-weekdays legend { font-size:12px; }

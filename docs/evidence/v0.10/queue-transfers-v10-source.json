@@ -1,0 +1,18 @@
+{
+  "packaged": false,
+  "elapsed": 4455,
+  "peak": 2,
+  "order": [
+    "9d59bd7f-c2eb-43e4-bf8e-5f4cb35ddb35",
+    "ea1c23c8-d1e9-4784-8e95-4369a8c22eb0"
+  ],
+  "calls": [
+    {
+      "action": "shutdown",
+      "context": {
+        "queueName": "Nguồn giả lập"
+      },
+      "at": 1792981331165
+    }
+  ]
+}

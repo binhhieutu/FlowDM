@@ -4,11 +4,12 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const { createReadStream, constants } = require('node:fs');
 
-async function atomicJournal(filename, tasks, version = 2) {
-  if (![2, 3, 4, 5, 6].includes(version)) throw Error('Unsupported download journal version');
+async function atomicJournal(filename, tasks, version = 2, metadata = {}) {
+  if (![2, 3, 4, 5, 6, 7].includes(version)) throw Error('Unsupported download journal version');
+  if (version === 7 && !Array.isArray(metadata.queues)) throw Error('Queue journal metadata is required');
   const temporary = `${filename}.${crypto.randomUUID()}.tmp`;
   const handle = await fs.open(temporary, 'wx', 0o600);
-  try { await handle.writeFile(JSON.stringify({ version, tasks })); await handle.sync(); } finally { await handle.close(); }
+  try { await handle.writeFile(JSON.stringify({ version, tasks, ...(version === 7 ? { queues: metadata.queues } : {}) })); await handle.sync(); } finally { await handle.close(); }
   try { await fs.rename(temporary, filename); } catch (error) { await fs.unlink(temporary).catch(() => {}); throw error; }
 }
 async function backupJournal(filename, version) {

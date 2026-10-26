@@ -1,0 +1,231 @@
+✖ scheduler exports its pure interface (1.5259ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:11:61)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.start (node:internal/test_runner/test:829:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:297:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual'
+  }
+
+✖ canonical validation rejects malformed queues (0.2317ms)
+  TypeError [Error]: Cannot read properties of undefined (reading 'createDefaultQueue')
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:13:21)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3)
+
+✖ fair selection skips blocked hosts and respects global and queue caps (0.1375ms)
+  TypeError [Error]: Cannot read properties of undefined (reading 'createDefaultQueue')
+      at q (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:7:34)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:18:19)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+✖ manual pauses, headers, completed tasks and one shots remain intact (0.1868ms)
+  TypeError [Error]: Cannot read properties of undefined (reading 'createDefaultQueue')
+      at q (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:7:34)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:24:17)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+✖ half open windows pause running work and calculate wake boundaries (0.144ms)
+  TypeError [Error]: Cannot read properties of undefined (reading 'createDefaultQueue')
+      at q (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:7:34)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:29:17)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+✖ overnight weekdays refer to start day (0.1182ms)
+  TypeError [Error]: Cannot read properties of undefined (reading 'createDefaultQueue')
+      at q (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:7:34)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:36:15)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+✖ closed watermark prevents reopening after arbitrary clock rollback (0.1831ms)
+  TypeError [Error]: Cannot read properties of undefined (reading 'createDefaultQueue')
+      at q (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:7:34)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:41:13)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+✖ DST gap advances boundary while fold closes at first stop (0.1297ms)
+  TypeError [Error]: Cannot read properties of undefined (reading 'createDefaultQueue')
+      at q (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:7:34)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:48:13)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+✖ disabled queues pause work and tiny byte caps reduce slots (0.3538ms)
+  TypeError [Error]: Cannot read properties of undefined (reading 'createDefaultQueue')
+      at q (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:7:34)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:56:29)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+ℹ tests 9
+ℹ suites 0
+ℹ pass 0
+ℹ fail 9
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 72.6537
+
+✖ failing tests:
+
+test at tests\core\queue-scheduler.test.cjs:11:1
+✖ scheduler exports its pure interface (1.5259ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:11:61)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.start (node:internal/test_runner/test:829:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:297:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual'
+  }
+
+test at tests\core\queue-scheduler.test.cjs:12:1
+✖ canonical validation rejects malformed queues (0.2317ms)
+  TypeError [Error]: Cannot read properties of undefined (reading 'createDefaultQueue')
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:13:21)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3)
+
+test at tests\core\queue-scheduler.test.cjs:17:1
+✖ fair selection skips blocked hosts and respects global and queue caps (0.1375ms)
+  TypeError [Error]: Cannot read properties of undefined (reading 'createDefaultQueue')
+      at q (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:7:34)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:18:19)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+test at tests\core\queue-scheduler.test.cjs:22:1
+✖ manual pauses, headers, completed tasks and one shots remain intact (0.1868ms)
+  TypeError [Error]: Cannot read properties of undefined (reading 'createDefaultQueue')
+      at q (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:7:34)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:24:17)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+test at tests\core\queue-scheduler.test.cjs:28:1
+✖ half open windows pause running work and calculate wake boundaries (0.144ms)
+  TypeError [Error]: Cannot read properties of undefined (reading 'createDefaultQueue')
+      at q (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:7:34)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:29:17)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+test at tests\core\queue-scheduler.test.cjs:35:1
+✖ overnight weekdays refer to start day (0.1182ms)
+  TypeError [Error]: Cannot read properties of undefined (reading 'createDefaultQueue')
+      at q (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:7:34)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:36:15)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+test at tests\core\queue-scheduler.test.cjs:40:1
+✖ closed watermark prevents reopening after arbitrary clock rollback (0.1831ms)
+  TypeError [Error]: Cannot read properties of undefined (reading 'createDefaultQueue')
+      at q (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:7:34)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:41:13)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+test at tests\core\queue-scheduler.test.cjs:47:1
+✖ DST gap advances boundary while fold closes at first stop (0.1297ms)
+  TypeError [Error]: Cannot read properties of undefined (reading 'createDefaultQueue')
+      at q (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:7:34)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:48:13)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+test at tests\core\queue-scheduler.test.cjs:55:1
+✖ disabled queues pause work and tiny byte caps reduce slots (0.3538ms)
+  TypeError [Error]: Cannot read properties of undefined (reading 'createDefaultQueue')
+      at q (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:7:34)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\queue-scheduler.test.cjs:56:29)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
