@@ -61,6 +61,7 @@ test('real Chromium extension auto capture, video/HLS, cookie consent and host-d
     }
     if (desktop) await desktop.app.close().catch(() => {});
     server.closeAllConnections(); await new Promise(resolve => server.close(resolve));
+    assert.equal(path.dirname(root), os.tmpdir()); assert.ok(path.basename(root).startsWith('flowdm-browser-e2e-'));
     await fs.rm(root, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 });
     if (cleanupErrors.length) throw new AggregateError(cleanupErrors, 'Browser registration restoration failed');
   });
@@ -115,6 +116,29 @@ test('real Chromium extension auto capture, video/HLS, cookie consent and host-d
       chrome.downloads[method] = (...args) => { const callback = args.pop(); return original(...args, result => { globalThis.flowTestTrace.push({ method, error: chrome.runtime.lastError?.message, result }); callback(result); }); };
     }
   });
+  // Explicit rendered-page discovery stages a desktop preview, never a download.
+  await page.bringToFront(); await popup.reload();
+  await popup.getByTestId('collect-page-links').click();
+  await until(async () => await popup.getByTestId('page-links-list').locator('input').count() === 3, 'page links collected');
+  assert.equal(await popup.getByTestId('page-links-list').locator('input:checked').count(), 0);
+  assert.equal((await tasks()).length, 0);
+  await popup.getByTestId('page-links-filter').fill('fallback.bin');
+  await popup.getByTestId('page-links-list').locator('input').check();
+  await popup.getByTestId('preview-page-links').click();
+  await desktop.page.locator('#batch-dialog').waitFor({ state: 'visible' });
+  assert.equal(await desktop.page.locator('#batch-text').inputValue(), origin + '/fallback.bin');
+  assert.equal((await tasks()).length, 0);
+  await desktop.page.locator('#batch-preview').click();
+  await desktop.page.locator('#batch-results input').waitFor();
+  assert.equal(await desktop.page.locator('#batch-results input:checked').count(), 0);
+  await desktop.page.locator('#batch-results input').check();
+  await desktop.page.locator('#batch-submit').click();
+  const batchTask = await until(async () => (await tasks()).find(item => item.url === origin + '/fallback.bin' && item.status === 'completed'), 'selected browser batch completes');
+  assert.deepEqual(await fs.readFile(batchTask.path), body);
+  await desktop.page.locator('#batch-close').click();
+  await desktop.page.evaluate(id => window.flow.action(id, 'remove'), batchTask.id);
+  await fs.mkdir('test-results', { recursive: true });
+  await fs.writeFile(`test-results/page-links-v11-${process.env.FLOWDM_EXECUTABLE ? 'packaged' : 'source'}.json`, JSON.stringify({ at: new Date().toISOString(), appVersion: (await desktop.page.evaluate(() => window.flow.info())).data.version, stagedOnly: true, collected: 3, selected: 1, bytes: body.length, sha256: crypto.createHash('sha256').update(body).digest('hex') }, null, 2));
   await page.locator('#file').click();
   let auto;
   try { auto = await until(async () => (await tasks()).find(item => item.url === `${origin}/auto.bin` && item.status === 'completed'), 'auto capture completed'); }

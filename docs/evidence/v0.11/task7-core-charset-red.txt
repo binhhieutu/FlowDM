@@ -1,0 +1,43 @@
+✖ crawler refuses unsupported charset or invalid UTF8 instead of returning altered URL bytes (33.2021ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(rows[0].error)
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\site-grabber.test.cjs:126:67)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: true,
+    operator: '=='
+  }
+
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 99.4052
+
+✖ failing tests:
+
+test at tests\core\site-grabber.test.cjs:120:1
+✖ crawler refuses unsupported charset or invalid UTF8 instead of returning altered URL bytes (33.2021ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(rows[0].error)
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\site-grabber.test.cjs:126:67)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: true,
+    operator: '=='
+  }

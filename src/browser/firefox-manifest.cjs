@@ -9,7 +9,7 @@ function firefoxManifest(chromium) {
     browser_specific_settings: { gecko: { id: FIREFOX_EXTENSION_ID, strict_min_version: '115.0' } },
     permissions: [...chromium.permissions, ...chromium.host_permissions],
     optional_permissions: [...chromium.optional_permissions, ...chromium.optional_host_permissions],
-    background: { scripts: ['capture.js', 'media.js', 'background.js'], persistent: true },
+    background: { scripts: ['capture.js', 'media.js', 'page-links.js', 'background.js'], persistent: true },
     browser_action: structuredClone(chromium.action),
     content_scripts: structuredClone(chromium.content_scripts)
   };

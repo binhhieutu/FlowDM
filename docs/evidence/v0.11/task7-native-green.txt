@@ -1,0 +1,10 @@
+✔ previewBatch accepts only bounded canonical HTTP links, not credentials or job options (5.8159ms)
+✔ native preview is replay-safe, stages once and never creates downloads (15.2216ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 85.546

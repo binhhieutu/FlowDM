@@ -1,0 +1,62 @@
+{
+  "at": "2026-10-26T03:21:11.899Z",
+  "version": "0.11.0",
+  "baseline": "1314956",
+  "task": 7,
+  "artifact": {
+    "path": "dist/FlowDM 0.11.0.exe",
+    "bytes": 263204800,
+    "sha256": "c4c66ccc3466e5a52081b36bf0250b0149f8fce107b48bd591c432320ea1ddcf",
+    "asarSha256": "9f9decfd8a99ce277ad3e95d366d683d2d31a764cbf4c369d5a81afe314065a9"
+  },
+  "unit": {
+    "pass": 389,
+    "fail": 0,
+    "skip": 0
+  },
+  "coverage": {
+    "lines": 93.51,
+    "statements": 93.51,
+    "branches": 86.49,
+    "functions": 87.52
+  },
+  "auditVulnerabilities": 0,
+  "packaged": {
+    "batchCases": 7,
+    "browserSuites": 3,
+    "queueCases": 2,
+    "mediaCases": 5,
+    "mediaOptInSkipped": 5,
+    "portableHttpBytes": 2097152,
+    "filesVerifiedPerPlatform": 60
+  },
+  "source": {
+    "coreFocused": 20,
+    "serviceFocused": 5,
+    "nativeFocused": 2,
+    "extensionFocused": 8,
+    "batchCases": 7,
+    "publicImportVideoBytes": 4372373,
+    "externalDirectory": "access refused; no bypass; public video URL imported separately"
+  },
+  "power": "fake only; no real OS action",
+  "platforms": {
+    "windows": "actual source/packaged/portable",
+    "linux": "directory build and integrity only",
+    "macOS": "not built/run"
+  },
+  "automaticApprovalRejection": {
+    "action": "test command temporarily removing UI epoch guards to prove additional RED",
+    "reason": "blocked by policy",
+    "applied": false,
+    "retried": false,
+    "alternative": "delayed preview/start tests validated intact guards GREEN; independent stage and picker/queue bugs had natural RED->GREEN"
+  },
+  "provenance": "Reports retaining v6/v7/v8/v9/v10 names are refreshed by the recorded 0.11 executable and ASAR. Source reports retain actual appVersion (some initial source runs pre-bump). Text logs only trim trailing whitespace; raw originals remain local scratch.",
+  "remainingTasks": [
+    8,
+    9,
+    10
+  ],
+  "published": false
+}

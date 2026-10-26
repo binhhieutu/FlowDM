@@ -87,3 +87,7 @@ Host chuyển tới named pipe Windows/Unix socket có secret ngẫu nhiên mỗ
 ### Nâng cấp 0.10
 
 Journal desktop chuyển schema7 (tasks+queues); sao lưu tự động nguyên byte bản cũ trước ghi. Không mở state mới bằng FlowDM0.9/cũ hơn. Handoff trình duyệt và playlist mặc định vào queue Default; chuyển sang queue khác trong desktop sau khi dừng. Không thêm trường queue vào giao thức extension/native. Xuất/Reload tiện ích và kết nối lại host để dùng cùng bundle0.10. Xem [queue và lịch lặp](VERIFICATION_V10.md).
+
+### Link trên trang — 0.11
+
+Xuất/Reload tiện ích và ngắt/kết nối lại native host để cập nhật operation previewBatch. Trong popup nhấn Lấy link trên trang, lọc/chọn (mặc định unchecked), rồi Xem trước trong FlowDM. Chỉ thu anchor của tab HTTP(S) hiện tại, không incognito/credentials. Desktop chỉ mở text preview, phải chọn/submit tiếp mới tạo job; nativepayload≤1000URL/512KiB, mỗiURL≤16384ký tự. Trang thay đổi thì lấy lại. SiteGrabber desktop độc lập, không dùng phiên browser và không chạy JS. [Báo cáo0.11](VERIFICATION_V11.md).

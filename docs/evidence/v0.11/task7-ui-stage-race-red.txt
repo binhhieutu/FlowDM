@@ -1,0 +1,25 @@
+✖ batch preview creates only selected queue jobs and bounded Site Grabber cancels without losing downloads (16788.1685ms)
+  Error: Timeout: browser staging cancels previous discovery
+      at until (I:\dich_nguoc\FlowDM\tests\e2e\batch.test.cjs:11:198)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\e2e\batch.test.cjs:58:3)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3)
+
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 17122.8437
+
+✖ failing tests:
+
+test at tests\e2e\batch.test.cjs:13:1
+✖ batch preview creates only selected queue jobs and bounded Site Grabber cancels without losing downloads (16788.1685ms)
+  Error: Timeout: browser staging cancels previous discovery
+      at until (I:\dich_nguoc\FlowDM\tests\e2e\batch.test.cjs:11:198)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\e2e\batch.test.cjs:58:3)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3)

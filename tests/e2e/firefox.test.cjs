@@ -86,6 +86,19 @@ test('real Firefox captures authenticated HTTP/HLS, rebinds after app restart an
     await until(async () => await firefox.evaluate(() => !document.querySelector('[data-testid=credentials]').disabled && document.querySelector('[data-testid=capture-status]').textContent !== 'Đang đọc trạng thái…'), 'popup for active website');
   }
   async function fixtureClick(selector) { await firefox.switchTo(fixtureHandle); await until(async () => await firefox.evaluate(value => !!document.querySelector(value), selector), 'fixture clickable ' + selector); await firefox.click(selector); }
+  stage = 'rendered page links preview';
+  report.version = (await desktop.page.evaluate(() => window.flow.info())).data.version;
+  await firefox.switchTo(fixtureHandle);
+  await firefox.evaluate(origin => { const a = document.createElement('a'); a.href = origin + '/page-links-only.bin'; a.textContent = 'Explicit link preview'; document.body.append(a); }, fixture.origin);
+  await popup(); await firefox.click('[data-testid=collect-page-links]');
+  await until(async () => await firefox.evaluate(() => document.querySelectorAll('[data-testid=page-links-list] input').length > 0), 'Firefox page links');
+  assert.equal(await firefox.evaluate(() => document.querySelectorAll('[data-testid=page-links-list] input:checked').length), 0);
+  await firefox.evaluate(() => { const filter = document.querySelector('[data-testid=page-links-filter]'); filter.value = 'page-links-only.bin'; filter.dispatchEvent(new Event('input')); });
+  await firefox.click('[data-testid=page-links-list] input'); await firefox.click('[data-testid=preview-page-links]');
+  await desktop.page.locator('#batch-dialog').waitFor({ state: 'visible' });
+  assert.equal(await desktop.page.locator('#batch-text').inputValue(), fixture.origin + '/page-links-only.bin');
+  assert.equal((await tasks()).length, 0); await desktop.page.locator('#batch-close').click();
+  report.pageLinks = { uncheckedByDefault: true, selected: 1, desktopPreviewOnly: true, jobsCreated: 0 };
   stage = 'cookie without consent stays in Firefox';
   await firefox.evaluate(cookie => browser.cookies.set({ ...cookie, sameSite: cookie.sameSite.toLowerCase() }), fixture.grantCookie());
   await fixtureClick('#auth'); await popup();

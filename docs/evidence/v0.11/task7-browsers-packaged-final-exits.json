@@ -1,0 +1,33 @@
+{
+  "at": "2026-10-26T03:17:06.277Z",
+  "version": "0.11.0",
+  "packagedExecutable": "I:/dich_nguoc/FlowDM/dist/win-unpacked/FlowDM.exe",
+  "asarSha256": "9f9decfd8a99ce277ad3e95d366d683d2d31a764cbf4c369d5a81afe314065a9",
+  "toolOverridesPresent": false,
+  "tests": [
+    {
+      "file": "tests/e2e/credential-rebind.test.cjs",
+      "start": "2026-10-26T03:17:06.278Z",
+      "finished": "2026-10-26T03:17:35.101Z",
+      "exitCode": 0,
+      "error": null,
+      "signal": null
+    },
+    {
+      "file": "tests/e2e/browser.test.cjs",
+      "start": "2026-10-26T03:17:35.101Z",
+      "finished": "2026-10-26T03:18:02.892Z",
+      "exitCode": 0,
+      "error": null,
+      "signal": null
+    },
+    {
+      "file": "tests/e2e/firefox.test.cjs",
+      "start": "2026-10-26T03:18:02.892Z",
+      "finished": "2026-10-26T03:18:31.682Z",
+      "exitCode": 0,
+      "error": null,
+      "signal": null
+    }
+  ]
+}

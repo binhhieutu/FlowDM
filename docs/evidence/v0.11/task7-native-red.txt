@@ -1,0 +1,60 @@
+✖ previewBatch accepts only bounded canonical HTTP links, not credentials or job options (1.1267ms)
+  TypeError [Error]: Cannot read properties of null (reading 'urls')
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\bridge\batch-preview.test.cjs:6:268)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.start (node:internal/test_runner/test:829:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:297:17)
+
+✖ native preview is replay-safe, stages once and never creates downloads (16.4198ms)
+  AssertionError [ERR_ASSERTION]: {"request_id":"batch-one","ok":false,"error":"INVALID_REQUEST"}
+
+  false !== true
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\bridge\batch-preview.test.cjs:7:690)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual'
+  }
+
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 85.7029
+
+✖ failing tests:
+
+test at tests\bridge\batch-preview.test.cjs:6:1
+✖ previewBatch accepts only bounded canonical HTTP links, not credentials or job options (1.1267ms)
+  TypeError [Error]: Cannot read properties of null (reading 'urls')
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\bridge\batch-preview.test.cjs:6:268)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.start (node:internal/test_runner/test:829:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:297:17)
+
+test at tests\bridge\batch-preview.test.cjs:7:1
+✖ native preview is replay-safe, stages once and never creates downloads (16.4198ms)
+  AssertionError [ERR_ASSERTION]: {"request_id":"batch-one","ok":false,"error":"INVALID_REQUEST"}
+
+  false !== true
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\bridge\batch-preview.test.cjs:7:690)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual'
+  }

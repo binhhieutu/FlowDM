@@ -1,0 +1,192 @@
+✖ page link collector canonicalizes unique HTTP anchors while retaining query and Unicode filenames (1.1557ms)
+  Error: Cannot find module '../../extension/page-links.js'
+  Require stack:
+  - I:\dich_nguoc\FlowDM\tests\browser\page-links.test.cjs
+      at Function._resolveFilename (node:internal/modules/cjs/loader:1409:15)
+      at defaultResolveImpl (node:internal/modules/cjs/loader:1060:19)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1065:22)
+      at Function._load (node:internal/modules/cjs/loader:1214:37)
+      at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:234:24)
+      at Module.require (node:internal/modules/cjs/loader:1495:12)
+      at require (node:internal/modules/helpers:135:16)
+      at load (I:\dich_nguoc\FlowDM\tests\browser\page-links.test.cjs:5:16)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\page-links.test.cjs:7:18) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [ 'I:\\dich_nguoc\\FlowDM\\tests\\browser\\page-links.test.cjs' ]
+  }
+
+✖ page link collector bounds rows and payload without reading unbounded anchors (0.3274ms)
+  Error: Cannot find module '../../extension/page-links.js'
+  Require stack:
+  - I:\dich_nguoc\FlowDM\tests\browser\page-links.test.cjs
+      at Function._resolveFilename (node:internal/modules/cjs/loader:1409:15)
+      at defaultResolveImpl (node:internal/modules/cjs/loader:1060:19)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1065:22)
+      at Function._load (node:internal/modules/cjs/loader:1214:37)
+      at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:234:24)
+      at Module.require (node:internal/modules/cjs/loader:1495:12)
+      at require (node:internal/modules/helpers:135:16)
+      at load (I:\dich_nguoc\FlowDM\tests\browser\page-links.test.cjs:5:16)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\page-links.test.cjs:13:28) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [ 'I:\\dich_nguoc\\FlowDM\\tests\\browser\\page-links.test.cjs' ]
+  }
+
+✖ explicit extension page collection and selected subset stage one native preview, never add jobs or headers (5.7242ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  false !== true
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\page-links.test.cjs:24:98)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual'
+  }
+
+✔ web content, incognito, inactive tab, uncached URLs and navigation cannot stage native preview (1.4167ms)
+✖ navigation while collecting and wrong native acknowledgements leave no usable preview (6.611ms)
+  TypeError [Error]: release is not a function
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\page-links.test.cjs:40:154)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+✖ content page collection is read-only and popup exposes an unchecked preview flow (0.7734ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /data-testid="collect-page-links"/. Input:
+
+  '<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>FlowDM</title><link rel="stylesheet" href="popup.css"></head><body>\n' +
+    '<h1>FlowDM</h1>\n' +
+    '<label for="connections">Số kết nối tối đa mỗi lượt tải</label><select id="connections" data-testid="connections"><option value="1">1</option><option value="2">2</option><option value="4">4</option><option value="8">8</option><option value="16">16</option></select><p>HLS/DASH tải nhiều đoạn; YouTube dùng nhiều dải byte khi server hỗ trợ. Số kết nối thực tế có thể thấp hơn lựa chọn.</p>\n' +
+    '<label><input type="checkbox" data-testid="auto-capture"> Tự bắt tải xuống HTTP(S)</label>\n' +
+    '<p>Trình duyệt chỉ hủy tải sau khi FlowDM xác nhận đã nhận. Khi cầu nối lỗi, trình duyệt tiếp tục tải.</p>\n' +
+    '<label for="credential-origin">Trang được cấp quyền đăng nhập</label><select id="credential-origin" data-testid="credential-origin" aria-label="Trang được cấp quyền đăng nhập"></select><label><input type="checkbox" data-testid="credentials"> Cho phép gửi thông tin đăng nhập cho tên miền đã chọn</label>\n' +
+    '<p data-testid="site-origin"></p><p class="privacy">Mặc định không gửi Cookie, Authorization, Referer hoặc User-Agent. Bật quyền theo từng trang nếu tệp yêu cầu đăng nhập. Không chia sẻ thông tin này với trang khác; không lưu vào lịch sử FlowDM.</p>\n' +
+    '<p role="status" data-testid="capture-status">Đang đọc trạng thái…</p>\n' +
+    '<h2>Tiếp tục tải cần đăng nhập</h2><p data-testid="credential-status">Mở trang gốc và cấp quyền đăng nhập để kết nối lại.</p>\n' +
+    '<button type="button" data-testid="find-credential-requests">Tìm tác vụ cần kết nối lại</button><div data-testid="credential-requests"></div>\n' +
+    '<h2>Video / âm thanh trên trang</h2><p>Chỉ tải khi bạn chọn. DASH/YouTube dùng công cụ media đi kèm; HLS dùng engine tích hợp. DASH và YouTube luôn không gửi Cookie, Authorization hay Referer.</p>\n' +
+    '<div data-testid="media-list"></div><script src="popup.js"></script></body></html>\r\n' +
+    '\r\n'
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\page-links.test.cjs:47:144)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>FlowDM</title><link rel="stylesheet" href="popup.css"></head><body>\n<h1>FlowDM</h1>\n<label for="connections">Số kết nối tối đa mỗi lượt tải</label><select id="connections" data-testid="connections"><option value="1">1</option><option value="2">2</option><option value="4">4</option><option value="8">8</option><option value="16">16</option></select><p>HLS/DASH tải nhiều đoạn; YouTube dùng nhiều dải byte khi server hỗ trợ. Số kết nối thực tế có thể thấp hơn lựa chọn.</p>\n<label><input type="checkbox" data-testid="auto-capture"> Tự bắt tải xuống HTTP(S)</label>\n<p>Trình duyệt chỉ hủy tải sau khi FlowDM xác nhận đã nhận. Khi cầu nối lỗi, trình duyệt tiếp tục tải.</p>\n<label for="credential-origin">Trang được cấp quyền đăng nhập</label><select id="credential-origin" data-testid="credential-origin" aria-label="Trang được cấp quyền đăng nhập"></select><label><input type="checkbox" data-testid="credentials"> Cho phép gửi thông tin đăng nhập cho tên miền đã chọn</label>\n<p data-testid="site-origin"></p><p class="privacy">Mặc định không gửi Cookie, Authorization, Referer hoặc User-Agent. Bật quyền theo từng trang nếu tệp yêu cầu đăng nhập. Không chia sẻ thông tin này với trang khác; không lưu vào lịch sử FlowDM.</p>\n<p role="status" data-testid="capture-status">Đang đọc trạng thái…</p>\n<h2>Tiếp tục tải cần đăng nhập</h2><p data-testid="credential-status">Mở trang gốc và cấp quyền đăng nhập để kết nối lại.</p>\n<button type="button" data-testid="find-credential-requests">Tìm tác vụ cần kết nối lại</button><div data-testid="credential-requests"></div>\n<h2>Video / âm thanh trên trang</h2><p>Chỉ tải khi bạn chọn. DASH/YouTube dùng công cụ media đi kèm; HLS dùng engine tích hợp. DASH và YouTube luôn không gửi Cookie, Authorization hay Referer.</p>\n<div data-testid="media-list"></div><script src="popup.js"></script></body></html>\r\n\r\n',
+    expected: /data-testid="collect-page-links"/,
+    operator: 'match'
+  }
+
+ℹ tests 6
+ℹ suites 0
+ℹ pass 1
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 76.2614
+
+✖ failing tests:
+
+test at tests\browser\page-links.test.cjs:6:1
+✖ page link collector canonicalizes unique HTTP anchors while retaining query and Unicode filenames (1.1557ms)
+  Error: Cannot find module '../../extension/page-links.js'
+  Require stack:
+  - I:\dich_nguoc\FlowDM\tests\browser\page-links.test.cjs
+      at Function._resolveFilename (node:internal/modules/cjs/loader:1409:15)
+      at defaultResolveImpl (node:internal/modules/cjs/loader:1060:19)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1065:22)
+      at Function._load (node:internal/modules/cjs/loader:1214:37)
+      at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:234:24)
+      at Module.require (node:internal/modules/cjs/loader:1495:12)
+      at require (node:internal/modules/helpers:135:16)
+      at load (I:\dich_nguoc\FlowDM\tests\browser\page-links.test.cjs:5:16)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\page-links.test.cjs:7:18) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [ 'I:\\dich_nguoc\\FlowDM\\tests\\browser\\page-links.test.cjs' ]
+  }
+
+test at tests\browser\page-links.test.cjs:12:1
+✖ page link collector bounds rows and payload without reading unbounded anchors (0.3274ms)
+  Error: Cannot find module '../../extension/page-links.js'
+  Require stack:
+  - I:\dich_nguoc\FlowDM\tests\browser\page-links.test.cjs
+      at Function._resolveFilename (node:internal/modules/cjs/loader:1409:15)
+      at defaultResolveImpl (node:internal/modules/cjs/loader:1060:19)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1065:22)
+      at Function._load (node:internal/modules/cjs/loader:1214:37)
+      at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:234:24)
+      at Module.require (node:internal/modules/cjs/loader:1495:12)
+      at require (node:internal/modules/helpers:135:16)
+      at load (I:\dich_nguoc\FlowDM\tests\browser\page-links.test.cjs:5:16)
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\page-links.test.cjs:13:28) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [ 'I:\\dich_nguoc\\FlowDM\\tests\\browser\\page-links.test.cjs' ]
+  }
+
+test at tests\browser\page-links.test.cjs:23:1
+✖ explicit extension page collection and selected subset stage one native preview, never add jobs or headers (5.7242ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  false !== true
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\page-links.test.cjs:24:98)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual'
+  }
+
+test at tests\browser\page-links.test.cjs:38:1
+✖ navigation while collecting and wrong native acknowledgements leave no usable preview (6.611ms)
+  TypeError [Error]: release is not a function
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\page-links.test.cjs:40:154)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7)
+
+test at tests\browser\page-links.test.cjs:45:1
+✖ content page collection is read-only and popup exposes an unchecked preview flow (0.7734ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /data-testid="collect-page-links"/. Input:
+
+  '<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>FlowDM</title><link rel="stylesheet" href="popup.css"></head><body>\n' +
+    '<h1>FlowDM</h1>\n' +
+    '<label for="connections">Số kết nối tối đa mỗi lượt tải</label><select id="connections" data-testid="connections"><option value="1">1</option><option value="2">2</option><option value="4">4</option><option value="8">8</option><option value="16">16</option></select><p>HLS/DASH tải nhiều đoạn; YouTube dùng nhiều dải byte khi server hỗ trợ. Số kết nối thực tế có thể thấp hơn lựa chọn.</p>\n' +
+    '<label><input type="checkbox" data-testid="auto-capture"> Tự bắt tải xuống HTTP(S)</label>\n' +
+    '<p>Trình duyệt chỉ hủy tải sau khi FlowDM xác nhận đã nhận. Khi cầu nối lỗi, trình duyệt tiếp tục tải.</p>\n' +
+    '<label for="credential-origin">Trang được cấp quyền đăng nhập</label><select id="credential-origin" data-testid="credential-origin" aria-label="Trang được cấp quyền đăng nhập"></select><label><input type="checkbox" data-testid="credentials"> Cho phép gửi thông tin đăng nhập cho tên miền đã chọn</label>\n' +
+    '<p data-testid="site-origin"></p><p class="privacy">Mặc định không gửi Cookie, Authorization, Referer hoặc User-Agent. Bật quyền theo từng trang nếu tệp yêu cầu đăng nhập. Không chia sẻ thông tin này với trang khác; không lưu vào lịch sử FlowDM.</p>\n' +
+    '<p role="status" data-testid="capture-status">Đang đọc trạng thái…</p>\n' +
+    '<h2>Tiếp tục tải cần đăng nhập</h2><p data-testid="credential-status">Mở trang gốc và cấp quyền đăng nhập để kết nối lại.</p>\n' +
+    '<button type="button" data-testid="find-credential-requests">Tìm tác vụ cần kết nối lại</button><div data-testid="credential-requests"></div>\n' +
+    '<h2>Video / âm thanh trên trang</h2><p>Chỉ tải khi bạn chọn. DASH/YouTube dùng công cụ media đi kèm; HLS dùng engine tích hợp. DASH và YouTube luôn không gửi Cookie, Authorization hay Referer.</p>\n' +
+    '<div data-testid="media-list"></div><script src="popup.js"></script></body></html>\r\n' +
+    '\r\n'
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\browser\page-links.test.cjs:47:144)
+      at Test.runInAsyncScope (node:async_hooks:211:14)
+      at Test.run (node:internal/test_runner/test:931:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:629:18)
+      at Test.postRun (node:internal/test_runner/test:1042:19)
+      at Test.run (node:internal/test_runner/test:970:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>FlowDM</title><link rel="stylesheet" href="popup.css"></head><body>\n<h1>FlowDM</h1>\n<label for="connections">Số kết nối tối đa mỗi lượt tải</label><select id="connections" data-testid="connections"><option value="1">1</option><option value="2">2</option><option value="4">4</option><option value="8">8</option><option value="16">16</option></select><p>HLS/DASH tải nhiều đoạn; YouTube dùng nhiều dải byte khi server hỗ trợ. Số kết nối thực tế có thể thấp hơn lựa chọn.</p>\n<label><input type="checkbox" data-testid="auto-capture"> Tự bắt tải xuống HTTP(S)</label>\n<p>Trình duyệt chỉ hủy tải sau khi FlowDM xác nhận đã nhận. Khi cầu nối lỗi, trình duyệt tiếp tục tải.</p>\n<label for="credential-origin">Trang được cấp quyền đăng nhập</label><select id="credential-origin" data-testid="credential-origin" aria-label="Trang được cấp quyền đăng nhập"></select><label><input type="checkbox" data-testid="credentials"> Cho phép gửi thông tin đăng nhập cho tên miền đã chọn</label>\n<p data-testid="site-origin"></p><p class="privacy">Mặc định không gửi Cookie, Authorization, Referer hoặc User-Agent. Bật quyền theo từng trang nếu tệp yêu cầu đăng nhập. Không chia sẻ thông tin này với trang khác; không lưu vào lịch sử FlowDM.</p>\n<p role="status" data-testid="capture-status">Đang đọc trạng thái…</p>\n<h2>Tiếp tục tải cần đăng nhập</h2><p data-testid="credential-status">Mở trang gốc và cấp quyền đăng nhập để kết nối lại.</p>\n<button type="button" data-testid="find-credential-requests">Tìm tác vụ cần kết nối lại</button><div data-testid="credential-requests"></div>\n<h2>Video / âm thanh trên trang</h2><p>Chỉ tải khi bạn chọn. DASH/YouTube dùng công cụ media đi kèm; HLS dùng engine tích hợp. DASH và YouTube luôn không gửi Cookie, Authorization hay Referer.</p>\n<div data-testid="media-list"></div><script src="popup.js"></script></body></html>\r\n\r\n',
+    expected: /data-testid="collect-page-links"/,
+    operator: 'match'
+  }

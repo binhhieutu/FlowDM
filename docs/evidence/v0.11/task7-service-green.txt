@@ -1,0 +1,15 @@
+✔ previewBatch accepts only bounded canonical HTTP links, not credentials or job options (6.8929ms)
+✔ native preview is replay-safe, stages once and never creates downloads (16.9576ms)
+✔ preview validates and deduplicates without creating downloads (1.422ms)
+✔ submit creates only selected unique jobs in requested queue/directory and reports individual failures (0.7234ms)
+✔ rejects whole invalid batch before creating any job and bounds concurrent submits (6.0297ms)
+✔ grab streams dedup preview, cancellation stops crawler and retains existing jobs (18.7086ms)
+✔ invalid settings and crawler failure are explicit, no task side effects (15.0279ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 122.28

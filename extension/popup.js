@@ -71,6 +71,48 @@
   if(enable&&!await extensionAPI.permissions.request({permissions:['cookies'],origins:[`${origin}/*`]})){event.target.checked=false;return;}
   await extensionAPI.runtime.sendMessage({type:'flowdm:settings',origin,credentials:enable});await refresh();
  };
+ let pageLinks=[];const selectedLinks=new Set();let collectingLinks=false;
+ const supportedPage=!!pageOrigin&&!tab?.incognito;
+ find('collect-page-links').disabled=!supportedPage;
+ function renderPageLinks(){
+  const filter=find('page-links-filter').value.trim().toLocaleLowerCase();const visible=pageLinks.filter(url=>url.toLocaleLowerCase().includes(filter));
+  const list=find('page-links-list');list.replaceChildren();
+  for(const url of visible){
+   const label=document.createElement('label');label.className='page-link';const check=document.createElement('input');check.type='checkbox';check.checked=selectedLinks.has(url);
+   check.onchange=()=>{if(check.checked)selectedLinks.add(url);else selectedLinks.delete(url);renderPageLinks();};
+   const text=document.createElement('span');text.textContent=url;label.append(check,text);list.append(label);
+  }
+  find('page-links-all').checked=visible.length>0&&visible.every(url=>selectedLinks.has(url));
+  find('preview-page-links').disabled=!selectedLinks.size||collectingLinks;
+  find('page-links-status').textContent=pageLinks.length+' liên kết · '+visible.length+' đang hiện · '+selectedLinks.size+' đã chọn';
+ }
+ find('page-links-filter').oninput=renderPageLinks;
+ find('page-links-all').onchange=event=>{
+  const filter=find('page-links-filter').value.trim().toLocaleLowerCase();
+  for(const url of pageLinks.filter(value=>value.toLocaleLowerCase().includes(filter)))if(event.target.checked)selectedLinks.add(url);else selectedLinks.delete(url);
+  renderPageLinks();
+ };
+ find('collect-page-links').onclick=async event=>{
+  if(!event.isTrusted||collectingLinks||!supportedPage)return;collectingLinks=true;find('collect-page-links').disabled=true;find('preview-page-links').disabled=true;selectedLinks.clear();pageLinks=[];
+  find('page-links-status').textContent='Đang đọc liên kết trên trang…';
+  try{
+   const result=await extensionAPI.runtime.sendMessage({type:'flowdm:collectPageLinks',tabId:tab.id});
+   if(!result?.ok||!Array.isArray(result.urls))throw Error(result?.error||'Không đọc được trang. Tải lại trang rồi mở lại tiện ích.');
+   pageLinks=result.urls;find('page-links-panel').hidden=false;renderPageLinks();
+   if(result.truncated)find('page-links-status').textContent+=' · Đã giới hạn danh sách (1.000 link/512 KiB).';
+  }catch(error){find('page-links-status').textContent=error.message;}
+  finally{collectingLinks=false;find('collect-page-links').disabled=false;find('preview-page-links').disabled=!selectedLinks.size;}
+ };
+ find('preview-page-links').onclick=async event=>{
+  if(!event.isTrusted||!selectedLinks.size||collectingLinks)return;
+  find('preview-page-links').disabled=true;
+  try{
+   const result=await extensionAPI.runtime.sendMessage({type:'flowdm:previewBatch',tabId:tab.id,urls:[...selectedLinks]});
+   if(!result?.ok)throw Error(result?.error||'Chưa mở được bản xem trước trong FlowDM.');
+   find('page-links-status').textContent='Đã gửi '+result.count+' liên kết để xem trước. Chọn mục và nhấn tải trong FlowDM.';
+  }catch(error){find('page-links-status').textContent=error.message;}
+  finally{find('preview-page-links').disabled=!selectedLinks.size;}
+ };
  await refresh();
 })().catch(()=>{
  const extensionAPI=globalThis.browser||chrome;document.querySelector('[data-testid="capture-status"]').textContent='Không thể đọc tiện ích. Hãy tải lại tiện ích.';});

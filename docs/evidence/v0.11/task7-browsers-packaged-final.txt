@@ -1,0 +1,39 @@
+Task7 packaged browser verification 0.11.0 2026-10-26T03:17:06.277Z
+START tests/e2e/credential-rebind.test.cjs 2026-10-26T03:17:06.278Z
+✔ real Chromium rebinds rotated HTTP/HLS cookies after app restart and resumes exact retained data (28397.752ms)
+ℹ {"rows":[{"kind":"direct","taskId":"d6a87f29-d5f9-416b-811b-d4ab662ef573","pausedBytes":81920,"restoredBytes":81920,"connections":1,"bytes":2097152,"sha256":"411e416f231a38296893d772490a30eaf07fcb6026a714934db87e95a30544db","sameTaskPreserved":true,"completedDataNotRequestedAgain":true,"rotatedCookieAccepted":true,"wholeFileDecoded":true},{"kind":"hls","taskId":"22086ac0-9b4d-40c0-ac5d-4435a7b837f2","pausedBytes":15416,"restoredBytes":15416,"connections":1,"bytes":47188,"sha256":"8fd49049fe73583d0e179541f59b57090178a412cd8676250cabbcb6f0bfbc4e","sameTaskPreserved":true,"completedDataNotRequestedAgain":true,"rotatedCookieAccepted":true,"wholeFileDecoded":true}],"hostDownFallback":true}
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 28769.6435
+EXIT tests/e2e/credential-rebind.test.cjs {"file":"tests/e2e/credential-rebind.test.cjs","start":"2026-10-26T03:17:06.278Z","finished":"2026-10-26T03:17:35.101Z","exitCode":0,"error":null,"signal":null}
+START tests/e2e/browser.test.cjs 2026-10-26T03:17:35.101Z
+✔ real Chromium extension auto capture, video/HLS, cookie consent and host-down fallback (27314.3442ms)
+ℹ Loaded real extension mnkibiiidjgpgpmilkbbhomfbmnmjifb
+ℹ Native messaging launches the generated host successfully
+ℹ Auto capture completed exact bytes and original browser download was canceled after ACK
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 27740.2024
+EXIT tests/e2e/browser.test.cjs {"file":"tests/e2e/browser.test.cjs","start":"2026-10-26T03:17:35.101Z","finished":"2026-10-26T03:18:02.892Z","exitCode":0,"error":null,"signal":null}
+START tests/e2e/firefox.test.cjs 2026-10-26T03:18:02.892Z
+✔ real Firefox captures authenticated HTTP/HLS, rebinds after app restart and restores native registration (28384.8273ms)
+ℹ {"at":"2026-10-26T03:18:03.403Z","packaged":true,"rows":[{"type":"direct","transitions":["capture","pause","close","relaunch","rebind","resume"],"pausedBytes":65536,"restoredBytes":65536,"bytes":2097152,"sha256":"411e416f231a38296893d772490a30eaf07fcb6026a714934db87e95a30544db","connections":1,"committedReplay":false,"wholeFileDecoded":true},{"type":"hls","transitions":["capture","pause","close","relaunch","rebind","resume"],"pausedBytes":15416,"restoredBytes":15416,"bytes":47188,"sha256":"8fd49049fe73583d0e179541f59b57090178a412cd8676250cabbcb6f0bfbc4e","connections":1,"committedReplay":false,"wholeFileDecoded":true}],"firefoxBrowserHandoff":"ack-before-cancel","fixturesPregrantCookieApi":true,"scope":"private Firefox profile, temporary unsigned addon, authenticated local actual video fixtures","version":"0.11.0","firefoxVersion":"149.0.2","pageLinks":{"uncheckedByDefault":true,"selected":1,"desktopPreviewOnly":true,"jobsCreated":0},"automaticBrowserDownloadCanceled":true,"nativeMessaging":true,"cookieConsent":true,"hostDownFallback":true,"status":"passed"}
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 28743.7379
+EXIT tests/e2e/firefox.test.cjs {"file":"tests/e2e/firefox.test.cjs","start":"2026-10-26T03:18:02.892Z","finished":"2026-10-26T03:18:31.682Z","exitCode":0,"error":null,"signal":null}

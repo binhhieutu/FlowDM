@@ -1,0 +1,68 @@
+node:internal/modules/cjs/loader:1412
+  throw err;
+  ^
+
+Error: Cannot find module '../../src/core/batch-import.cjs'
+Require stack:
+- I:\dich_nguoc\FlowDM\tests\core\batch-import.test.cjs
+    at Function._resolveFilename (node:internal/modules/cjs/loader:1409:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1060:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1065:22)
+    at Function._load (node:internal/modules/cjs/loader:1214:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:234:24)
+    at Module.require (node:internal/modules/cjs/loader:1495:12)
+    at require (node:internal/modules/helpers:135:16)
+    at Object.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\batch-import.test.cjs:4:26)
+    at Module._compile (node:internal/modules/cjs/loader:1739:14) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [ 'I:\\dich_nguoc\\FlowDM\\tests\\core\\batch-import.test.cjs' ]
+}
+
+Node.js v23.6.0
+✖ tests\core\batch-import.test.cjs (46.6043ms)
+  'test failed'
+
+node:internal/modules/cjs/loader:1412
+  throw err;
+  ^
+
+Error: Cannot find module '../../src/core/site-grabber.cjs'
+Require stack:
+- I:\dich_nguoc\FlowDM\tests\core\site-grabber.test.cjs
+    at Function._resolveFilename (node:internal/modules/cjs/loader:1409:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1060:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1065:22)
+    at Function._load (node:internal/modules/cjs/loader:1214:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:234:24)
+    at Module.require (node:internal/modules/cjs/loader:1495:12)
+    at require (node:internal/modules/helpers:135:16)
+    at Object.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\site-grabber.test.cjs:5:24)
+    at Module._compile (node:internal/modules/cjs/loader:1739:14) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [ 'I:\\dich_nguoc\\FlowDM\\tests\\core\\site-grabber.test.cjs' ]
+}
+
+Node.js v23.6.0
+✖ tests\core\site-grabber.test.cjs (45.8646ms)
+  'test failed'
+
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 61.1145
+
+✖ failing tests:
+
+test at tests\core\batch-import.test.cjs:1:1
+✖ tests\core\batch-import.test.cjs (46.6043ms)
+  'test failed'
+
+test at tests\core\site-grabber.test.cjs:1:1
+✖ tests\core\site-grabber.test.cjs (45.8646ms)
+  'test failed'

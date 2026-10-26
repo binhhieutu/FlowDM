@@ -1,0 +1,19 @@
+{
+  "at": "2026-10-26T03:12:39.615Z",
+  "version": "0.11.0",
+  "seed": "https://media.w3.org/2010/05/sintel/",
+  "externalCrawler": [
+    {
+      "links": 0,
+      "error": "Page requires access or authentication"
+    }
+  ],
+  "pages": 1,
+  "discovered": 0,
+  "preview": 1,
+  "selected": 1,
+  "jobs": 1,
+  "bytes": 4372373,
+  "sha256": "b670602fa00934ca27c4351bb0efe7ea7a07fae57284e44226025eeed7c51254",
+  "wholeFileDecoded": true
+}

@@ -4,7 +4,7 @@
 
 **Ngày:** 2026-10-25. **Trạng thái:** kế hoạch; chưa triển khai các mục chưa đánh dấu.
 
-**Tiến độ 2026-10-26:** Task 1–2 hoàn tất ở 0.6.0, Task 3 hoàn tất ở 0.7.0. Task 4 và đổi N khi tải media hoàn tất ở 0.8.0, Task 5 hoàn tất ở 0.9.0, Task 6 hoàn tất ở 0.10.0. Task 7–10 chưa triển khai. Xem [VERIFICATION_V10.md](../../VERIFICATION_V10.md) và [review Task 6](../../queues-v10-review.md). Xem [VERIFICATION_V9.md](../../VERIFICATION_V9.md) và [review Task5](../../browser-rebind-v9-review.md). Xem [VERIFICATION_V8.md](../../VERIFICATION_V8.md) và [review 0.8](../../media-selection-v8-review.md). Xem [VERIFICATION_V7.md](../../VERIFICATION_V7.md) và [review Task 3](../../dynamic-ranges-v7-review.md). Xem [VERIFICATION_V6.md](../../VERIFICATION_V6.md) và [review](../../source-refresh-v6-review.md). External HTTP fallback thiếu validator vẫn bị từ chối; legacy DASH thiếu base hash được giữ nguyên nhưng không resume an toàn.
+**Tiến độ 2026-10-26:** Task 1–2 hoàn tất ở 0.6.0, Task 3 hoàn tất ở 0.7.0. Task 4 và đổi N khi tải media hoàn tất ở 0.8.0, Task 5 hoàn tất ở 0.9.0, Task 6 hoàn tất ở 0.10.0, Task 7 hoàn tất ở 0.11.0. Task 8–10 chưa triển khai. Xem [VERIFICATION_V11.md](../../VERIFICATION_V11.md) và [review Task7](../../batch-v11-review.md). Xem [VERIFICATION_V10.md](../../VERIFICATION_V10.md) và [review Task 6](../../queues-v10-review.md). Xem [VERIFICATION_V9.md](../../VERIFICATION_V9.md) và [review Task5](../../browser-rebind-v9-review.md). Xem [VERIFICATION_V8.md](../../VERIFICATION_V8.md) và [review 0.8](../../media-selection-v8-review.md). Xem [VERIFICATION_V7.md](../../VERIFICATION_V7.md) và [review Task 3](../../dynamic-ranges-v7-review.md). Xem [VERIFICATION_V6.md](../../VERIFICATION_V6.md) và [review](../../source-refresh-v6-review.md). External HTTP fallback thiếu validator vẫn bị từ chối; legacy DASH thiếu base hash được giữ nguyên nhưng không resume an toàn.
 
 **Goal:** Hoàn thiện những khả năng tải xuống còn thiếu theo hướng sử dụng tương tự IDM, giữ được dữ liệu tải dở và kiểm chứng thực tế trên Windows/Linux/macOS.
 
@@ -157,11 +157,13 @@ Các task tùy chọn 7–8 không chặn bản phát hành A/B. Không mở t�
 
 **Interfaces mới:** `parseUrlList(text) -> { urls, errors }`; `crawlLinks({ seed, maxDepth, maxPages, signal }) -> AsyncIterable<PageLinks>`. Mặc định same-origin, depth<=2, pages<=100, tối đa 1.000 URL/import, 2 crawl request đồng thời; chỉ HTTP(S), không chạy script tải về. Site Grabber không có nghĩa hỗ trợ mọi website.
 
-- [ ] RED: duplicate URL, URL sai, tên Unicode, vòng lặp crawl, redirect ra origin, link vô hạn, cancel, trang cần đăng nhập; input quá giới hạn trả lỗi rõ.
-- [ ] Chạy `node --test tests/core/batch-import.test.cjs tests/core/site-grabber.test.cjs`; xác nhận FAIL.
-- [ ] Implement preview/filter/deduplicate trước khi tạo job; chọn queue và destination. Không tự crawl/tải toàn site ngay khi mở popup; không dò endpoint hay vượt access control.
-- [ ] GREEN: unit + `node --test tests/e2e/batch.test.cjs`; chỉ các mục đã chọn được tạo, cancel dừng crawler và giữ job hiện có.
-- [ ] Review rồi commit `feat: import download batches and bounded site links`.
+- [x] RED: duplicate URL, URL sai, tên Unicode, vòng lặp crawl, redirect ra origin, link vô hạn, cancel, trang cần đăng nhập; input quá giới hạn trả lỗi rõ.
+- [x] Chạy `node --test tests/core/batch-import.test.cjs tests/core/site-grabber.test.cjs`; xác nhận FAIL.
+- [x] Implement preview/filter/deduplicate trước khi tạo job; chọn queue và destination. Không tự crawl/tải toàn site ngay khi mở popup; không dò endpoint hay vượt access control.
+- [x] GREEN: unit + `node --test tests/e2e/batch.test.cjs`; chỉ các mục đã chọn được tạo, cancel dừng crawler và giữ job hiện có.
+- [x] Review rồi commit `feat: import download batches and bounded site links`.
+
+**Bằng chứng0.11.0:** [VERIFICATION_V11](../../VERIFICATION_V11.md), [review](../../batch-v11-review.md), [summary](../../evidence/v0.11/summary.json). Unit389/389,coverage93,51/86,49/87,52,audit0. Packagedbatch7/7,browsers3/3,queues2/2,media5/5 (5opt-in skip),portableHTTP/tools;60ASARfilesverified. CrawlerUTF8/suffixsubset/caps được công bố; không vượt trang bị chặn. Linuxnative/macOS vẫnTask9.
 
 ## Task 8 — Phân loại, proxy/protocol và filesystem
 

@@ -1,0 +1,1 @@
+Public directory access refusal respected; URL import -> preview -> selected 1 -> HTTP SHA/full decode PASS

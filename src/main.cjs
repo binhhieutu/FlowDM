@@ -8,12 +8,15 @@ const { createBrowserAdmission } = require('./browser/admission.cjs');
 const { createCredentialRebind } = require('./browser/credential-rebind.cjs');
 const { mediaToolStatus } = require('./tools/media-tools.cjs');
 const { SystemPowerAdapter } = require('./core/power-actions.cjs');
+const { BatchService, selectedUrls } = require('./core/batch-service.cjs');
+const { randomUUID } = require('node:crypto');
 
 const dataDir = process.env.FLOWDM_DATA_DIR || path.join(app.getPath('userData'), 'state');
 if (process.env.FLOWDM_DATA_DIR) app.setPath('userData', path.dirname(dataDir));
 const downloadDir = process.env.FLOWDM_DOWNLOAD_DIR || path.join(app.getPath('downloads'), 'FlowDM');
 const uiFile = path.join(__dirname, 'ui', 'index.html');
 let manager; let win; let bridge; let browserSetup; let credentialRebind; let closing = false; let bridgeError = null;
+let batches; let stagedBatch = null;
 
 if (!app.requestSingleInstanceLock()) app.quit();
 else {
@@ -25,9 +28,18 @@ else {
     } });
     manager = new DownloadManager({ dataDir, downloadDir, maxConcurrent: 3, powerAdapter });
     await manager.init();
+    batches = new BatchService(manager);
+    batches.on('change', value => { if (win && !win.isDestroyed()) win.webContents.send('flow:grabChanged', value); });
     credentialRebind = createCredentialRebind(manager);
     browserSetup = createBrowserSetup({ appDir: app.getAppPath(), dataDir, userDataDir: app.getPath('userData'), executablePath: process.execPath });
     bridge = await createBridge({ dataDir, onAdd: createBrowserAdmission(manager),
+      onPreviewBatch: input => {
+        const urls = selectedUrls(input.urls); manager.cancelPower();
+        const previewId = randomUUID(); stagedBatch = { text: urls.join('\n') };
+        if (!win || win.isDestroyed()) createWindow();
+        if (!win.webContents.isLoadingMainFrame()) { win.webContents.send('flow:batchPreview', stagedBatch); stagedBatch = null; }
+        win.show(); win.focus(); return { previewId, count: urls.length };
+      },
       onCredentialRequests: input => ({ requests: credentialRebind.requests(input.origin) }),
       onRebindCredentials: (input, context) => credentialRebind.prepare(input, context),
       onCommitCredentials: (input, context) => credentialRebind.commit(input, context),
@@ -51,6 +63,9 @@ function createWindow() {
   win.webContents.session.setPermissionRequestHandler((_wc, _permission, callback) => callback(false));
   win.webContents.session.setPermissionCheckHandler(() => false);
   win.loadFile(uiFile);
+  win.webContents.on('did-finish-load', () => {
+    if (stagedBatch) { win.webContents.send('flow:batchPreview', stagedBatch); stagedBatch = null; }
+  });
   win.on('closed', () => { win = null; });
 }
 
@@ -68,6 +83,11 @@ function installHandlers() {
   handle('browserConnect', input => browserSetup.connect(input || {}));
   handle('browserDisconnect', browser => browserSetup.disconnect(browser));
   handle('list', () => manager.list());
+  handle('previewBatch', input => batches.previewBatch(input));
+  handle('submitBatch', input => batches.submitBatch(input));
+  handle('startGrab', input => { manager.cancelPower(); return batches.startGrab(input); });
+  handle('cancelGrab', input => batches.cancelGrab(input));
+  handle('listGrabs', () => batches.listGrabs());
   const queueInput = (input, keys) => {
     if (!input || typeof input !== 'object' || Array.isArray(input) || Object.keys(input).some(key => !keys.includes(key)) || typeof input.id !== 'string') throw Error('Thông tin hàng đợi không hợp lệ.');
     return input;
@@ -125,5 +145,5 @@ app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(
 app.on('before-quit', event => {
   if (closing || !manager) return;
   event.preventDefault(); closing = true;
-  Promise.allSettled([credentialRebind?.close(), manager.close(), bridge?.close(), browserSetup?.waitForIdle()]).then(() => app.quit());
+  Promise.allSettled([batches?.close(), credentialRebind?.close(), manager.close(), bridge?.close(), browserSetup?.waitForIdle()]).then(() => app.quit());
 });

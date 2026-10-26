@@ -1,0 +1,121 @@
+▶ stale directory picker results and errors cannot change a newer staged batch
+  ✖ success (1108.3108ms)
+    AssertionError [ERR_ASSERTION]: stale picker must not replace newer batch destination
+    + actual - expected
+
+    + 'C:\\stale-picker'
+    - 'C:\\Users\\hieuPC\\AppData\\Local\\Temp\\flowdm-batch-v11-1PL7RN\\files'
+
+        at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\e2e\batch.test.cjs:112:12)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\e2e\batch.test.cjs:102:47)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+      generatedMessage: false,
+      code: 'ERR_ASSERTION',
+      actual: 'C:\\stale-picker',
+      expected: 'C:\\Users\\hieuPC\\AppData\\Local\\Temp\\flowdm-batch-v11-1PL7RN\\files',
+      operator: 'strictEqual'
+    }
+
+  ✖ error (935.2852ms)
+    AssertionError [ERR_ASSERTION]: stale picker errors must not appear in newer batch
+
+    false !== true
+
+        at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\e2e\batch.test.cjs:113:12)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\e2e\batch.test.cjs:102:47)
+        at async Test.run (node:internal/test_runner/test:932:9)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+      generatedMessage: false,
+      code: 'ERR_ASSERTION',
+      actual: false,
+      expected: true,
+      operator: 'strictEqual'
+    }
+
+✖ stale directory picker results and errors cannot change a newer staged batch (2044.8783ms)
+✖ stale queue refresh cannot replace newer staged batch queue options or selection (1010.0837ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'default'
+  - 'new-queue'
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\e2e\batch.test.cjs:134:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'default',
+    expected: 'new-queue',
+    operator: 'strictEqual'
+  }
+
+ℹ tests 4
+ℹ suites 0
+ℹ pass 0
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3382.6211
+
+✖ failing tests:
+
+test at tests\e2e\batch.test.cjs:102:55
+✖ success (1108.3108ms)
+  AssertionError [ERR_ASSERTION]: stale picker must not replace newer batch destination
+  + actual - expected
+
+  + 'C:\\stale-picker'
+  - 'C:\\Users\\hieuPC\\AppData\\Local\\Temp\\flowdm-batch-v11-1PL7RN\\files'
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\e2e\batch.test.cjs:112:12)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\e2e\batch.test.cjs:102:47)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'C:\\stale-picker',
+    expected: 'C:\\Users\\hieuPC\\AppData\\Local\\Temp\\flowdm-batch-v11-1PL7RN\\files',
+    operator: 'strictEqual'
+  }
+
+test at tests\e2e\batch.test.cjs:102:55
+✖ error (935.2852ms)
+  AssertionError [ERR_ASSERTION]: stale picker errors must not appear in newer batch
+
+  false !== true
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\e2e\batch.test.cjs:113:12)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\e2e\batch.test.cjs:102:47)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual'
+  }
+
+test at tests\e2e\batch.test.cjs:117:1
+✖ stale queue refresh cannot replace newer staged batch queue options or selection (1010.0837ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'default'
+  - 'new-queue'
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\e2e\batch.test.cjs:134:10)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:629:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'default',
+    expected: 'new-queue',
+    operator: 'strictEqual'
+  }

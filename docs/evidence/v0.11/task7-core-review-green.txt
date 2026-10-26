@@ -1,0 +1,28 @@
+✔ batch parser canonicalizes, deduplicates fragments and preserves meaningful query and Unicode (1.6767ms)
+✔ batch parser reports line errors without echoing unsafe URLs or embedded credentials (0.4208ms)
+✔ batch parser rejects oversized inputs, too many nonempty lines, invalid type and overlong URL (8.9447ms)
+✔ batch parser bounds canonical encoded aggregate as well as raw UTF8 bytes (3.5307ms)
+✔ batch parser refuses embedded controls instead of silently changing the URL (0.2039ms)
+✔ crawler discovers bounded same-origin anchors, deduplicates loops and does not execute scripts or fetch files (29.6029ms)
+✔ HTML lexical extraction handles base, quote delimiters, numeric entities and raw-text contexts safely (7.3299ms)
+✔ crawler checks redirect origin before following (6.2417ms)
+✔ same-origin redirects consume request budget and redirect cycles terminate (5.5524ms)
+✔ crawler reports protected pages, login forms, non-HTML and encoded responses without consuming bodies (6.1615ms)
+✔ crawler refuses unsupported settings and bounds pages, link count, text and total result bytes (18.2367ms)
+✔ crawler rejects oversized HTML and cancellation destroys live requests without further discovery (47.5837ms)
+✔ crawler maxDepth two and maxPages bound an infinite same-origin navigation chain (5.7547ms)
+✔ same-origin redirect resolves final-page links while external base cannot rewrite candidates onto the seed (3.917ms)
+✔ crawler bounds unknown-length HTML streams and aggregate canonical URL bytes (29.3771ms)
+✔ crawler handles missing redirects, bad settings and unsupported seeds without exposing credentials (5.0674ms)
+✔ crawler terminates a silent page at its real ten second deadline (10004.1928ms)
+✔ HTML anchor extraction preserves bare query ampersands and ambiguous entity-like parameter names (5.2081ms)
+✔ crawler refuses unsupported charset or invalid UTF8 instead of returning altered URL bytes (4.034ms)
+✔ crawler follows common dynamic HTML page extensions while leaving binary and unknown extensions for preview (6.7186ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10263.7859

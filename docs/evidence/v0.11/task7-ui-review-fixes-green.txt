@@ -1,0 +1,16 @@
+✔ batch preview creates only selected queue jobs and bounded Site Grabber cancels without losing downloads (1827.8275ms)
+✔ late preview response cannot replace newer staged text or a closed and reopened view (1425.0867ms)
+✔ late crawler start acknowledgment is cancelled after a newer browser preview (948.3328ms)
+▶ stale directory picker results and errors cannot change a newer staged batch
+  ✔ success (918.7319ms)
+  ✔ error (909.1029ms)
+✔ stale directory picker results and errors cannot change a newer staged batch (1828.5504ms)
+✔ stale queue refresh cannot replace newer staged batch queue options or selection (1049.4663ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7409.6743

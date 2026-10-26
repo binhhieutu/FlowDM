@@ -2,6 +2,13 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('flow', {
   info: () => ipcRenderer.invoke('flow:info'),
   list: () => ipcRenderer.invoke('flow:list'),
+  previewBatch: input => ipcRenderer.invoke('flow:previewBatch', input),
+  submitBatch: input => ipcRenderer.invoke('flow:submitBatch', input),
+  startGrab: input => ipcRenderer.invoke('flow:startGrab', input),
+  cancelGrab: input => ipcRenderer.invoke('flow:cancelGrab', input),
+  listGrabs: () => ipcRenderer.invoke('flow:listGrabs'),
+  onGrabChange: callback => { const listener = (_event, value) => callback(value); ipcRenderer.on('flow:grabChanged', listener); return () => ipcRenderer.removeListener('flow:grabChanged', listener); },
+  onBatchPreview: callback => { const listener = (_event, value) => callback(value); ipcRenderer.on('flow:batchPreview', listener); return () => ipcRenderer.removeListener('flow:batchPreview', listener); },
   listQueues: () => ipcRenderer.invoke('flow:listQueues'),
   createQueue: input => ipcRenderer.invoke('flow:createQueue', input),
   updateQueue: (id, patch) => ipcRenderer.invoke('flow:updateQueue', { id, patch }),

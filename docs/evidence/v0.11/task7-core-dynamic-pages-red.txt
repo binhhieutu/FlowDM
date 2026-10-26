@@ -1,0 +1,63 @@
+✖ crawler follows common dynamic HTML page extensions while leaving binary and unknown extensions for preview (24.0931ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    [
+      '/',
+  -   '/next.php',
+  -   '/next.php8',
+  -   '/next.asp',
+  -   '/next.aspx',
+  -   '/next.jsp',
+  -   '/next.cgi',
+  -   '/next.cfm'
+    ]
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\site-grabber.test.cjs:136:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ '/' ],
+    expected: [ '/', '/next.php', '/next.php8', '/next.asp', '/next.aspx', '/next.jsp', '/next.cgi', '/next.cfm' ],
+    operator: 'deepStrictEqual'
+  }
+
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 93.5955
+
+✖ failing tests:
+
+test at tests\core\site-grabber.test.cjs:129:1
+✖ crawler follows common dynamic HTML page extensions while leaving binary and unknown extensions for preview (24.0931ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    [
+      '/',
+  -   '/next.php',
+  -   '/next.php8',
+  -   '/next.asp',
+  -   '/next.aspx',
+  -   '/next.jsp',
+  -   '/next.cgi',
+  -   '/next.cfm'
+    ]
+
+      at TestContext.<anonymous> (I:\dich_nguoc\FlowDM\tests\core\site-grabber.test.cjs:136:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async Test.run (node:internal/test_runner/test:932:9)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:297:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ '/' ],
+    expected: [ '/', '/next.php', '/next.php8', '/next.asp', '/next.aspx', '/next.jsp', '/next.cgi', '/next.cfm' ],
+    operator: 'deepStrictEqual'
+  }

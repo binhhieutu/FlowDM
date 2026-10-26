@@ -1,9 +1,10 @@
-if(typeof importScripts==='function')importScripts('capture.js','media.js');
+if(typeof importScripts==='function')importScripts('capture.js','media.js','page-links.js');
 const extensionAPI=globalThis.browser||chrome;
 const captureAPI=globalThis.browser?{runtime:chrome.runtime,downloads:chrome.downloads,get permissions(){return extensionAPI.permissions;},get cookies(){return extensionAPI.cookies;}}:chrome;
 const extensionBase=extensionAPI.runtime.getURL?extensionAPI.runtime.getURL(''):'chrome-extension://'+extensionAPI.runtime.id+'/';
 const extensionAction=extensionAPI.action||extensionAPI.browserAction;
 const credentialRequestsCache=new Map();
+const pageLinkCache=new Map(),pageLinkEpochs=new Map();
 let status='Sẵn sàng';
 const capture=FlowDMCapture.createCapture(captureAPI,{automaticMode:extensionBase.startsWith('moz-extension://')?'ack-before-cancel':'pause-before-ack',onStatus:text=>{
  status=text;extensionAction.setBadgeText({text:text.startsWith('Đã')?'✓':'!'});
@@ -58,8 +59,8 @@ extensionAPI.webRequest.onHeadersReceived.addListener(async details=>{
  const mime=details.responseHeaders?.find(h=>h.name.toLowerCase()==='content-type')?.value||'';
  media.add(details.tabId,{url:details.url,mime});await persistMedia();
 },{urls:['http://*/*','https://*/*']},['responseHeaders']);
-extensionAPI.tabs.onUpdated.addListener(async(id,change)=>{if(change.status==='loading')clearCredentialRequests(id);await ready;if(change.status==='loading'){media.clear(id);await persistMedia();}});
-extensionAPI.tabs.onRemoved.addListener(async id=>{clearCredentialRequests(id);await ready;media.clear(id);await persistMedia();});
+extensionAPI.tabs.onUpdated.addListener(async(id,change)=>{if(change.status==='loading'){clearCredentialRequests(id);pageLinkCache.delete(id);pageLinkEpochs.set(id,(pageLinkEpochs.get(id)||0)+1);}await ready;if(change.status==='loading'){media.clear(id);await persistMedia();}});
+extensionAPI.tabs.onRemoved.addListener(async id=>{clearCredentialRequests(id);pageLinkCache.delete(id);pageLinkEpochs.delete(id);await ready;media.clear(id);await persistMedia();});
 extensionAPI.permissions.onRemoved.addListener(async()=>{credentialRequestsCache.clear();capture.permissionsRemoved();await ready;capture.permissionsRemoved();await extensionAPI.storage.local.set(capture.settings);});
 extensionAPI.runtime.onMessage.addListener((message,sender,respond)=>{
  (async()=>{
@@ -78,6 +79,7 @@ extensionAPI.runtime.onMessage.addListener((message,sender,respond)=>{
   if(message?.type==='flowdm:options')return {items:sender.tab&&!sender.tab.incognito?media.list(sender.tab.id):[]};
   // Content scripts may request only a previously detected media URL for their own tab.
   if(!extensionPage&&message?.type!=='flowdm:download')return {ok:false};
+  if(['flowdm:collectPageLinks','flowdm:previewBatch'].includes(message?.type))return pageLinksMessage(message);
   if(['flowdm:credentialRequests','flowdm:rebindCredentials'].includes(message?.type))return credentialsMessage(message);
   if(message?.type==='flowdm:state')return {settings:capture.settings,status,items:await stateItems(message.tabId,extensionPage)};
   if(message?.type==='flowdm:settings'){
@@ -104,3 +106,39 @@ extensionAPI.runtime.onMessage.addListener((message,sender,respond)=>{
   return {ok:false};
  })().then(respond,()=>respond({ok:false,error:'Không thể kết nối FlowDM.'}));return true;
 });
+async function currentPageLinksTab(tabId){
+ if(!Number.isInteger(tabId)||tabId<0||!extensionAPI.tabs.query)return null;
+ const tabs=await extensionAPI.tabs.query({active:true,currentWindow:true});
+ const tab=tabs.find(value=>value.id===tabId&&!value.incognito&&FlowDMPageLinks.normalize(value.url));
+ return tab?{id:tab.id,url:tab.url}:null;
+}
+async function pageLinksMessage(message){
+ const collecting=message.type==='flowdm:collectPageLinks';
+ const keys=collecting?['type','tabId']:['type','tabId','urls'];
+ if(Object.keys(message).some(key=>!keys.includes(key)))return {ok:false};
+ const tab=await currentPageLinksTab(message.tabId);if(!tab)return {ok:false,error:'Mở lại tiện ích trên trang HTTP(S) đang hoạt động.'};
+ if(collecting){
+  pageLinkCache.delete(tab.id);const epoch=pageLinkEpochs.get(tab.id)||0;
+  const result=await extensionAPI.tabs.sendMessage(tab.id,{type:'flowdm:readPageLinks'},{frameId:0});
+  const current=await currentPageLinksTab(tab.id);
+  if(!current||current.url!==tab.url||(pageLinkEpochs.get(tab.id)||0)!==epoch)return {ok:false,error:'Trang đã thay đổi. Lấy lại liên kết.'};
+  if(!Array.isArray(result?.urls)||result.urls.length>1000)return {ok:false};
+  const urls=result.urls.filter(url=>FlowDMPageLinks.normalize(url)===url);
+  if(new Set(urls).size!==urls.length||urls.join('\n').length>512*1024)return {ok:false};
+  while(pageLinkCache.size>=32)pageLinkCache.delete(pageLinkCache.keys().next().value);
+  pageLinkCache.set(tab.id,{pageUrl:tab.url,urls});return {ok:true,urls,truncated:result.truncated===true};
+ }
+ const saved=pageLinkCache.get(tab.id),urls=message.urls;
+ if(!saved||saved.pageUrl!==tab.url||!Array.isArray(urls)||!urls.length||urls.length>1000||new Set(urls).size!==urls.length||urls.some(url=>!saved.urls.includes(url))||urls.join('\n').length>512*1024)return {ok:false,error:'Chọn liên kết đã lấy từ trang hiện tại.'};
+ const request_id=crypto.randomUUID();
+ const request={schema:1,request_id,op:'previewBatch',payload:{urls:[...urls]}};
+ return new Promise(resolve=>{
+  let done=false;const finish=value=>{if(done)return;done=true;clearTimeout(timer);resolve(value);};
+  const timer=setTimeout(()=>finish({ok:false,error:'FlowDM chưa trả lời. Mở ứng dụng rồi thử lại.'}),5000);
+  try{captureAPI.runtime.sendNativeMessage('local.flowdm.bridge',request,response=>{
+   const error=captureAPI.runtime.lastError;
+   if(error||response?.ok!==true||response.request_id!==request_id||typeof response.payload?.previewId!=='string'||!response.payload.previewId||response.payload.count!==urls.length)return finish({ok:false,error:'Chưa mở được bản xem trước. Mở FlowDM và kiểm tra cầu nối.'});
+   finish({ok:true,previewId:response.payload.previewId,count:response.payload.count});
+  });}catch{finish({ok:false,error:'Không thể kết nối FlowDM.'});}
+ });
+}

@@ -1,6 +1,10 @@
 /* This isolated content script never starts a transfer until its button is clicked. */
 (()=>{
  const extensionAPI=globalThis.browser||chrome;
+ extensionAPI.runtime.onMessage?.addListener((message,sender,respond)=>{
+  if(message?.type!=='flowdm:readPageLinks'||sender.id!==extensionAPI.runtime.id)return;
+  respond(FlowDMPageLinks.collect(document,globalThis.location?.href||''));
+ });
  const buttons=new WeakMap();let queued=false;
  const mime=element=>element.tagName==='VIDEO'?'video/mp4':'audio/mpeg';
  function sources(element){return [element.currentSrc,element.src,...Array.from(element.querySelectorAll('source'),s=>s.src)].filter(url=>FlowDMMedia.classify(url,mime(element)));}

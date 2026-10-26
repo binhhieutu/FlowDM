@@ -8,6 +8,9 @@
 <p role="status" data-testid="capture-status">Đang đọc trạng thái…</p>
 <h2>Tiếp tục tải cần đăng nhập</h2><p data-testid="credential-status">Mở trang gốc và cấp quyền đăng nhập để kết nối lại.</p>
 <button type="button" data-testid="find-credential-requests">Tìm tác vụ cần kết nối lại</button><div data-testid="credential-requests"></div>
+<h2>Liên kết trên trang</h2><p>Chỉ đọc liên kết trong trang đang mở. Chọn mục rồi xem trước trong FlowDM để chọn hàng đợi/thư mục; chưa tải khi gửi danh sách.</p>
+<button type="button" data-testid="collect-page-links">Lấy link trên trang</button><p role="status" data-testid="page-links-status">Chưa lấy liên kết.</p>
+<div data-testid="page-links-panel" hidden><label for="page-links-filter">Lọc liên kết</label><input id="page-links-filter" type="search" data-testid="page-links-filter"><label><input type="checkbox" data-testid="page-links-all"> Chọn tất cả mục đang hiện</label><div data-testid="page-links-list" class="page-links-list"></div><button type="button" data-testid="preview-page-links" disabled>Xem trước trong FlowDM</button></div>
 <h2>Video / âm thanh trên trang</h2><p>Chỉ tải khi bạn chọn. DASH/YouTube dùng công cụ media đi kèm; HLS dùng engine tích hợp. DASH và YouTube luôn không gửi Cookie, Authorization hay Referer.</p>
 <div data-testid="media-list"></div><script src="popup.js"></script></body></html>
 

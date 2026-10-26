@@ -1,0 +1,347 @@
+{
+  "at": "2026-10-26T03:18:25.868Z",
+  "rows": [
+    {
+      "mediaType": "hls",
+      "transitions": [
+        1,
+        4,
+        1
+      ],
+      "peakServerConnections": 4,
+      "pausedBytes": 109604,
+      "restoredBytes": 109604,
+      "restoredConnections": 1,
+      "durableResources": [
+        {
+          "route": "/live/hls/segment00.ts",
+          "count": 1
+        },
+        {
+          "route": "/live/hls/segment01.ts",
+          "count": 1
+        }
+      ],
+      "bytes": 224472,
+      "sha256": "6a9e41ab4d4eb32883e12a163dda84e5dc2639cef5c81ce1b100f0b41fb28ea8",
+      "referenceSha256": "6a9e41ab4d4eb32883e12a163dda84e5dc2639cef5c81ce1b100f0b41fb28ea8",
+      "duration": 6.021333,
+      "wholeFileDecoded": true
+    },
+    {
+      "mediaType": "dash",
+      "transitions": [
+        1,
+        4,
+        1
+      ],
+      "peakServerConnections": 4,
+      "pausedBytes": 12834,
+      "restoredBytes": 12834,
+      "restoredConnections": 1,
+      "selection": {
+        "mode": "video",
+        "videoFormatId": "0",
+        "audioFormatId": "1",
+        "subtitleIds": []
+      },
+      "durableResources": [
+        {
+          "route": "/live/dash/init-stream0.m4s",
+          "count": 1
+        },
+        {
+          "route": "/live/dash/chunk-stream0-00001.m4s",
+          "count": 1
+        }
+      ],
+      "bytes": 205020,
+      "sha256": "c88d42fffe773a09c8d834d436cd025aed8e16fbe792c4ae3b49a27e7c760da2",
+      "referenceSha256": "c88d42fffe773a09c8d834d436cd025aed8e16fbe792c4ae3b49a27e7c760da2",
+      "duration": 6,
+      "wholeFileDecoded": true
+    }
+  ],
+  "requests": [
+    {
+      "route": "/live/hls/segment00.ts",
+      "completed": true
+    },
+    {
+      "route": "/live/hls/segment01.ts",
+      "completed": true
+    },
+    {
+      "route": "/live/hls/segment02.ts",
+      "completed": true
+    },
+    {
+      "route": "/live/hls/segment03.ts",
+      "completed": true
+    },
+    {
+      "route": "/live/hls/segment04.ts",
+      "completed": true
+    },
+    {
+      "route": "/live/hls/segment05.ts",
+      "completed": true
+    },
+    {
+      "route": "/live/hls/segment06.ts",
+      "completed": false
+    },
+    {
+      "route": "/live/hls/segment06.ts",
+      "completed": true
+    },
+    {
+      "route": "/live/hls/segment07.ts",
+      "completed": true
+    },
+    {
+      "route": "/live/hls/segment08.ts",
+      "completed": true
+    },
+    {
+      "route": "/live/hls/segment09.ts",
+      "completed": true
+    },
+    {
+      "route": "/live/hls/segment10.ts",
+      "completed": true
+    },
+    {
+      "route": "/live/hls/segment11.ts",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/init-stream0.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream0-00001.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream0-00002.m4s",
+      "completed": false
+    },
+    {
+      "route": "/live/dash/chunk-stream0-00005.m4s",
+      "completed": false
+    },
+    {
+      "route": "/live/dash/chunk-stream0-00004.m4s",
+      "completed": false
+    },
+    {
+      "route": "/live/dash/chunk-stream0-00002.m4s",
+      "completed": false
+    },
+    {
+      "route": "/live/dash/chunk-stream0-00003.m4s",
+      "completed": false
+    },
+    {
+      "route": "/live/dash/chunk-stream0-00002.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream0-00003.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream0-00004.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream0-00005.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream0-00006.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream0-00007.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream0-00008.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream0-00009.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream0-00010.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream0-00011.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream0-00012.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/init-stream1.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream1-00001.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream1-00002.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream1-00003.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream1-00004.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream1-00005.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream1-00006.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream1-00007.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream1-00008.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream1-00009.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream1-00010.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream1-00011.m4s",
+      "completed": true
+    },
+    {
+      "route": "/live/dash/chunk-stream1-00012.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/init-stream0.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream0-00001.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream0-00002.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream0-00003.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream0-00004.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream0-00005.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream0-00006.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream0-00007.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream0-00008.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream0-00009.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream0-00010.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream0-00011.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream0-00012.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/init-stream1.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream1-00001.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream1-00002.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream1-00003.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream1-00004.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream1-00005.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream1-00006.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream1-00007.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream1-00008.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream1-00009.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream1-00010.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream1-00011.m4s",
+      "completed": true
+    },
+    {
+      "route": "/baseline/dash/chunk-stream1-00012.m4s",
+      "completed": true
+    }
+  ]
+}

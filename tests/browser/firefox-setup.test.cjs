@@ -51,7 +51,7 @@ test('Firefox export is separate and restores its prior registration without rep
   const firefox = await setup.prepareExtension('firefox'); assert.notEqual(firefox, chrome);
   const manifest = JSON.parse(await fs.readFile(path.join(firefox, 'manifest.json'), 'utf8'));
   assert.equal(manifest.manifest_version, 2); assert.equal(manifest.browser_specific_settings.gecko.id, GECKO_ID);
-  assert.deepEqual(manifest.background.scripts, ['capture.js', 'media.js', 'background.js']);
+  assert.deepEqual(manifest.background.scripts, ['capture.js', 'media.js', 'page-links.js', 'background.js']);
   assert.equal(manifest.background.service_worker, undefined); assert.ok(manifest.browser_action.default_popup);
   assert.ok(manifest.permissions.includes('http://*/*')); assert.equal(manifest.host_permissions, undefined);
   assert.equal(await fs.readFile(path.join(chrome, 'manifest.json'), 'utf8'), original);

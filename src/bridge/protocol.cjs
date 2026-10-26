@@ -63,6 +63,17 @@ function validRequest(value) {
 function normalizeOperationPayload(op, payload) {
   if (op === 'add') return normalizePayload(payload);
   if (!plainObject(payload)) return null;
+  if (op === 'previewBatch') {
+    if (Object.keys(payload).join(',') !== 'urls' || !Array.isArray(payload.urls) || !payload.urls.length || payload.urls.length > 1000) return null;
+    const urls = new Set(); let bytes = 0;
+    for (const value of payload.urls) {
+      const entry = normalizePayload({ url: value }); if (!entry) return null;
+      const url = new URL(entry.url); url.hash = '';
+      bytes += Buffer.byteLength(url.href, 'utf8') + 1; if (bytes > 512 * 1024) return null;
+      urls.add(url.href);
+    }
+    return { urls: [...urls] };
+  }
   if (!['credentialRequests', 'rebindCredentials', 'commitCredentials', 'cancelCredentials'].includes(op)) return null;
   const fields = op === 'credentialRequests' ? ['origin'] : ['taskId', 'origin', 'requestId', ...(op === 'rebindCredentials' ? ['headers'] : [])];
   if (Object.keys(payload).length !== fields.length || Object.keys(payload).some(key => !fields.includes(key))) return null;
